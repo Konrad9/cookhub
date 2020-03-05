@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+{% load rango_template_tags %}
+
+<html lang="en">
+    <head>
+    <title>
+        {% block title_block %}
+        {% endblock %}
+    </title>
+    </head>
+    
+    <body>
+    {% block body_block %}{% endblock %}
+    </body>
+</html>
