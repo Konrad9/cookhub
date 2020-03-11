@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+Login
+{% endblock %}
+
+{% block head_block %}
+<!-- sign in template -->
+<link href="{% static 'css/signin.css' %}" rel="stylesheet">
+<link href="{% static 'css/buttons.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body_class %}
+class="text-center" 
+{% endblock %}
+
+{% block body_block %}
+
+<form class="form-signin" method="post" action=".">
+    {% csrf_token %}
+  <!--<img class="mb-4" src="/docs/4.4/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">-->
+  <h1 class="h3 mb-3 font-weight-normal">Please log in</h1>
+    Username: <input type="text" name="username" value="" size="10%" />
+    <br />
+    Password: <input type="password" name="password" value="" size="10%" />
+    <br />
+  <div class="checkbox mb-3">
+    <label>
+      <input type="checkbox" value="remember-me"> Remember me
+    </label>
+  </div>
+  <button class="standard rounded pill" type="submit" value="Log In">Log In</button>
+    <br />
+    Not yet registered?
+    <a href="{% url 'cookhub:register' %}">Register here!</a>
+  
+  <input type="hidden" name="next" value="{{ next }}" />
+  <p class="mt-5 mb-3 text-muted">&copy; 2017-2019</p>
+</form>
+<script> 
+window.onload = function() {
+    document.getElementById("login_link").remove();
+    document.getElementById("register_link").remove();
+    
+}
+</script>
+<!--
+<h1>Login</h1>
+
+<form method="post" action=".">
+    {% csrf_token %}
+    
+    {{ form.as_p }}
+    
+    <input type="submit" value="Log In" />
+    <input type="hidden" name="next" value="{{ next }}" />
+</form>
+-->
+{% endblock %}
