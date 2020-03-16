@@ -59,7 +59,7 @@ def register(request):
             # registration was successful.
             registered = True
             
-            return redirect(reverse('cookhub:homepage'))
+            return render(request, "cookhub/homepage.html", {"content": "You are logged in, and this is the homepage!"})
         else:
             # Invalid form(s): print problems to terminal.
             print(user_form.errors, profile_form.errors)

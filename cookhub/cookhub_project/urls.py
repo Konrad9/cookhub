@@ -21,8 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-        #path('', views.IndexView.as_view(), name='homepage'),
-        path('cookhub/', include('cookhub.urls')),
+        path('', include('cookhub.urls')),
         # The above maps any URLs starting with cookhub/ to be handled by cookhub.
         path('admin/', admin.site.urls),
         #path("accounts/", include("registration.backends.simple.urls")),
