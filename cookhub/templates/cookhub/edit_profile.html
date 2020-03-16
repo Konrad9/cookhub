@@ -28,11 +28,12 @@ Profile for {{ selected_user.username }}
                     <p>Last Name: {{ selected_user.last_name }}</p>
                     <p>User Name: {{ selected_user.username }}</p>
                     <p><label for="id_email">Email address:</label> <input type="email" name="email" value="{{ selected_user.email }}" maxlength="254" id="id_email"></p>
+                    <p><a href="{% url 'cookhub:change_password' %}">Change password</a></p>
                     <input type="submit" value="Update" />
                     
                 </form>
             {% else %}
-                
+                You can't edit this profile!
             {% endif %}
         </div>
     </div>

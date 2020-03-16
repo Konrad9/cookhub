@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "cookhub",
-    "registration",
+    #"registration",
 ]
 
 MIDDLEWARE = [
@@ -142,6 +142,7 @@ MEDIA_URL = "/media/"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 3600
 
+"""
 # django-registration-redux variables
 
 # If True, users can register
@@ -155,3 +156,4 @@ LOGIN_REDIRECT_URL = "cookhub:homepage"
 
 # The page users are directed to if they are not logged in.
 LOGIN_URL = "auth_login"
+"""

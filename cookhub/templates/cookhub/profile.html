@@ -2,13 +2,13 @@
 {% load staticfiles %}
 
 {% block title_block %}
-Profile for {{ selected_user.username }}
+Edit Profile for {{ selected_user.username }}
 {% endblock %}
 
 {% block body_block %}
 <div class="jumbotron p-4">
     <div class="container">
-        <h1 class="jumbotron-heading">Edit {{ selected_user.username }}'s Profile</h1>
+        <h1 class="jumbotron-heading">{{ selected_user.username }}'s Profile</h1>
     </div>
 </div>
 
@@ -20,17 +20,15 @@ Profile for {{ selected_user.username }}
                 alt="{{ selected_user.username }}'s profile image" />
             <br />
         <div>
+            First Name: {{ selected_user.first_name }}<br />
+            Last Name: {{ selected_user.last_name }}<br />
+            User Name: {{ selected_user.username }}<br />
+            Email: {{ selected_user.email }}<br />
             {% if selected_user == user %}
-                    First Name: {{ selected_user.first_name }}<br />
-                    Last Name: {{ selected_user.last_name }}<br />
-                    User Name: {{ selected_user.username }}<br />
-                    Email: {{ selected_user.email }}<br />
-                    
-            {% else %}
-                
+                    <a href="{% url 'cookhub:edit_profile' user.username %}">Edit Profile</a>   
             {% endif %}
         </div>
-        <a href="{% url 'cookhub:edit_profile' user.username %}">Edit Profile</a>
+        
     </div>
 </div>
 {% endblock %}

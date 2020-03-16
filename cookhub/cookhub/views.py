@@ -138,6 +138,7 @@ class EditProfileView(View):
     
     @method_decorator(login_required)
     def get(self, request, username):
+        print("here edit\n")
         try:
             (user, user_profile, form) = self.get_user_details(username)
         except TypeError:
@@ -169,6 +170,7 @@ class EditProfileView(View):
     
     
 class ProfileView(View):
+    print("here just view\n")
     def get_user_details(self, username):
         try:
             user = User.objects.get(username=username)
@@ -179,7 +181,6 @@ class ProfileView(View):
         form = UserProfileForm({'picture': user_profile.picture})
         return (user, user_profile, form)
     
-    @method_decorator(login_required)
     def get(self, request, username):
         try:
             (user, user_profile, form) = self.get_user_details(username)
@@ -187,8 +188,7 @@ class ProfileView(View):
             return redirect(reverse('cookhub:homepage'))
         
         context_dict = {'user_profile': user_profile,
-                        'selected_user': user,
-                        'form': form}
+                        'selected_user': user,}
         return render(request, 'cookhub/profile.html', context_dict)
  
     @method_decorator(login_required)
@@ -214,3 +214,35 @@ class ProfileView(View):
                         'selected_user': user,
                         'form': form}
         return render(request, 'cookhub/profile.html', context_dict)
+    
+@login_required
+def change_password(request, username):
+    # A boolean telling the template whether the registration was succesful, 
+    # set initially to false. Code changes it to true 
+    # once the registration is complete.
+    
+    #If it is a HTTP post, we are interested in processing form data.
+    if request.method == "POST":
+        # Attempt to grap information from the raw form information.
+        # Note that we make use of both UserForm and UserProfileForm.
+        user_form = UserForm(request.POST)
+        
+        if user_form.is_valid():
+            
+            # Hash the password with the set_password method.
+            # Once hashed, we can update the user object.
+            request.user.set_password(request.POST.get("password"))
+            request.user.save()
+            
+            return redirect(reverse('cookhub:edit_profile'))
+        else:
+            # Invalid form(s): print problems to terminal.
+            print(user_form.errors)
+            
+    else:
+        # Not a HTTP post, so we render our form using two ModelForm instances.
+        # These forms will be blank, ready for user input.
+        user_form = UserForm()
+        
+    # Render the template depending on the context.
+    return render(request, "registration/change_password.html", context = {"user_form":user_form})
