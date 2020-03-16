@@ -16,21 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
-from cookhub_app import views
+from cookhub import views
 from django.conf import settings
 from django.conf.urls.static import static
-from registration.backends.simple.views import RegistrationView
-from django.urls import reverse
-
-class MyRegistrationView(RegistrationView):
-    def get_success_url(self, url):
-        return reverse("cookhub_app:register_profile")
 
 urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
-        path('cookhub/', include('cookhub_app.urls')),
-        # The above maps any URLs starting with rango/ to be handled by rango.
+        #path('', views.IndexView.as_view(), name='homepage'),
+        path('cookhub/', include('cookhub.urls')),
+        # The above maps any URLs starting with cookhub/ to be handled by cookhub.
         path('admin/', admin.site.urls),
-        path("accounts/register/", MyRegistrationView.as_view(), name="registration_register"),
-        path("accounts/", include("registration.backends.simple.urls")),
+        #path("accounts/", include("registration.backends.simple.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,3 +1,4 @@
 from django.contrib import admin
+from cookhub.models import UserModel
 
-# Register your models here.
+admin.site.register(UserModel)
