@@ -9,8 +9,9 @@ from datetime import datetime
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from cookhub.forms import UserForm, UserProfileForm
-from cookhub.models import UserModel
+from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, IngredientArrayForm
+from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category, IngredientArray
+from django.utils import timezone
 
 class Homepage(View):
     def get(self, request):
@@ -246,3 +247,193 @@ def change_password(request, username):
         
     # Render the template depending on the context.
     return render(request, "registration/change_password.html", context = {"user_form":user_form})
+
+class RecipeView(View):
+    def get_recipe_details(self, recipe_id):
+        try:
+            recipe = Recipe.objects.get(id=recipe_id)
+            ingredients = Ingredient.objects.filter(recipe=recipe)
+            categories = recipe.categories.all()
+            comments = Comment.objects.filter(recipe=recipe)
+            ratings = Rating.objects.filter(recipe=recipe)
+            creator = recipe.user
+            rating_form = RatingForm()
+            comment_form = CommentForm()
+            
+        except Recipe.DoesNotExist:
+            return None
+        
+        context_dict = {}
+        context_dict['ingredients'] = ingredients
+        context_dict['categories'] = categories
+        context_dict['comments'] = comments
+        context_dict['ratings'] = ratings
+        context_dict['creator'] = creator
+        context_dict['recipe'] = recipe
+        context_dict['rating_form'] = rating_form
+        context_dict['comment_form'] = comment_form
+        return context_dict
+    
+    def get (self, request, recipe_id):
+        try: 
+            context_dict = self.get_recipe_details(recipe_id=recipe_id)
+        except TypeError:
+            return redirect(reverse('cookhub:homepage'))
+        context_dict['rpresent'] = not context_dict['ratings'].filter(user=request.user)
+        context_dict['recipe'].views+=1
+        Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
+        return render(request, 'cookhub/recipe.html', context=context_dict)
+    
+    @method_decorator(login_required)
+    def post(self, request, recipe_id):
+        print("post")
+        try:
+            context_dict = self.get_recipe_details(recipe_id=recipe_id)
+        except TypeError:
+            return redirect(reverse('cookhub:homepage'))
+        
+        context_dict['rpresent'] = not context_dict['ratings'].filter(user=request.user)
+        rating_form = RatingForm(request.POST)
+        comment_form = CommentForm(request.POST)
+        
+        if rating_form.is_valid():
+            rating = rating_form.save(commit=False)
+            user = request.user
+            rating.user = user
+            recipe = context_dict['recipe']
+            rating.recipe = recipe
+            print(str(rating_form))
+            num = context_dict['recipe'].averageRating*len(context_dict['ratings']) + int(rating.rating)
+            if len(context_dict['ratings']):
+                rnum = ((num))/(len(context_dict['ratings']))
+            else:
+                rnum = num
+            Recipe.objects.filter(id=recipe_id).update(averageRating=rnum)
+            rating.save()
+            context_dict = self.get_recipe_details(recipe_id=recipe_id)
+            return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
+        
+        if comment_form.is_valid():
+            print(str(not context_dict['ratings'].filter(user=request.user)))
+            comment = comment_form.save(commit=False)
+            comment.user = request.user
+            comment.recipe = context_dict['recipe']
+            comment.save()
+            context_dict = self.get_recipe_details(recipe_id=recipe_id)
+            return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
+        return render(request, 'cookhub/recipe.html', context=context_dict)
+
+class EditRecipeView(View):
+    def get_recipe_details(self, recipe_id):
+        try:
+            recipe = Recipe.objects.get(id=recipe_id)
+            ingredients = Ingredient.objects.filter(recipe=recipe)
+            creator = recipe.user
+            ingredient_form = IngredientForm()
+            recipe_form = RecipeForm(instance=recipe)
+            category_form = CategoryForm()
+            
+        except Recipe.DoesNotExist:
+            return None
+        
+        context_dict = {}
+        context_dict['ingredients'] = ingredients
+        context_dict['creator'] = creator
+        context_dict['recipe'] = recipe
+        context_dict['ingredient_form'] = ingredient_form
+        context_dict['recipe_form'] = recipe_form
+        context_dict['category_form'] = category_form
+        return context_dict
+    
+    def get (self, request, recipe_id):
+        try: 
+            context_dict = self.get_recipe_details(recipe_id=recipe_id)
+        except TypeError:
+            return redirect(reverse('cookhub:homepage'))
+        return render(request, 'cookhub/edit_recipe.html', context=context_dict)
+    
+    def post(self, request, recipe_id):
+        try:
+            context_dict = self.get_recipe_details(recipe_id=recipe_id)
+        except TypeError:
+            return redirect(reverse('cookhub:homepage'))
+            
+        if 'addIngredient' in request.POST:
+            ingredient_form = IngredientForm(request.POST)
+            if ingredient_form.is_valid():
+                ingredient = ingredient_form.save(commit=False)
+                ingredient.recipe = context_dict['recipe']
+                ingredient.save()
+            return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
+        
+        if 'editRecipe' in request.POST:
+            recipe_form = RecipeForm(request.POST, request.FILES, instance=context_dict['recipe'])
+            if recipe_form.is_valid():
+                recipe = recipe_form.save(commit = False)
+                recipe.save()
+                recipe_form.save_m2m()
+                return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
+            
+        
+        if 'addCategory' in request.POST:
+            category_form = CategoryForm(request.POST)
+            if category_form.is_valid():
+                category_form.save()
+            return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
+        return render(request, 'cookhub/edit_recipe.html', context=context_dict)
+
+@login_required
+def create_recipe(request):
+    recipe = Recipe(user=request.user)
+    recipe.save()
+    return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe.id}))
+
+@login_required
+def add_recipe(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
+    recipe_form = RecipeForm(instance=recipe)
+    category_form = CategoryForm()
+    ingredient_form = IngredientForm()
+    if request.method == 'POST':
+        if 'addCategory' in request.POST:
+            category_form = CategoryForm(request.POST)
+            if category_form.is_valid():
+                category_form.save()
+            return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
+            
+        if 'addRecipe' in request.POST:
+            recipe_form = RecipeForm(request.POST, request.FILES, instance=recipe)
+            if recipe_form.is_valid():
+                recipe = recipe_form.save(commit=False)
+                recipe.save()
+                recipe_form.save_m2m()
+                return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
+            else:
+                print(recipe_form.errors)
+        
+        if 'addIngredient' in request.POST:
+            ingredient_form = IngredientForm(request.POST)
+            if ingredient_form.is_valid():
+                ingredient = ingredient_form.save(commit=False)
+                ingredient.recipe = recipe
+                ingredient.save()
+            return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
+            
+
+    return render(request, 'cookhub/add_recipe.html', context={'recipe_form':recipe_form, 'category_form':category_form, 'recipe':recipe, 'ingredient_form':ingredient_form, 'ingredients':Ingredient.objects.filter(recipe=recipe)})
+
+@login_required
+def del_ingredient(request, recipe_id, ingredient_id):
+    if request.method == 'POST':
+        if ingredient_id:
+            ingredient = Ingredient.objects.get(id=ingredient_id).delete()
+        return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
+    return render(request, 'cookhub/del_ingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
+
+@login_required
+def del_editingredient(request, recipe_id, ingredient_id):
+    if request.method == 'POST':
+        if ingredient_id:
+            ingredient = Ingredient.objects.get(id=ingredient_id).delete()
+        return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
+    return render(request, 'cookhub/del_editingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
