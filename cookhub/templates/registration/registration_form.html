@@ -1,0 +1,102 @@
+{% extends 'cookhub/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+Register
+{% endblock %}
+
+{% block body_class %}
+class="text-center"
+{% endblock %}
+
+{% block body_block %}
+<style>
+/* The message box is shown when the user clicks on the password field */
+#message {
+  display:none;
+  background: #f1f1f1;
+  color: #000;
+  position: relative;
+  padding: 20px;
+  margin-top: 10px;
+}
+
+#message p {
+  padding: 10px 35px;
+  font-size: 18px;
+}
+
+/* Add a green text color and a checkmark when the requirements are right */
+.valid {
+  color: green;
+}
+
+.valid:before {
+  position: relative;
+  left: -35px;
+  content: "✔";
+}
+
+/* Add a red text color and an "x" when the requirements are wrong */
+.invalid {
+  color: red;
+}
+
+.invalid:before {
+  position: relative;
+  left: -35px;
+  content: "✖";
+}
+</style>
+<div class="jumbotron p-4">
+    <div class="container">
+        <h1 class="jumbotron-heading">Register Here</h1>
+    </div>
+</div>
+
+{% if registered %}
+    cookhub says: <strong>thank you for registering!</strong>
+    <a href="{% url 'cookhub:homepage' %}">Return to the homepage.</a><br />
+{% else %}
+    <form id="user_form" method="post" action="{% url 'cookhub:register' %}"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <p><label for="id_profile_picture">Profile picture:</label> 
+        <input type="file" name="picture" accept="image/*" id="id_profile_picture"></p>
+        
+        <p><div id="username_taken"><!--Username is already taken<br />--></div>
+        <label for="id_username">Username:</label> 
+        <input type="text" name="username" maxlength="150" required id="id_username"> <br />
+        <span class="helptext">150 characters or fewer. Letters, digits and @/./+/-/_ only.</span></p>
+        
+        <p><label for="id_email">Email address:</label> 
+        <input type="email" name="email" maxlength="254" required id="id_email"></p>
+        
+        <p><label for="id_first_name">First Name:</label> 
+        <input type="text" name="first_name" maxlength="254" required id="id_first_name"></p>
+        
+        <p><label for="id_last_name">Last Name:</label> 
+        <input type="text" name="last_name" maxlength="254" required id="id_last_name"></p>
+        
+        <p>
+        <label for="id_password">Password:</label> 
+        <input type="password" name="password" required id="id_password"></p>
+        <div id="message">
+          <h3>Password must contain the following:</h3>
+          <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+          <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+          <p id="number" class="invalid">A <b>number</b></p>
+          <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+        </div>
+
+        <p><div id="password_repetition"><!--Does not match with password<br />--></div>
+        <label for="id_password2">Repeat Password:</label> 
+        <input onkeyup="checkPasswordRepetition();" type="password" name="password2" required id="id_password2"></p>
+        
+        <!-- Provide a button to click to submit the form. -->
+        <input disabled id="password_validate" type="submit" name="submit" value="Register" />
+    </form>
+{% endif %}
+<script src="{% static 'js/registration_validator.js' %}" crossorigin="anonymous"></script>
+{% endblock %}

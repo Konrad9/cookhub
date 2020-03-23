@@ -1,0 +1,58 @@
+{% extends 'cookhub/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+Register
+{% endblock %}
+
+{% block head_block %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+{% endblock %}
+
+{% block body_class %}
+class="text-center"
+{% endblock %}
+
+{% block body_block %}
+<div class="jumbotron p-4">
+    <div class="container">
+        <h1 class="jumbotron-heading">Register Here</h1>
+    </div>
+</div>
+{% if user.is_authenticated %}
+    You are already registered!
+    <a href="{% url 'cookhub:homepage' %}">Return to the homepage.</a><br />
+{% else %}
+    <form id="user_form" method="post" action="{% url 'cookhub:register' %}"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ profile_form.as_p }}
+        <img src="" id="preview" width="200px" />
+        {{ user_form.as_p }}
+   <script type="text/javascript">
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#preview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#id_picture").change(function(){
+        readURL(this);
+    });
+
+window.onload = function() {
+    document.getElementById("register_link").remove();
+    
+}
+
+</script>
+        
+        <input type="submit" name="submit" value="Register" />
+</form>
+{% endif %}
+{% endblock %}

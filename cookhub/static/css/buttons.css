@@ -1,0 +1,27 @@
+/* button styles */
+
+.standard {
+  background-color: #0069d9; /* blue */
+  border: none;
+  color: white;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.rounded {
+    border-radius: 10%; 
+    }
+    
+.small {
+    font-size: 14px;
+    padding: 10;
+    }
+
+.pill {
+    padding: 2% 20%;
+    }

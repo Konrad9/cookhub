@@ -1,0 +1,41 @@
+{% extends 'cookhub/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+Profile for {{ selected_user.username }}
+{% endblock %}
+
+{% block body_block %}
+<div class="jumbotron p-4">
+    <div class="container">
+        <h1 class="jumbotron-heading">Edit {{ selected_user.username }}'s Profile</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <img src="{{ MEDIA_URL }}{{ user_profile.picture }}"
+                width="300"
+                height="300"
+                alt="{{ selected_user.username }}'s profile image" />
+            <br />
+        <div>
+            {% if selected_user == user %}
+                <form method="post" action="." enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <p>First Name: {{ selected_user.first_name }}</p>
+                    <p>Last Name: {{ selected_user.last_name }}</p>
+                    <p>User Name: {{ selected_user.username }}</p>
+                    <p><label for="id_email">Email address:</label> <input type="email" name="email" value="{{ selected_user.email }}" maxlength="254" id="id_email"></p>
+                    <p><a href="{% url 'cookhub:change_password' %}">Change password</a></p>
+                    <input type="submit" value="Update" />
+                    
+                </form>
+            {% else %}
+                You can't edit this profile!
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
