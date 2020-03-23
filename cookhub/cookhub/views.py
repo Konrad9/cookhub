@@ -16,8 +16,12 @@ from django.utils import timezone
 
 class Homepage(View):
     def get(self, request):
-        return render(request, "cookhub/homepage.html", {"content": "Cookhub Homepage"})
+        context_dict = {}
 
+        recipe_list = Recipe.objects.order_by('-views')[:5]
+        context_dict['recipes'] = recipe_list
+        response = render(request, 'cookhub/homepage.html', context=context_dict)
+        return response
 
 def register(request):
     # A boolean telling the template whether the registration was succesful, 
