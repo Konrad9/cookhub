@@ -3,3 +3,5 @@ db.sqlite3
 *.pdf
 *.key
 *.docx
+cookhub/media/profile_images/
+cookhub/media/recipe_images/
