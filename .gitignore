@@ -5,3 +5,5 @@ db.sqlite3
 *.docx
 cookhub/media/profile_images/
 cookhub/media/recipe_images/
+*.pyc
+*.time

@@ -1,0 +1,60 @@
+{% extends 'cookhub/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+	Add Recipe
+{% endblock %}
+
+{% block body_block %}
+{% if recipe.user == user %}
+	<div>
+		<form id="recipe_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}" enctype="multipart/form-data"> 
+			{% csrf_token %}
+			{% for hidden in recipe_form.hidden_fields %}
+				{{ hidden }}
+			{% endfor %}
+			{% for field in recipe_form.visible_fields %}
+				{{ field.errors }}
+				{{ field.help_text }}
+				{{ field }} <br />
+			{% endfor %}
+		<input type="submit" name="addRecipe" value="Finished Recipe" />
+		</form>
+			<form id="category_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}">
+				{% csrf_token %}
+				{% for field in  category_form.visible_fields %}
+					{{ field.errors }}
+					{{ field.help_text }}
+					{{ field }} <br />
+				{% endfor %}
+				<input type="submit" name="addCategory" value="Add category" />
+			</form>
+			
+			<h2>Ingredients for {{ recipe.title }}</h2>
+			{% if ingredients %}
+			{% for ingredient in ingredients %}
+				<form method="get" action="{% url 'cookhub:del_ingredient' recipe.id ingredient.id %}">
+					{% csrf_token %}
+					{{ ingredient.quantity }} 
+					{% if ingredient.unit %}
+						{{ ingredient.unit }} of 
+					{% endif %}
+					{{ ingredient.name }}
+					<input type='submit' value="Delete" type='deleteIngredient'/>
+				</form>
+			{% endfor %}
+			{% endif %}
+			<form id="ingredient_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}">
+				{% csrf_token %}
+				{% for field in ingredient_form.visible_fields %}
+					{{ field.errors }}
+					{{ field.help_text }}
+					{{ field }} <br />
+				{% endfor %}
+				<input type='submit' value='Add ingredient' name='addIngredient'/>
+			</form>
+		
+		
+	</div>
+{% endif %}
+{% endblock %}

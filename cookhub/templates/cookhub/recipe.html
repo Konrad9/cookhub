@@ -1,0 +1,129 @@
+{% extends 'cookhub/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+	{{ recipe.title }}
+{% endblock %}
+
+{% block body_block %}
+	<table>
+	<tr>
+		<td>
+		<img src="{{ MEDIA_URL }}{{ recipe.photo }}" width = "600" height = "300" /><br />
+		{{ recipe.title }} <br />
+		
+		<h3> Ingredients </h3> <br />
+		
+		{% if ingredients %}
+		<ul>
+		{% for ingredient in ingredients %}
+			<li>
+			{{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}
+			</li>
+		{% endfor %}
+		</ul>
+		{% else %}
+			<strong> No ingredients in this recipe </strong>
+		{% endif %}
+		</td>
+	
+		<td>
+		<table>
+		<tr>
+			<table>
+			<tr>
+				<td>
+				<img src="{{ Media_URL }}{{ creator.picture }}" width = "150" height "150" />
+				</td>
+				<td>
+				{{ creator.username }} <br />
+				Views: {{ recipe.views }} <br />
+				Rating: {{ recipe.averageRating }} <br />
+				</td>
+			</tr>
+			</table>
+		</tr>
+		<tr>
+			Cooking time: {{ recipe.time }} <br />
+			Serving(s) {{ recipe.servings }} <br />
+		</tr>
+		<tr>
+			<h3>Categories</h3> <br />
+			{% if categories %}
+				<ul>
+				{% for category in categories %}
+					<li>
+					{{ category.name }} <br />
+					</li>
+				{% endfor %}
+				</ul>
+			{% else %}
+				<strong>This recipe is not part of any categories</strong><br />
+			{% endif %}
+		</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<h2> Description </h2>
+		{% if recipe.description %}
+			{{ recipe.description }} <br />
+		{% else %}
+			<strong>There is no description for this recipe</strong> <br />
+		{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td>
+		{% if user.is_authenticated %}
+		{% if rpresent %}
+		Rate: <br /> 
+		<form id="rating_form" method="post" action=".">
+			{% csrf_token %}
+			{% for field in rating_form.visible_fields %}
+				{{ field.errors }}
+				{{ field }}
+			{% endfor %}
+			<input type="submit" name="submit" value="Submit Rating" />
+		</form> 
+
+		{% endif %}
+		{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<h2>Comments:</h2> <br />
+		{% if user.is_authenticated %} 
+		<form id="comment_form" method="post" action=".">
+			{% csrf_token %}
+			{% for field in comment_form.visible_fields %}
+				{{ field.errors }}
+				{{ field }}
+			{% endfor %}
+			<input type="submit" name="submit" value="Submit Comment" />
+		</form>
+		{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td>
+		{% if comments %}
+			<table>
+			{% for comment in comments %}
+				<tr>
+					<td>
+					{{ comment.user.username }} {{ comment.creationDate }}: {{ comment.text }}
+					</td>
+				</tr>
+			{% endfor %}
+			</table>
+		{% else %}
+			<strong>There are no comments on this recipe</strong><br />
+		{% endif %}
+		</td>
+	</tr>
+	</table>
+{% endblock %}
+		
