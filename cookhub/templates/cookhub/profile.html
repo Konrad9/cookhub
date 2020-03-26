@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block title_block %}
-Edit Profile for {{ selected_user.username }}
+Profile of {{ selected_user.username }}
 {% endblock %}
 
 {% block body_block %}
@@ -15,8 +15,8 @@ Edit Profile for {{ selected_user.username }}
 <div class="container">
     <div class="row">
         <img src="{{ MEDIA_URL }}{{ user_profile.picture }}"
-                width="300"
-                height="300"
+                width="150"
+                height="150"
                 alt="{{ selected_user.username }}'s profile image" />
             <br />
         <div>
@@ -27,8 +27,80 @@ Edit Profile for {{ selected_user.username }}
             {% if selected_user == user %}
                     <a href="{% url 'cookhub:edit_profile' user.username %}">Edit Profile</a>   
             {% endif %}
-        </div>
-        
+        </div> 
     </div>
 </div>
+<div class="album py-5 bg-light">
+    <div class="container">
+    <h2> My recipes  <br /></h2>
+        <div class="row">
+        
+            {% if MyRecipes %}
+                {% for recipe in MyRecipes %}
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;"
+                                 src="{{ MEDIA_URL }}{{ recipe.photo }}" data-holder-rendered="true">
+                            <div class="card-body">
+                                <a class="card-text" href="/recipe/{{ recipe.id }}">{{ recipe.title }}</a>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a>Rating: {{ recipe.averageRating }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% if user.is_authenticated %}
+        <h2> Saved recipes <br /></h2>
+        <div class="row">
+        
+            {% if SavedRecipes %}
+                {% for recipe in SavedRecipes %}
+                    <div class="col-md-4" id="{{ recipe.id }}">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;"
+                                 src="{{ MEDIA_URL }}{{ recipe.photo }}" data-holder-rendered="true">
+                            <div class="card-body">
+                                <a class="card-text" href="/recipe/{{ recipe.id }}/">{{ recipe.title }}</a>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a>Rating: {{ recipe.averageRating }}</a>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button"
+                                            id="removeRecipeButton"
+                                            class="btn btn-sm btn-outline-secondary"
+                                            data-recipeid="{{ recipe.id }}" >
+                                        Remove
+                                    </button>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script type="text/javascript" >
+    $(document).ready(function () {
+    
+        $(".btn").click(function() {
+            var recipeID = $(this).attr("data-recipeid");
+            //$(this).hide();
+            $.post("{% url 'cookhub:save_recipe' %}",
+                    {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"}, 
+                    function(data) {
+                        if (data=="correct") {
+                            $("div#"+recipeID).remove();
+                        }
+                    })
+        });
+        
+        
+    });
+    </script>
 {% endblock %}

@@ -21,10 +21,10 @@
 
         <div class="album py-5 bg-light">
             <div class="container">
-
+                <h2> Newest recipes  <br /></h2>
                 <div class="row">
-                    {% if recipes %}
-                        {% for recipe in recipes %}
+                    {% if newestRecipes %}
+                        {% for recipe in newestRecipes %}
                             <div class="col-md-4">
                                 <div class="card mb-4 box-shadow">
                                     <img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;"
@@ -34,9 +34,22 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <a>Author: {{ recipe.user }}</a>
                                             <a>Rating: {{ recipe.averageRating }}</a>
+                                            {% if user.is_authenticated %}
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" >Save</button>
+                                                <button type="button"
+                                                        id="addRecipeButton"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        data-recipeid="{{ recipe.id }}" 
+                                                        {% if recipe.id in saved %}
+                                                        disabled="true">
+                                                    Saved
+                                                        {% else %}
+                                                        >
+                                                    Save
+                                                        {% endif %}
+                                                </button>
                                             </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -44,6 +57,43 @@
                         {% endfor %}
                     {% endif %}
                 </div>
+                <h2> Most popular recipes  <br /></h2>
+                <div class="row">
+                    {% if popularRecipes %}
+                        {% for recipe in popularRecipes %}
+                            <div class="col-md-4">
+                                <div class="card mb-4 box-shadow">
+                                    <img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;"
+                                         src="{{ MEDIA_URL }}{{ recipe.photo }}" data-holder-rendered="true">
+                                    <div class="card-body">
+                                        <a class="card-text" href="recipe/{{ recipe.id }}">{{ recipe.title }}</a>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a>Author: {{ recipe.user }}</a>
+                                            <a>Rating: {{ recipe.averageRating }}</a>
+                                            {% if user.is_authenticated %}
+                                            <div class="btn-group">
+                                                <button type="button"
+                                                        id="addRecipeButton"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        data-recipeid="{{ recipe.id }}" 
+                                                        {% if recipe.id in saved %}
+                                                        disabled="true">
+                                                    Saved
+                                                        {% else %}
+                                                        >
+                                                    Save
+                                                        {% endif %}
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
             </div>
         </div>
 
@@ -51,5 +101,16 @@
     <style>
         .card-text { color: #272727; font-weight: 500} /* CSS link color */
     </style>
+    <script type="text/javascript" >
+    $(document).ready(function () {
+        $(".btn").click(function() {
+            var recipeID = $(this).attr("data-recipeid");
+            $(this).attr("disabled", true);
+            $(this).html("Saved");
+            $.get("{% url 'cookhub:save_recipe' %}",
+                    {"recipeID": recipeID})
+        });
+    });
+    </script>
 {% endblock %}
 

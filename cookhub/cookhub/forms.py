@@ -9,7 +9,7 @@ class UserForm(forms.ModelForm):
     
     class Meta:
         model = User
-        fields = ("username", "email", "first_name", "last_name", "password", "confirm_password")
+        fields = ("username", "email", "first_name", "last_name", "password", "confirm_password", )
         
     def clean(self):
         cleaned_data = super(UserForm, self).clean()
@@ -24,8 +24,25 @@ class UserProfileForm(forms.ModelForm):
         model = UserModel
         fields = ("picture",)
 
+
+class ChangePasswordForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    confirm_password = forms.CharField(widget=forms.PasswordInput())
+    
+    class Meta:
+        model = User
+        fields = ("password", "confirm_password", )
+        
+    def clean(self):
+        cleaned_data = super(ChangePasswordForm, self).clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+        if password!=confirm_password:
+            raise forms.ValidationError("Confirm password and password don't match")
+
+
 class RecipeForm(forms.ModelForm):
-    title = forms.CharField(max_length=20, help_text="Name of your recipe:")
+    title = forms.CharField(max_length=40, help_text="Name of your recipe:")
     description = forms.CharField(widget=forms.Textarea, max_length=4000, help_text="How to make your recipe:")
     photo = forms.ImageField(required=False, help_text="Upload a photo of your recipe:")
     time = forms.IntegerField(help_text="How long it takes to prepare your recipe:")
@@ -76,3 +93,6 @@ class IngredientArrayForm(forms.ModelForm):
     class Meta:
         model = IngredientArray
         fields = ('text',)
+        
+
+    

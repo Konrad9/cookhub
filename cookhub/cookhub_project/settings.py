@@ -140,7 +140,7 @@ MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = "/media/"
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 3600
+SESSION_COOKIE_AGE = 86400
 
 """
 # django-registration-redux variables
@@ -150,10 +150,10 @@ REGISTRATION_OPEN = True
 
 # If True, the user will be automatically logged in after registration
 REGISTRATION_AUTO_LOGIN = True
-
+"""
 # The URL that Django redirects users to after logging in.
 LOGIN_REDIRECT_URL = "cookhub:homepage"
-
+"""
 # The page users are directed to if they are not logged in.
 LOGIN_URL = "auth_login"
 """

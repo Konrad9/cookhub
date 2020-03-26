@@ -9,7 +9,7 @@ from datetime import datetime
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, IngredientArrayForm
+from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, IngredientArrayForm, ChangePasswordForm
 from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category, IngredientArray
 from django.utils import timezone
 
@@ -17,9 +17,22 @@ from django.utils import timezone
 class Homepage(View):
     def get(self, request):
         context_dict = {}
-
-        recipe_list = Recipe.objects.order_by('-views')[:5]
-        context_dict['recipes'] = recipe_list
+        saved = []
+        
+        context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')[:5]
+        context_dict['popularRecipes'] = Recipe.objects.order_by('-views')[:5]
+        if request.user.is_authenticated:
+            userProfile = UserModel.objects.get(user=request.user)
+            savedRecipes = userProfile.saved_recipes.all()
+            for recipe in context_dict['newestRecipes']:
+                if recipe in savedRecipes:
+                    saved += [recipe.id]
+                    print(recipe)
+            for recipe in context_dict['popularRecipes']:
+                if recipe in savedRecipes:
+                    saved += [recipe.id]
+                    print(recipe)
+        context_dict["saved"] = saved
         response = render(request, 'cookhub/homepage.html', context=context_dict)
         return response
 
@@ -64,9 +77,8 @@ def register(request):
             # Update our variable to indicate that the template
             # registration was successful.
             registered = True
-
-            return render(request, "cookhub/homepage.html",
-                          {"content": "You have successfully registered, and this is the homepage!"})
+            login(request, user)
+            return redirect(reverse("cookhub:homepage"))
         else:
             # Invalid form(s): print problems to terminal.
             print(user_form.errors, profile_form.errors)
@@ -96,6 +108,7 @@ def user_login(request):
         # will raise a KeyError exception.
         username = request.POST.get('username')
         password = request.POST.get('password')
+        remember = request.POST.get("rememberme")
 
         # Use Django's machinery to attempt to see if the username/password
         # combination is valid - a User object is returned if it is.
@@ -110,7 +123,9 @@ def user_login(request):
                 # If the account is valid and active, we can log the user in.
                 # We'll send the user back to the homepage.
                 login(request, user)
-                return redirect(reverse('cookhub:homepage'))  # reverse obtains the URL named index from views.py
+                if remember!="remember-me":
+                    request.session.set_expiry(0)
+                return redirect(reverse('cookhub:homepage'))
             else:
                 # An inactive account was used - no logging in!
                 return HttpResponse("Your Cookhub account is disabled.")
@@ -125,6 +140,29 @@ def user_login(request):
         # No context variables to pass to the template system, hence the 
         # blank dictionary object.
         return render(request, "registration/login.html")
+
+
+def get_server_side_cookie(request, cookie, default_val=None):
+    val = request.session.get(cookie)
+    if not val:
+        val = default_val
+    return val
+
+# Updated the function definition
+def visitor_cookie_handler(request):
+    visits = int(get_server_side_cookie(request, 'visits', '1'))
+    last_visit_cookie = get_server_side_cookie(request,'last_visit',str(datetime.now()))
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7], '%Y-%m-%d %H:%M:%S')
+    # If it's been more than a day since the last visit...
+    if (datetime.now() - last_visit_time).days > 0:
+        visits = visits + 1
+        # Update the last visit cookie now that we have updated the count
+        request.session['last_visit'] = str(datetime.now())
+    else:
+        # Set the last visit cookie
+        request.session['last_visit'] = last_visit_cookie
+        # Update/set the visits cookie
+        request.session['visits'] = visits
 
 
 @login_required
@@ -180,7 +218,6 @@ class EditProfileView(View):
 
 
 class ProfileView(View):
-    print("here just view\n")
 
     def get_user_details(self, username):
         try:
@@ -197,14 +234,17 @@ class ProfileView(View):
             (user, user_profile, form) = self.get_user_details(username)
         except TypeError:
             return redirect(reverse('cookhub:homepage'))
-
+        
         context_dict = {'user_profile': user_profile,
                         'selected_user': user, }
+        recipe_list = Recipe.objects.filter(user=user).order_by('-creationDate')[:5]
+        context_dict['MyRecipes'] = recipe_list
+        savedRecipeList = user_profile.saved_recipes.all()[:5]
+        context_dict["SavedRecipes"] = savedRecipeList
         return render(request, 'cookhub/profile.html', context_dict)
 
     @method_decorator(login_required)
     def post(self, request, username):
-        print("post")
         try:
             (user, user_profile, form) = self.get_user_details(username)
         except TypeError:
@@ -229,36 +269,25 @@ class ProfileView(View):
 
 @login_required
 def change_password(request, username):
-    # A boolean telling the template whether the registration was succesful, 
-    # set initially to false. Code changes it to true 
-    # once the registration is complete.
 
-    # If it is a HTTP post, we are interested in processing form data.
     if request.method == "POST":
-        # Attempt to grap information from the raw form information.
-        # Note that we make use of both UserForm and UserProfileForm.
-        user_form = UserForm(request.POST)
+        form = ChangePasswordForm(request.POST)
 
-        if user_form.is_valid():
-
+        if form.is_valid():
             # Hash the password with the set_password method.
             # Once hashed, we can update the user object.
             request.user.set_password(request.POST.get("password"))
             request.user.save()
-
-            return redirect(reverse('cookhub:edit_profile'))
+            login(request, request.user)
+            return redirect('cookhub:edit_profile', request.user.username)
         else:
-            # Invalid form(s): print problems to terminal.
-            print(user_form.errors)
+            print(form.errors)
 
     else:
-        # Not a HTTP post, so we render our form using two ModelForm instances.
-        # These forms will be blank, ready for user input.
-        user_form = UserForm()
-
-    # Render the template depending on the context.
-
-    return render(request, "registration/change_password.html", context = {"user_form":user_form})
+        # Not a HTTP post, so we render the form
+        form = ChangePasswordForm()
+    print("about to render change_password.html")
+    return render(request, "registration/change_password.html", context = {"form":form})
   
 
 class RecipeView(View):
@@ -292,8 +321,9 @@ class RecipeView(View):
             context_dict = self.get_recipe_details(recipe_id=recipe_id)
         except TypeError:
             return redirect(reverse('cookhub:homepage'))
-        context_dict['rpresent'] = not context_dict['ratings'].filter(user=request.user)
-        context_dict['recipe'].views+=1
+        if request.user!=context_dict['creator']:
+            context_dict['recipe'].views+=1
+            context_dict['rpresent'] = not context_dict['ratings'].filter(user=request.user)
         Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
         return render(request, 'cookhub/recipe.html', context=context_dict)
     
@@ -450,3 +480,39 @@ def del_editingredient(request, recipe_id, ingredient_id):
             ingredient = Ingredient.objects.get(id=ingredient_id).delete()
         return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
     return render(request, 'cookhub/del_editingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
+
+class SaveRecipeView(View):
+    @method_decorator(login_required)
+    def get(self, request):
+        recipeID = request.GET["recipeID"]
+        try:
+            recipe = Recipe.objects.get(id=int(recipeID))
+        except Recipe.DoesNotExist:
+            return HttpResponse("Error - recipe not found.")
+        except ValueError:
+            return HttpResponse("Error - bad recipe ID.")
+        
+        userProfile = UserModel.objects.get(user=request.user)
+        userProfile.saved_recipes.add(recipe)
+        userProfile.save()
+        return HttpResponse()
+    
+    @method_decorator(login_required)
+    def post(self, request):
+        recipeID = request.POST["recipeID"]
+        try:
+            recipe = Recipe.objects.get(id=int(recipeID))
+        except Recipe.DoesNotExist:
+            return HttpResponse("Error - recipe not found.")
+        except ValueError:
+            return HttpResponse("Error - bad recipe ID.")
+        
+        userProfile = UserModel.objects.get(user=request.user)
+        userProfile.saved_recipes.remove(recipe)
+        userProfile.save()
+        return HttpResponse("correct")
+
+
+
+
+

@@ -5,6 +5,10 @@
 	Add Recipe
 {% endblock %}
 
+{% block head_block %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+{% endblock %}
+
 {% block body_block %}
 {% if recipe.user == user %}
 	<div>
@@ -13,11 +17,30 @@
 			{% for hidden in recipe_form.hidden_fields %}
 				{{ hidden }}
 			{% endfor %}
+			
 			{% for field in recipe_form.visible_fields %}
 				{{ field.errors }}
 				{{ field.help_text }}
 				{{ field }} <br />
 			{% endfor %}
+			<img src="" id="preview" width="200px" />
+<script type="text/javascript">
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#preview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#id_photo").change(function(){
+        readURL(this);
+    });
+
+</script>
 		<input type="submit" name="addRecipe" value="Finished Recipe" />
 		</form>
 			<form id="category_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}">

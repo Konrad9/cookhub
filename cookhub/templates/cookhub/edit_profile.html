@@ -2,7 +2,11 @@
 {% load staticfiles %}
 
 {% block title_block %}
-Profile for {{ selected_user.username }}
+Edit Profile for {{ selected_user.username }}
+{% endblock %}
+
+{% block head_block %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 {% endblock %}
 
 {% block body_block %}
@@ -17,18 +21,37 @@ Profile for {{ selected_user.username }}
         <img src="{{ MEDIA_URL }}{{ user_profile.picture }}"
                 width="300"
                 height="300"
-                alt="{{ selected_user.username }}'s profile image" />
-            <br />
+                alt="{{ selected_user.username }}'s profile image"
+                id="previous" />
         <div>
             {% if selected_user == user %}
                 <form method="post" action="." enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
+                    <script type="text/javascript">
+
+                            
+                    function readURL(input) {
+                        if (input.files && input.files[0]) {
+                            var reader = new FileReader();
+                            reader.onload = function (e) {
+                                $('#previous').attr('src', e.target.result);
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    }
+                
+                    $("#id_picture").change(function(){
+                        readURL(this);
+                    });  
+                    
+                        
+                    </script>
                     <p>First Name: {{ selected_user.first_name }}</p>
                     <p>Last Name: {{ selected_user.last_name }}</p>
                     <p>User Name: {{ selected_user.username }}</p>
-                    <p><label for="id_email">Email address:</label> <input type="email" name="email" value="{{ selected_user.email }}" maxlength="254" id="id_email"></p>
-                    <p><a href="{% url 'cookhub:change_password' %}">Change password</a></p>
+                    <p><label for="id_email">Email address:</label> <input type="email" name="email" value="{{ selected_user.email }}" maxlength="254" id="id_email" ></p>
+                    <p><a href="{% url 'cookhub:change_password' user.username %}">Change password</a></p>
                     <input type="submit" value="Update" />
                     
                 </form>

@@ -2,12 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-class UserModel(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    picture = models.ImageField(upload_to="profile_images", blank=True, default="default.jpg")
-    
-    def __str__(self):
-        return self.user.username
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -18,6 +12,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Recipe(models.Model):
     title = models.CharField(max_length=40, blank=True, default='')
     description = models.TextField(max_length=4000, blank=True, default='')
@@ -25,13 +20,22 @@ class Recipe(models.Model):
     time = models.IntegerField(blank=True, default=0)
     averageRating = models.FloatField(blank=True, default=0)
     servings = models.IntegerField(blank=True, default=1)
-    creationDate = models.DateTimeField(blank=True, default=timezone.now())
+    creationDate = models.DateTimeField(blank=True, default=timezone.now)
     views = models.IntegerField(blank=True, default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     categories = models.ManyToManyField(Category, blank=True, default=None)
     
     def __str__ (self):
         return self.title + str(self.id)
+    
+class UserModel(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    picture = models.ImageField(upload_to="profile_images", blank=True, default="default.jpg")
+    saved_recipes = models.ManyToManyField(Recipe, blank=True)
+    
+    def __str__(self):
+        return self.user.username
+    
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=20)
@@ -55,7 +59,7 @@ class Rating(models.Model):
 
 class Comment(models.Model):
     text = models.TextField(max_length=500)
-    creationDate = models.DateField(blank=True, default=timezone.now())
+    creationDate = models.DateField(blank=True, default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     
