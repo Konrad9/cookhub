@@ -1,7 +1,5 @@
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -12,7 +10,6 @@ from django.contrib.auth.models import User
 from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, IngredientArrayForm, ChangePasswordForm
 from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category, IngredientArray
 from django.utils import timezone
-from django.core.paginator import Paginator
 
 
 class Homepage(View):
@@ -20,8 +17,16 @@ class Homepage(View):
         context_dict = {}
         saved = []
         
-        context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')[:5]
-        context_dict['popularRecipes'] = Recipe.objects.order_by('-views')[:5]
+        context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')
+        context_dict['popularRecipes'] = Recipe.objects.order_by('-views')
+        n = len(Recipe.objects.order_by('-creationDate'))
+        context_dict["NewestRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["NewestRecipePages"] += 1
+        n = len(Recipe.objects.order_by('-views'))
+        context_dict["PopularRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["PopularRecipePages"] += 1
         if request.user.is_authenticated:
             userProfile = UserModel.objects.get(user=request.user)
             savedRecipes = userProfile.saved_recipes.all()
@@ -32,6 +37,8 @@ class Homepage(View):
                 if recipe in savedRecipes:
                     saved += [recipe.id]
         context_dict["saved"] = saved
+        print("Newest pages: " + str(context_dict["NewestRecipePages"]))
+        print("Popular pages: " + str(context_dict["PopularRecipePages"]))
         response = render(request, 'cookhub/homepage.html', context=context_dict)
         return response
 
@@ -237,13 +244,18 @@ class ProfileView(View):
         context_dict = {'user_profile': user_profile,
                         'selected_user': user, }
         
-        recipe_list = Recipe.objects.filter(user=user).order_by('-creationDate')
-        context_dict['MyRecipes'] = recipe_list[:3]
-        context_dict["MyRecipePages"] = len(recipe_list)//3+1
+        MyRecipeList = Recipe.objects.filter(user=user).order_by('-creationDate')        
+        n = len(MyRecipeList)
+        context_dict["MyRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["MyRecipePages"] += 1
         
         savedRecipeList = user_profile.saved_recipes.all()
-        context_dict["SavedRecipes"] = savedRecipeList[:3]
-        context_dict["SavedRecipePages"] = len(savedRecipeList)//3+1
+        n = len(savedRecipeList)
+        context_dict["SavedRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["SavedRecipePages"] += 1
+        print("saved recipes: " + str(3//3))
         
         return render(request, 'cookhub/profile.html', context_dict)
 
@@ -534,7 +546,9 @@ class SavedRecipesView(View):
         userProfile = UserModel.objects.get(user=request.user)
         userProfile.saved_recipes.remove(recipe)
         userProfile.save()
-        return HttpResponse("correct")
+        n = len(userProfile.saved_recipes.all())
+        print("Saved recipes left: " + str(n))
+        return HttpResponse("correct"+str(n))
 
 
 class PaginationView(View):
@@ -543,6 +557,7 @@ class PaginationView(View):
         author = request.GET["author"]
         which = request.GET["which"]
         page = int(request.GET["page"])
+        print("Page to get: "+str(page))
         single = int(request.GET["single"])
         # deal with the author
         if author!="#":
@@ -577,6 +592,8 @@ class PaginationView(View):
         
         # deal with the RecipesPerPage and pages
         n = len(recipes)-1 # end index of the number of queryset
+        if n<0:
+            return HttpResponse("empty")
         if n<(page-1)*RecipesPerPage:
             return HttpResponse("error: not this many recipes exist for "+str(page) +" pages and "+str(RecipesPerPage)+" recipes per page")
         if n+1>page*RecipesPerPage:
@@ -591,7 +608,7 @@ class PaginationView(View):
         elif single>RecipesPerPage:
             return HttpResponse("error: single larger than RecipesPerPage")
         else:
-            recipes = recipes[single]
+            recipes = recipes[single-1]
         
         # pack the recipes into the format for the webpage
         responseString = ""
