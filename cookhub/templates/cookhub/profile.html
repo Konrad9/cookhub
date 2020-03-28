@@ -30,11 +30,18 @@ Profile of {{ selected_user.username }}
         </div> 
     </div>
 </div>
+
+
 <div class="album py-5 bg-light">
     <div class="container">
-    <h2> My recipes  <br /></h2>
-        <div class="row">
-        
+    
+    <table>
+    <tbody>
+    <tr>
+        <h2> My recipes </h2>
+    </tr>
+    <tr>
+        <div class="row" id="my">
             {% if MyRecipes %}
                 {% for recipe in MyRecipes %}
                     <div class="col-md-4">
@@ -52,10 +59,22 @@ Profile of {{ selected_user.username }}
                 {% endfor %}
             {% endif %}
         </div>
+    </tr>
+    <tr>
+            <div align="center" >
+            <button class="previous round" id="my" disabled="true" >&laquo; Previous</button>
+            <strong><em id="MyRecipePage" >   1    </em></strong>
+            <button class="next round" id="my" >Next &raquo;</button>
+            </div>
+    </tr>
+        </div>
+    <hr />
         {% if user.is_authenticated %}
-        <h2> Saved recipes <br /></h2>
-        <div class="row">
-        
+    <tr>
+        <h2> Saved recipes </h2>
+    </tr>
+    <tr>
+        <div class="row" id="saved">
             {% if SavedRecipes %}
                 {% for recipe in SavedRecipes %}
                     <div class="col-md-4" id="{{ recipe.id }}">
@@ -69,38 +88,91 @@ Profile of {{ selected_user.username }}
                                 </div>
                                 <div class="btn-group">
                                     <button type="button"
-                                            id="removeRecipeButton"
-                                            class="btn btn-sm btn-outline-secondary"
+                                            class="btn btn-sm btn-outline-secondary removeRecipeButton"
                                             data-recipeid="{{ recipe.id }}" >
                                         Remove
                                     </button>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
                 {% endfor %}
+    </tr>
+    <tr>
             {% endif %}
+            <div align="center" >
+            <button class="previous round" id="saved" disabled="true" >&laquo; Previous</button>
+            <strong><em id="SavedRecipePage" >   1    </em></strong>
+            <button class="next round" id="saved" >Next &raquo;</button>
+            </div>
+    </tr>
         </div>
         {% endif %}
+    </tbody>
+    </table>
     </div>
 </div>
-<script type="text/javascript" >
+
+<script src="{% static 'js/paginationHandler.js' %}"></script>
+<script>
     $(document).ready(function () {
-    
-        $(".btn").click(function() {
+        
+        // disable next if there is only one page
+        if ({{ MyRecipePages }}==1 ) {
+            //$("button.next#my").attr("disabled", "true");
+        }
+        
+        if ({{ SavedRecipePages }}==1 ) {
+            $("button.next#saved").attr("disabled", "true");
+        }
+        
+        // retrieve further pages
+        $("button.next#my").click(function () {
+            var currentPageNumber = parseInt($("em#MyRecipePage").html().replace(/ /g,''), 10);
+            $.get("{% url 'cookhub:recipe_pagination' %}", 
+                    {"direction":"next", "currentPageNumber":currentPageNumber, "mode":"My"},
+                    function(data) {
+                        $("div.row#my").html(data);
+                    });
+            
+            $("button.previous#my").attr("disabled", "false");
+        });
+        
+        // remove the recipe from saved
+        $("button.removeRecipeButton").click(function() {
+            alert("hey");
             var recipeID = $(this).attr("data-recipeid");
-            //$(this).hide();
             $.post("{% url 'cookhub:save_recipe' %}",
                     {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"}, 
                     function(data) {
                         if (data=="correct") {
                             $("div#"+recipeID).remove();
                         }
-                    })
+                    });
         });
         
         
     });
     </script>
+<style>
+    a {
+         text-decoration: none;
+         display: inline-block;
+         padding: 8px 16px;
+    }
+        
+    a.previous:hover {
+          background-color: #ddd;
+          color: black;
+    }
+        
+    .previous .next {
+          background-color: #f1f1f1;
+          color: black;
+    }
+        
+    .round {
+          border-radius: 50%;
+    }
+</style>
 {% endblock %}

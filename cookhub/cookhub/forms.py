@@ -65,7 +65,7 @@ class CommentForm(forms.ModelForm):
         exclude = ('user', 'recipe',)
 
 class RatingForm(forms.ModelForm):
-    rating = forms.IntegerField()
+    rating = forms.IntegerField(min_value=1, max_value=5)
     
     class Meta:
         model = Rating

@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, IngredientArrayForm, ChangePasswordForm
 from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category, IngredientArray
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 
 class Homepage(View):
@@ -27,11 +28,9 @@ class Homepage(View):
             for recipe in context_dict['newestRecipes']:
                 if recipe in savedRecipes:
                     saved += [recipe.id]
-                    print(recipe)
             for recipe in context_dict['popularRecipes']:
                 if recipe in savedRecipes:
                     saved += [recipe.id]
-                    print(recipe)
         context_dict["saved"] = saved
         response = render(request, 'cookhub/homepage.html', context=context_dict)
         return response
@@ -237,11 +236,17 @@ class ProfileView(View):
         
         context_dict = {'user_profile': user_profile,
                         'selected_user': user, }
-        recipe_list = Recipe.objects.filter(user=user).order_by('-creationDate')[:5]
-        context_dict['MyRecipes'] = recipe_list
-        savedRecipeList = user_profile.saved_recipes.all()[:5]
-        context_dict["SavedRecipes"] = savedRecipeList
+        
+        recipe_list = Recipe.objects.filter(user=user).order_by('-creationDate')
+        context_dict['MyRecipes'] = recipe_list[:3]
+        context_dict["MyRecipePages"] = len(recipe_list)//3+1
+        
+        savedRecipeList = user_profile.saved_recipes.all()
+        context_dict["SavedRecipes"] = savedRecipeList[:3]
+        context_dict["SavedRecipePages"] = len(savedRecipeList)//3+1
+        
         return render(request, 'cookhub/profile.html', context_dict)
+
 
     @method_decorator(login_required)
     def post(self, request, username):
@@ -265,6 +270,7 @@ class ProfileView(View):
                         'selected_user': user,
                         'form': form}
         return render(request, 'cookhub/profile.html', context_dict)
+
 
 
 @login_required
@@ -299,6 +305,7 @@ class RecipeView(View):
             comments = Comment.objects.filter(recipe=recipe)
             ratings = Rating.objects.filter(recipe=recipe)
             creator = recipe.user
+            user_profile = UserModel.objects.get(user=creator)
             rating_form = RatingForm()
             comment_form = CommentForm()
             
@@ -311,6 +318,7 @@ class RecipeView(View):
         context_dict['comments'] = comments
         context_dict['ratings'] = ratings
         context_dict['creator'] = creator
+        context_dict["profile_picture"] = user_profile.picture
         context_dict['recipe'] = recipe
         context_dict['rating_form'] = rating_form
         context_dict['comment_form'] = comment_form
@@ -323,7 +331,7 @@ class RecipeView(View):
             return redirect(reverse('cookhub:homepage'))
         if request.user!=context_dict['creator']:
             context_dict['recipe'].views+=1
-            context_dict['rpresent'] = not context_dict['ratings'].filter(user=request.user)
+            context_dict['rpresent'] = (request.user.is_authenticated and not context_dict['ratings'].filter(user=request.user))
         Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
         return render(request, 'cookhub/recipe.html', context=context_dict)
     
@@ -416,7 +424,6 @@ class EditRecipeView(View):
                 recipe.save()
                 recipe_form.save_m2m()
                 return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
-            
         
         if 'addCategory' in request.POST:
             category_form = CategoryForm(request.POST)
@@ -425,11 +432,14 @@ class EditRecipeView(View):
             return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
         return render(request, 'cookhub/edit_recipe.html', context=context_dict)
 
+
+
 @login_required
 def create_recipe(request):
     recipe = Recipe(user=request.user)
     recipe.save()
     return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe.id}))
+
 
 @login_required
 def add_recipe(request, recipe_id):
@@ -462,8 +472,18 @@ def add_recipe(request, recipe_id):
                 ingredient.save()
             return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
             
-
     return render(request, 'cookhub/add_recipe.html', context={'recipe_form':recipe_form, 'category_form':category_form, 'recipe':recipe, 'ingredient_form':ingredient_form, 'ingredients':Ingredient.objects.filter(recipe=recipe)})
+
+
+class DeleteRecipeView(View):
+    @method_decorator(login_required)
+    def get(self, request, recipe_id):
+        try:
+            Recipe.objects.get(id=int(recipe_id)).delete()
+            return redirect(reverse('cookhub:profile', kwargs={'username':request.user.username}))
+        except Recipe.DoesNotExist:
+            return HttpResponse("An error occurred and the recipe could not be found. <a href='/profile/"+request.user.username+"/'>Return to your profile page.</a>")
+
 
 @login_required
 def del_ingredient(request, recipe_id, ingredient_id):
@@ -481,8 +501,11 @@ def del_editingredient(request, recipe_id, ingredient_id):
         return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
     return render(request, 'cookhub/del_editingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
 
-class SaveRecipeView(View):
+
+
+class SavedRecipesView(View):
     @method_decorator(login_required)
+    # saves a recipe
     def get(self, request):
         recipeID = request.GET["recipeID"]
         try:
@@ -498,6 +521,7 @@ class SaveRecipeView(View):
         return HttpResponse()
     
     @method_decorator(login_required)
+    # removes a saved recipe
     def post(self, request):
         recipeID = request.POST["recipeID"]
         try:
@@ -513,6 +537,84 @@ class SaveRecipeView(View):
         return HttpResponse("correct")
 
 
-
-
-
+class PaginationView(View):
+    def get(self, request):
+        RecipesPerPage = int(request.GET["RecipesPerPage"])
+        author = request.GET["author"]
+        which = request.GET["which"]
+        page = int(request.GET["page"])
+        single = int(request.GET["single"])
+        # deal with the author
+        if author!="#":
+            # TODO: for testing purposes seperate, put in one try block later
+            try:
+                user = User.objects.get(username=author)
+            except User.DoesNotExist:
+                return HttpResponse("error: User does not exist")
+            except ValueError:
+                return HttpResponse("error: value error")
+            try:
+                recipes = Recipe.objects.filter(user=user)
+            except Recipe.DoesNotExist:
+                return HttpResponse("error: Recipe does not exist")
+            except ValueError:
+                return HttpResponse("error: value error")
+        else:
+            recipes = Recipe.objects.all()
+        
+        # deal with the which
+        if which=="newest":
+            recipes = recipes.order_by("-creationDate")
+        elif which=="popular":
+            recipes = recipes.order_by("-views")
+        elif which=="my":
+            pass # we already specified the author
+        elif which=="saved":
+            user_profile = UserModel.objects.get(user=user)
+            recipes = user_profile.saved_recipes.all()
+        else:
+            return HttpResponse("error: Wrong 'which' parameter")
+        
+        # deal with the RecipesPerPage and pages
+        n = len(recipes)-1 # end index of the number of queryset
+        if n<(page-1)*RecipesPerPage:
+            return HttpResponse("error: not this many recipes exist for "+str(page) +" pages and "+str(RecipesPerPage)+" recipes per page")
+        if n+1>page*RecipesPerPage:
+            recipes = recipes[(page-1)*RecipesPerPage:page*RecipesPerPage] 
+        else:
+            recipes = recipes[(page-1)*RecipesPerPage:n+1]
+        
+        if single==0:
+            pass
+        elif single<0:
+            return HttpResponse("error: single bellow 0")
+        elif single>RecipesPerPage:
+            return HttpResponse("error: single larger than RecipesPerPage")
+        else:
+            recipes = recipes[single]
+        
+        # pack the recipes into the format for the webpage
+        responseString = ""
+        
+        if n==0 or single!=0:
+            responseString += str(recipes.photo) + ";;"
+            responseString += str(recipes.id) + ";;"
+            responseString += recipes.title + ";;"
+            responseString += str(recipes.averageRating)
+            responseString += "||RCP||"
+        elif n>0:
+            for recipe in recipes:
+                responseString += str(recipe.photo) + ";;"
+                responseString += str(recipe.id) + ";;"
+                responseString += recipe.title + ";;"
+                responseString += str(recipe.averageRating)
+                responseString += "||RCP||"
+        else:
+            return HttpResponse("error: no recipes returned")
+            
+        responseString = responseString[:-7] # remove last ||RCP|| delimiter
+        return HttpResponse(responseString)
+        
+def test(request):
+    #recipe = Recipe.objects.get(id=1)
+    return render(request, "cookhub/test.html", {"debuggingInformation":""})

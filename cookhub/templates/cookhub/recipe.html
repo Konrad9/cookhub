@@ -33,14 +33,25 @@
 			<table>
 			<tr>
 				<td>
-				<img src="{{ Media_URL }}{{ creator.picture }}" width = "150" height "150" />
+				<img src="{{ MEDIA_URL }}{{ profile_picture }}" width = "150" height "150" />
 				</td>
+            </tr>
+            <tr>
 				<td>
 				{{ creator.username }} <br />
 				Views: {{ recipe.views }} <br />
 				Rating: {{ recipe.averageRating }} <br />
 				</td>
 			</tr>
+			{% ifequal user creator %}
+			{% if user.is_authenticated %}
+			<tr>
+				<td>
+				<button onclick="deleteRecipe()" >Delete Recipe</button>
+				</td>
+			</tr>
+			{% endif %}
+			{% endifequal %}
 			</table>
 		</tr>
 		<tr>
@@ -125,5 +136,12 @@
 		</td>
 	</tr>
 	</table>
+<script type="text/javascript">
+    function deleteRecipe() {
+          if (confirm("Delete Recipe?\nPress OK to confirm deletion.")) {
+              window.open("/recipe/{{ recipe.id }}/delete/", "_self");
+          }
+    }
+</script>
 {% endblock %}
 		
