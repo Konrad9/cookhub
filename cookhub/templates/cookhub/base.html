@@ -28,12 +28,12 @@
     
     <body>
         <header>
-            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark p-0">
-                <a class="navbar-brand" href="{% url 'cookhub:homepage' %}"><img src="{{ MEDIA_URL }}logo.png" /></a>
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top p-2" style="background-color:#252525">
+                <a class="navbar-brand p-0" href="{% url 'cookhub:homepage' %}"><img src="{{ MEDIA_URL }}logo.png" /></a>
                 <div class="collapse navbar-collapse pr-3" id="navbarCollapse">
                     <ul class="navbar-nav mr-auto">
 
-{#                         TODO: Search function#}
+                        {#                         TODO: Search function#}
                         <form class="form-inline mt-2 mt-md-0"
                               id="user-form"
                               method="post"
@@ -60,17 +60,18 @@
                         </form>
                     </ul>
                     <ul class="navbar-nav mt-2 mt-md-0">{% if user.is_authenticated %}
-                        <li class="nav-item nav-item mt-2 mr-3"><a class="text"
-                                                                   style="color:white">Welcome back, {{ user.username }}</a></li>
-
+                        <li class="nav-item">
+                            <a class="nav-link active pr-3">Welcome back, {{ user.username }}</a>
+                        </li>
                         <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit" style="border-radius:10rem" href="{% url 'cookhub:create_recipe' %}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 27" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg>
                             New Recipe</a></li>
                         <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit" style="border-radius:10rem" href="{% url 'cookhub:profile' user.username %}">My Profile</a></li>
                         <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0" type="submit" style="border-radius:10rem" href="{% url 'cookhub:logout' %}?next=/cookhub/">Logout</a></li>
                     {% else %}
-                        <li class="nav-item mt-2 mr-3"><a class="text"
-                                                          style="color:white">You are not logged in</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link active pr-3">You are not logged in</a>
+                        </li>
                         <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit" style="border-radius:10rem" href="{% url 'cookhub:register' %}" name="submit">Register</a></li>
                         <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0" type="submit" style="border-radius:10rem" href="{% url 'cookhub:login' %}" name="submit">Login</a></li>
 
@@ -78,13 +79,21 @@
                 </div>
             </nav>
         </header>
-        <div class="container-fluid pt-5 mt-5">
+        <div class="container-fluid pr-0 pl-0 ml-0 pt-5 mt-5">
 
         {% block body_block %}{% endblock %}
         </div>
         <script src="{% static 'js/paginationHandler.js' %}"></script>
         <!--<script src="{% static 'js/jquery-3.3.1.slim.min.js' %}" crossorigin="anonymous"></script>-->
     </body>
+
+<style>
+    .container-fluid {
+        background-color: #343434;
+    }
+
+</style>
+
 
 
 </html>
