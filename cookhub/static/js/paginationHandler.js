@@ -18,6 +18,7 @@ function RecipeGetter(RecipesPerPage, author, which, page, single, element, url,
                          recipeInformation.photoSource = "/media/"+recipe[0];
                          recipeInformation.id = recipe[1];
                          recipeInformation.title = recipe[2];
+                         recipeInformation.author = recipe[3];
                          recipeInformation.averageRating = recipe[3];
                          if (buttons=="yes") {
                                 recipeInformation.button = recipe[4];
@@ -36,7 +37,7 @@ function RecipeGetter(RecipesPerPage, author, which, page, single, element, url,
 // now to the representation
 function displayRecipes(element, recipesArray, buttons) {
     var part1 = "<div class='col-md-4'><div class='card mb-4 box-shadow'><img class='card-img-top' alt='Thumbnail [100%x225]' style='height: 225px; width: 100%; display: block;' src='";
-    var part2 = "' data-holder-rendered='true'><div class='card-body'><a class='card-text-title p-0 m-0' href='/recipe/";
+    var part2 = "' data-holder-rendered='true'><div class='card-body'><a class='card-text-title p-0 m-0 text-truncate' style='max-width: 300px' href='/recipe/";
     var part3 = "'>";
     var part4 = "</a><div class='d-flex justify-content-between align-items-center'><p class=\"card-text-author mt-2 mb-2\">Author: ";
     var part41 = "</p><p class=\"card-text-rating mt-2 mb-2\">Rating: ";

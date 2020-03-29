@@ -25,16 +25,16 @@ Profile of {{ selected_user.username }}
             User Name: {{ selected_user.username }}<br />
             Email: {{ selected_user.email }}<br />
             {% if selected_user == user %}
-                    <a href="{% url 'cookhub:edit_profile' user.username %}">Edit Profile</a>   
+                    <a href="{% url 'cookhub:edit_profile' user.username %}">Edit Profile</a>
             {% endif %}
-        </div> 
+        </div>
     </div>
 </div>
 
 
-<div class="album py-5 bg-light">
+<div class="album py-5">
     <div class="container">
-    
+
     <table>
     <tbody>
     <tr>
@@ -46,9 +46,9 @@ Profile of {{ selected_user.username }}
     </tr>
     <tr>
             <div align="center" >
-            <button class="previous round" id="my" >&laquo; Previous</button>
-            <strong><em id="MyRecipePage" >   1   </em></strong>
-            <button class="next round" id="my" >Next &raquo;</button>
+            <button class="previous btn btn-outline-warning my-2 my-sm-0" id="my" >&laquo; Previous</button>
+            <strong><em class="pr-2 pl-2" id="NewestRecipePage" style="color: white">   1   </em></strong>
+            <button class="next btn btn-outline-warning my-2 my-sm-0" id="my" >Next &raquo;</button>
             </div>
     </tr>
         </div>
@@ -60,13 +60,13 @@ Profile of {{ selected_user.username }}
     <tr>
         <div class="row" id="saved">
         </div>
-        
+
     </tr>
     <tr>
             <div align="center" >
-            <button class="previous round" id="saved" >&laquo; Previous</button>
-            <strong><em id="SavedRecipePage" >   1   </em></strong>
-            <button class="next round" id="saved" >Next &raquo;</button>
+            <button class="previous btn btn-outline-warning my-2 my-sm-0" id="saved" >&laquo; Previous</button>
+            <strong><em class="pr-2 pl-2" id="NewestRecipePage" style="color: white">   1   </em></strong>
+            <button class="next btn btn-outline-warning my-2 my-sm-0" id="saved" >Next &raquo;</button>
             </div>
     </tr>
         </div>
@@ -79,9 +79,9 @@ Profile of {{ selected_user.username }}
 
 <script>
     $(document).ready(function () {
-        
+
         $("button.previous").attr("disabled", true);
-        
+
         var RecipesPerPage = "3";
         var author = "{{ selected_user.username }}";
         var which = "my";
@@ -95,7 +95,7 @@ Profile of {{ selected_user.username }}
         }
         $("em#MyRecipePage").text("   "+page+"   ");
         RecipeGetter(RecipesPerPage, author, which, page, single, element, url);
-        
+
         {% if user.is_authenticated %}
         which = "saved";
         element = "div.row#saved";
@@ -105,13 +105,13 @@ Profile of {{ selected_user.username }}
         }
         $("em#SavedRecipePage").text("   "+page+"   ");
         RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-        
-        
+
+
         // remove the recipe from saved
         $("body").on("click", "button.removeRecipeButton", function() {
             var recipeID = $(this).attr("data-recipeid");
             $.post("{% url 'cookhub:save_recipe' %}",
-                    {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"}, 
+                    {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"},
                     function(data) {
                         if (data.startsWith("correct")) {
                             //$("div#"+recipeID).remove();
@@ -141,17 +141,17 @@ Profile of {{ selected_user.username }}
                             }
                             else if (nextPageNumber=={{ MyRecipePages }}) {
                                 $("button.next#saved").attr("disabled", true);
-                            }                            
+                            }
                             if (nextPageNumber>0) {
                                 $("em#SavedRecipePage").text("   "+page+"   ");
                             }
                             RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
                         }
                     });
-                
+
         });
         {% endif %}
-        
+
         // retrieve next "My Recipes" page
         $("button.next#my").click(function () {
             var RecipesPerPage = "3";
@@ -167,9 +167,9 @@ Profile of {{ selected_user.username }}
                 $("button.next#my").attr("disabled", true);
             }
             $("em#MyRecipePage").text("   "+page+"   ");
-            RecipeGetter(RecipesPerPage, author, which, page, single, element, url);   
+            RecipeGetter(RecipesPerPage, author, which, page, single, element, url);
         });
-        
+
         // retrieve previous "My Recipes" page
         $("button.previous#my").click(function () {
             var RecipesPerPage = "3";
@@ -187,7 +187,7 @@ Profile of {{ selected_user.username }}
             $("em#MyRecipePage").text("   "+page+"   ");
             RecipeGetter(RecipesPerPage, author, which, page, single, element, url);
         });
-        
+
         {% if user.is_authenticated %}
         // retrieve next "Saved Recipes" page
         $("button.next#saved").click(function () {
@@ -206,9 +206,9 @@ Profile of {{ selected_user.username }}
             }
             $("em#SavedRecipePage").text("   "+page+"   ");
             RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-            
+
         });
-        
+
         // retrieve previous "Saved Recipes" page
         $("button.previous#saved").click(function () {
             var RecipesPerPage = "3";
@@ -228,7 +228,7 @@ Profile of {{ selected_user.username }}
             RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
         });
         {% endif %}
-    
+
     });
     </script>
 <style>
@@ -237,17 +237,17 @@ Profile of {{ selected_user.username }}
          display: inline-block;
          padding: 8px 16px;
     }
-        
+
     a.previous:hover {
           background-color: #ddd;
           color: black;
     }
-        
+
     .previous .next {
           background-color: #f1f1f1;
           color: black;
     }
-        
+
     .round {
           border-radius: 50%;
     }
