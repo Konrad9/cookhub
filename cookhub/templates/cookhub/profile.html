@@ -38,7 +38,7 @@ Profile of {{ selected_user.username }}
     <table>
     <tbody>
     <tr>
-        <h2> My recipes </h2>
+        <h2> {% if user.is_authenticated %}My{% else %}{{ selected_user.username }}'s{% endif %} recipes </h2>
     </tr>
     <tr>
         <div class="row" id="my">
@@ -99,7 +99,7 @@ Profile of {{ selected_user.username }}
         {% if user.is_authenticated %}
         which = "saved";
         element = "div.row#saved";
-        var buttons = "yes";
+        var buttons = "remove";
         if (nextPageNumber=={{ SavedRecipePages }}) {
             $("button.next#saved").attr("disabled", true);
         }
@@ -120,11 +120,8 @@ Profile of {{ selected_user.username }}
                             var author = "{{ selected_user.username }}";
                             var which = "saved";
                             var nextPageNumber = parseInt($("em#SavedRecipePage").html().replace(/ /g,''), 10);
-                            if (recipesLeft%RecipesPerPage==0) {
+                            if (recipesLeft%RecipesPerPage==0 && nextPageNumber>1) {
                                 nextPageNumber -= 1;
-                            }
-                            else if (recipesLeft==0) {
-                                return;
                             }
                             var page = nextPageNumber.toString();
                             var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
@@ -132,9 +129,12 @@ Profile of {{ selected_user.username }}
                                 single = "1";
                             }
                             var element = "div.row#saved";
+                            if (recipesLeft==0) {
+                                $(element).html("");
+                                return;
+                            }
                             var url = "{% url 'cookhub:recipe_pagination' %}";
-                            var buttons = "yes";
-                            var recipesLeft = parseInt(data.substring(7), 10);
+                            var buttons = "remove";
                             if (recipesLeft<=parseInt(RecipesPerPage, 10)) {
                                 $("button.next#saved").attr("disabled", true);
                                 $("button.previous#saved").attr("disabled", true);
@@ -199,7 +199,7 @@ Profile of {{ selected_user.username }}
             var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
             var element = "div.row#saved";
             var url = "{% url 'cookhub:recipe_pagination' %}";
-            var buttons = "yes";
+            var buttons = "remove";
             $("button.previous#saved").attr("disabled", false);
             if (nextPageNumber=={{ MyRecipePages }}) {
                 $("button.next#saved").attr("disabled", true);
@@ -219,7 +219,7 @@ Profile of {{ selected_user.username }}
             var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
             var element = "div.row#saved";
             var url = "{% url 'cookhub:recipe_pagination' %}";
-            var buttons = "yes";
+            var buttons = "remove";
             $("button.next#saved").attr("disabled", false);
             if (nextPageNumber==1) {
                 $("button.previous#saved").attr("disabled", true);

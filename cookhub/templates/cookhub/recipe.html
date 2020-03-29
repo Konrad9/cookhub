@@ -52,6 +52,21 @@
 			</tr>
 			{% endif %}
 			{% endifequal %}
+			{% if user.is_authenticated %}
+			{% if saved %}
+			<tr>
+				<td>
+				<button id="removeRecipeButton" >Remove Recipe</button>
+				</td>
+			</tr>
+			{% else %}
+			<tr>
+				<td>
+				<button id="saveRecipeButton" >Save Recipe</button>
+				</td>
+			</tr>
+			{% endif %}
+			{% endif %}
 			</table>
 		</tr>
 		<tr>
@@ -142,6 +157,20 @@
               window.open("/recipe/{{ recipe.id }}/delete/", "_self");
           }
     }
+    
+    $("button#saveRecipeButton").click(function () {
+            $(this).attr("disabled", true);
+            $(this).html("Saved");
+            $.get("{% url 'cookhub:save_recipe' %}",
+                    {"recipeID": {{ recipe.id }}});
+    });
+    
+    $("button#removeRecipeButton").click(function () {
+            $(this).attr("disabled", true);
+            $(this).html("Removed");
+            $.post("{% url 'cookhub:save_recipe' %}",
+                    {"recipeID": {{ recipe.id }}, "csrfmiddlewaretoken": "{{ csrf_token }}"});
+    });
 </script>
 {% endblock %}
 		

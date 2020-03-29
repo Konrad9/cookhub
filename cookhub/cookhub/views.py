@@ -345,6 +345,11 @@ class RecipeView(View):
             context_dict['recipe'].views+=1
             context_dict['rpresent'] = (request.user.is_authenticated and not context_dict['ratings'].filter(user=request.user))
         Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
+        if request.user.is_authenticated:
+            userProfile = UserModel.objects.get(user=request.user)
+            savedRecipes = userProfile.saved_recipes.all()
+            if context_dict['recipe'] in savedRecipes:
+                context_dict["saved"] = "yes"
         return render(request, 'cookhub/recipe.html', context=context_dict)
     
     @method_decorator(login_required)
@@ -559,17 +564,14 @@ class PaginationView(View):
         page = int(request.GET["page"])
         print("Page to get: "+str(page))
         single = int(request.GET["single"])
+        buttons = request.GET.get("buttons", None)
         # deal with the author
         if author!="#":
-            # TODO: for testing purposes seperate, put in one try block later
             try:
                 user = User.objects.get(username=author)
+                recipes = Recipe.objects.filter(user=user)
             except User.DoesNotExist:
                 return HttpResponse("error: User does not exist")
-            except ValueError:
-                return HttpResponse("error: value error")
-            try:
-                recipes = Recipe.objects.filter(user=user)
             except Recipe.DoesNotExist:
                 return HttpResponse("error: Recipe does not exist")
             except ValueError:
@@ -592,6 +594,7 @@ class PaginationView(View):
         
         # deal with the RecipesPerPage and pages
         n = len(recipes)-1 # end index of the number of queryset
+        print("recipes: "+ str(n+1))
         if n<0:
             return HttpResponse("empty")
         if n<(page-1)*RecipesPerPage:
@@ -613,11 +616,20 @@ class PaginationView(View):
         # pack the recipes into the format for the webpage
         responseString = ""
         
-        if n==0 or single!=0:
+        if single!=0 or len(recipes)==1:
+            if (n==0 or len(recipes)==1) and single==0:
+                recipes = recipes[0]
             responseString += str(recipes.photo) + ";;"
             responseString += str(recipes.id) + ";;"
             responseString += recipes.title + ";;"
             responseString += str(recipes.averageRating)
+            if buttons=="yes" and request.user.is_authenticated:
+                userProfile = UserModel.objects.get(user=request.user)
+                savedRecipes = userProfile.saved_recipes.all()
+                if recipes in savedRecipes:
+                    responseString += ";;" + "saved" + ";;"
+                else:
+                    responseString += ";;" + "save" + ";;"
             responseString += "||RCP||"
         elif n>0:
             for recipe in recipes:
@@ -625,10 +637,18 @@ class PaginationView(View):
                 responseString += str(recipe.id) + ";;"
                 responseString += recipe.title + ";;"
                 responseString += str(recipe.averageRating)
+                if buttons=="yes" and request.user.is_authenticated:
+                    userProfile = UserModel.objects.get(user=request.user)
+                    savedRecipes = userProfile.saved_recipes.all()
+                    if recipe in savedRecipes:
+                        responseString += ";;" + "saved" + ";;"
+                    else:
+                        responseString += ";;" + "save" + ";;"
                 responseString += "||RCP||"
         else:
             return HttpResponse("error: no recipes returned")
-            
+        
+        print("recipes: "+ str(n+1))
         responseString = responseString[:-7] # remove last ||RCP|| delimiter
         return HttpResponse(responseString)
         

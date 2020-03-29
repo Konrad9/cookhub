@@ -262,7 +262,7 @@
 
         {% if user.is_authenticated %}
         // save recipes
-        $("body").on("click", "button.removeRecipeButton", function() {
+        $("body").on("click", "button.addRecipeButton", function() {
             var recipeID = $(this).attr("data-recipeid");
             $(this).attr("disabled", true);
             $(this).html("Saved");

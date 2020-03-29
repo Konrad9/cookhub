@@ -1,5 +1,5 @@
 function RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons, attributes) {
-    $.get(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "attributes":attributes},
+    $.get(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes},
           function(data) {
               if (data.startsWith("error")) {
                       alert(data);
@@ -20,12 +20,11 @@ function RecipeGetter(RecipesPerPage, author, which, page, single, element, url,
                          recipeInformation.title = recipe[2];
                          recipeInformation.averageRating = recipe[3];
                          if (buttons=="yes") {
-                             if (which=="newest" || which=="popular") {
-                                 recipeInformation.button = recipe[4];
-                                 }
-                            else if (which=="saved") {
+                                recipeInformation.button = recipe[4];
+                         }
+                            
+                         if (buttons=="remove") {
                                 recipeInformation.button = "remove";
-                            }
                          }
                          recipesArray[i] = recipeInformation;       // add the dictionary to the array of recipe dictionaries
                  }
@@ -45,16 +44,14 @@ function displayRecipes(element, recipesArray, buttons) {
     var recipeHTMLpiece = "";
     for (i=0; i<recipesArray.length; i++) {
         var buttonPart = "";
-        if (buttons=="yes") {
-            if (recipesArray[i].button=="remove") {
-                buttonPart = "<div class='btn-group'><button type='button' id='" + recipesArray[i].id + "' class='btn btn-sm btn-outline-secondary removeRecipeButton' data-recipeid='" + recipesArray[i].id + "' >Remove</button></div>";
-            }
-            else if (recipesArray[i].button=="save") {
-                buttonPart = "<div class='btn-group'><button type='button' id='" + recipesArray[i].id + "' class='btn btn-sm btn-outline-secondary addRecipeButton' data-recipeid='" + recipesArray[i].id + "' >Save</button></div>";
-            }
-            else if (recipesArray[i].button=="saved") {
-                buttonPart = "<div class='btn-group'><button type='button' id='" + recipesArray[i].id + "' class='btn btn-sm btn-outline-secondary addRecipeButton' data-recipeid='" + recipesArray[i].id + "' disabled='true' >Saved</button></div>";
-            }
+        if (recipesArray[i].button=="remove") {
+            buttonPart = "<div class='btn-group'><button type='button' id='" + recipesArray[i].id + "' class='btn btn-sm btn-outline-secondary removeRecipeButton' data-recipeid='" + recipesArray[i].id + "' >Remove</button></div>";
+        }
+        else if (recipesArray[i].button=="save") {
+            buttonPart = "<div class='btn-group'><button type='button' id='" + recipesArray[i].id + "' class='btn btn-sm btn-outline-secondary addRecipeButton' data-recipeid='" + recipesArray[i].id + "' >Save</button></div>";
+        }
+        else if (recipesArray[i].button=="saved") {
+            buttonPart = "<div class='btn-group'><button type='button' id='" + recipesArray[i].id + "' class='btn btn-sm btn-outline-secondary addRecipeButton' data-recipeid='" + recipesArray[i].id + "' disabled='true' >Saved</button></div>";
         }
         recipeHTMLpiece += part1 + recipesArray[i].photoSource + part2 + recipesArray[i].id + part3 + recipesArray[i].title + part4 + recipesArray[i].averageRating + part5 + buttonPart + part6;
     }
