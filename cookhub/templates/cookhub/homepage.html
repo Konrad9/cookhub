@@ -13,7 +13,7 @@
                 <table>
                     <tbody>
                     <tr>
-                        <h2> Newest recipes </h2>
+                        <h2 class="card-section p-1"> NEWEST RECIPES <br/></h2>
                     </tr>
                     <tr>
                         <div class="row" id="newest">
@@ -21,14 +21,14 @@
                     </tr>
                     <tr>
                         <div align="center">
-                            <button class="previous" id="newest">&laquo; Previous</button>
-                            <strong><em id="NewestRecipePage"> 1 </em></strong>
-                            <button class="next" id="newest">Next &raquo;</button>
+                            <button class="previous btn btn-outline-warning my-2 my-sm-0" id="newest">&laquo; Previous</button>
+                            <strong><em class="pr-2 pl-2" id="NewestRecipePage" style="color: white"> 1 </em></strong>
+                            <button class="next btn btn-outline-warning my-2 my-sm-0" id="newest">Next &raquo;</button>
                         </div>
                     </tr>
             <hr/>
             <tr>
-                <h2> Popular recipes </h2>
+                <h2 class="card-section p-1"> POPULAR RECIPES <br/></h2>
             </tr>
             <tr>
                 <div class="row" id="popular">
@@ -37,9 +37,9 @@
             </tr>
             <tr>
                 <div align="center">
-                    <button class="previous" id="popular">&laquo; Previous</button>
-                    <strong><em id="PopularRecipePage"> 1 </em></strong>
-                    <button class="next" id="popular">Next &raquo;</button>
+                    <button class="previous btn btn-outline-warning my-2 my-sm-0" id="popular">&laquo; Previous</button>
+                    <strong><em class="pr-2 pl-2" id="PopularRecipePage" style="color: white"> 1 </em></strong>
+                    <button class="next btn btn-outline-warning my-2 my-sm-0" id="popular">Next &raquo;</button>
                 </div>
             </tr>
             </tbody>
@@ -78,6 +78,32 @@
         .album {
             background-color: #343434;
         }
+
+        .card {
+            background-color: #252525;
+        }
+
+        .card-text-title {
+            color: #ffd32d;
+        }
+
+        .card-text-author {
+            color: #f5f2ff;
+        }
+
+        .card-text-rating {
+            color: #867a7f;
+        }
+
+        .card-section {
+            color: #fff9f8;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+        }
+
+
 
 
     </style>
