@@ -1,7 +1,5 @@
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -19,20 +17,28 @@ class Homepage(View):
         context_dict = {}
         saved = []
         
-        context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')[:5]
-        context_dict['popularRecipes'] = Recipe.objects.order_by('-views')[:5]
+        context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')
+        context_dict['popularRecipes'] = Recipe.objects.order_by('-views')
+        n = len(Recipe.objects.order_by('-creationDate'))
+        context_dict["NewestRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["NewestRecipePages"] += 1
+        n = len(Recipe.objects.order_by('-views'))
+        context_dict["PopularRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["PopularRecipePages"] += 1
         if request.user.is_authenticated:
             userProfile = UserModel.objects.get(user=request.user)
             savedRecipes = userProfile.saved_recipes.all()
             for recipe in context_dict['newestRecipes']:
                 if recipe in savedRecipes:
                     saved += [recipe.id]
-                    print(recipe)
             for recipe in context_dict['popularRecipes']:
                 if recipe in savedRecipes:
                     saved += [recipe.id]
-                    print(recipe)
         context_dict["saved"] = saved
+        print("Newest pages: " + str(context_dict["NewestRecipePages"]))
+        print("Popular pages: " + str(context_dict["PopularRecipePages"]))
         response = render(request, 'cookhub/homepage.html', context=context_dict)
         return response
 
@@ -237,11 +243,22 @@ class ProfileView(View):
         
         context_dict = {'user_profile': user_profile,
                         'selected_user': user, }
-        recipe_list = Recipe.objects.filter(user=user).order_by('-creationDate')[:5]
-        context_dict['MyRecipes'] = recipe_list
-        savedRecipeList = user_profile.saved_recipes.all()[:5]
-        context_dict["SavedRecipes"] = savedRecipeList
+        
+        MyRecipeList = Recipe.objects.filter(user=user).order_by('-creationDate')        
+        n = len(MyRecipeList)
+        context_dict["MyRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["MyRecipePages"] += 1
+        
+        savedRecipeList = user_profile.saved_recipes.all()
+        n = len(savedRecipeList)
+        context_dict["SavedRecipePages"] = n//3
+        if n//3!=n/3:
+            context_dict["SavedRecipePages"] += 1
+        print("saved recipes: " + str(3//3))
+        
         return render(request, 'cookhub/profile.html', context_dict)
+
 
     @method_decorator(login_required)
     def post(self, request, username):
@@ -265,6 +282,7 @@ class ProfileView(View):
                         'selected_user': user,
                         'form': form}
         return render(request, 'cookhub/profile.html', context_dict)
+
 
 
 @login_required
@@ -299,6 +317,7 @@ class RecipeView(View):
             comments = Comment.objects.filter(recipe=recipe)
             ratings = Rating.objects.filter(recipe=recipe)
             creator = recipe.user
+            user_profile = UserModel.objects.get(user=creator)
             rating_form = RatingForm()
             comment_form = CommentForm()
             
@@ -311,6 +330,7 @@ class RecipeView(View):
         context_dict['comments'] = comments
         context_dict['ratings'] = ratings
         context_dict['creator'] = creator
+        context_dict["profile_picture"] = user_profile.picture
         context_dict['recipe'] = recipe
         context_dict['rating_form'] = rating_form
         context_dict['comment_form'] = comment_form
@@ -323,8 +343,13 @@ class RecipeView(View):
             return redirect(reverse('cookhub:homepage'))
         if request.user!=context_dict['creator']:
             context_dict['recipe'].views+=1
-            context_dict['rpresent'] = not context_dict['ratings'].filter(user=request.user)
+            context_dict['rpresent'] = (request.user.is_authenticated and not context_dict['ratings'].filter(user=request.user))
         Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
+        if request.user.is_authenticated:
+            userProfile = UserModel.objects.get(user=request.user)
+            savedRecipes = userProfile.saved_recipes.all()
+            if context_dict['recipe'] in savedRecipes:
+                context_dict["saved"] = "yes"
         return render(request, 'cookhub/recipe.html', context=context_dict)
     
     @method_decorator(login_required)
@@ -416,7 +441,6 @@ class EditRecipeView(View):
                 recipe.save()
                 recipe_form.save_m2m()
                 return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
-            
         
         if 'addCategory' in request.POST:
             category_form = CategoryForm(request.POST)
@@ -425,11 +449,14 @@ class EditRecipeView(View):
             return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
         return render(request, 'cookhub/edit_recipe.html', context=context_dict)
 
+
+
 @login_required
 def create_recipe(request):
     recipe = Recipe(user=request.user)
     recipe.save()
     return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe.id}))
+
 
 @login_required
 def add_recipe(request, recipe_id):
@@ -462,8 +489,18 @@ def add_recipe(request, recipe_id):
                 ingredient.save()
             return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
             
-
     return render(request, 'cookhub/add_recipe.html', context={'recipe_form':recipe_form, 'category_form':category_form, 'recipe':recipe, 'ingredient_form':ingredient_form, 'ingredients':Ingredient.objects.filter(recipe=recipe)})
+
+
+class DeleteRecipeView(View):
+    @method_decorator(login_required)
+    def get(self, request, recipe_id):
+        try:
+            Recipe.objects.get(id=int(recipe_id)).delete()
+            return redirect(reverse('cookhub:profile', kwargs={'username':request.user.username}))
+        except Recipe.DoesNotExist:
+            return HttpResponse("An error occurred and the recipe could not be found. <a href='/profile/"+request.user.username+"/'>Return to your profile page.</a>")
+
 
 @login_required
 def del_ingredient(request, recipe_id, ingredient_id):
@@ -481,8 +518,11 @@ def del_editingredient(request, recipe_id, ingredient_id):
         return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
     return render(request, 'cookhub/del_editingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
 
-class SaveRecipeView(View):
+
+
+class SavedRecipesView(View):
     @method_decorator(login_required)
+    # saves a recipe
     def get(self, request):
         recipeID = request.GET["recipeID"]
         try:
@@ -498,6 +538,7 @@ class SaveRecipeView(View):
         return HttpResponse()
     
     @method_decorator(login_required)
+    # removes a saved recipe
     def post(self, request):
         recipeID = request.POST["recipeID"]
         try:
@@ -510,9 +551,107 @@ class SaveRecipeView(View):
         userProfile = UserModel.objects.get(user=request.user)
         userProfile.saved_recipes.remove(recipe)
         userProfile.save()
-        return HttpResponse("correct")
+        n = len(userProfile.saved_recipes.all())
+        print("Saved recipes left: " + str(n))
+        return HttpResponse("correct"+str(n))
 
 
-
-
-
+class PaginationView(View):
+    def get(self, request):
+        RecipesPerPage = int(request.GET["RecipesPerPage"])
+        author = request.GET["author"]
+        which = request.GET["which"]
+        page = int(request.GET["page"])
+        print("Page to get: "+str(page))
+        single = int(request.GET["single"])
+        buttons = request.GET.get("buttons", None)
+        # deal with the author
+        if author!="#":
+            try:
+                user = User.objects.get(username=author)
+                recipes = Recipe.objects.filter(user=user)
+            except User.DoesNotExist:
+                return HttpResponse("error: User does not exist")
+            except Recipe.DoesNotExist:
+                return HttpResponse("error: Recipe does not exist")
+            except ValueError:
+                return HttpResponse("error: value error")
+        else:
+            recipes = Recipe.objects.all()
+        
+        # deal with the which
+        if which=="newest":
+            recipes = recipes.order_by("-creationDate")
+        elif which=="popular":
+            recipes = recipes.order_by("-views")
+        elif which=="my":
+            pass # we already specified the author
+        elif which=="saved":
+            user_profile = UserModel.objects.get(user=user)
+            recipes = user_profile.saved_recipes.all()
+        else:
+            return HttpResponse("error: Wrong 'which' parameter")
+        
+        # deal with the RecipesPerPage and pages
+        n = len(recipes)-1 # end index of the number of queryset
+        print("recipes: "+ str(n+1))
+        if n<0:
+            return HttpResponse("empty")
+        if n<(page-1)*RecipesPerPage:
+            return HttpResponse("error: not this many recipes exist for "+str(page) +" pages and "+str(RecipesPerPage)+" recipes per page")
+        if n+1>page*RecipesPerPage:
+            recipes = recipes[(page-1)*RecipesPerPage:page*RecipesPerPage] 
+        else:
+            recipes = recipes[(page-1)*RecipesPerPage:n+1]
+        
+        if single==0:
+            pass
+        elif single<0:
+            return HttpResponse("error: single bellow 0")
+        elif single>RecipesPerPage:
+            return HttpResponse("error: single larger than RecipesPerPage")
+        else:
+            recipes = recipes[single-1]
+        
+        # pack the recipes into the format for the webpage
+        responseString = ""
+        
+        if single!=0 or len(recipes)==1:
+            if (n==0 or len(recipes)==1) and single==0:
+                recipes = recipes[0]
+            responseString += str(recipes.photo) + ";;"
+            responseString += str(recipes.id) + ";;"
+            responseString += recipes.title + ";;"
+            responseString += str(recipes.averageRating)
+            if buttons=="yes" and request.user.is_authenticated:
+                userProfile = UserModel.objects.get(user=request.user)
+                savedRecipes = userProfile.saved_recipes.all()
+                if recipes in savedRecipes:
+                    responseString += ";;" + "saved" + ";;"
+                else:
+                    responseString += ";;" + "save" + ";;"
+            responseString += "||RCP||"
+        elif n>0:
+            for recipe in recipes:
+                responseString += str(recipe.photo) + ";;"
+                responseString += str(recipe.id) + ";;"
+                responseString += recipe.title + ";;"
+                responseString += str(recipe.averageRating)
+                if buttons=="yes" and request.user.is_authenticated:
+                    userProfile = UserModel.objects.get(user=request.user)
+                    savedRecipes = userProfile.saved_recipes.all()
+                    if recipe in savedRecipes:
+                        responseString += ";;" + "saved" + ";;"
+                    else:
+                        responseString += ";;" + "save" + ";;"
+                responseString += "||RCP||"
+        else:
+            return HttpResponse("error: no recipes returned")
+        
+        print("recipes: "+ str(n+1))
+        responseString = responseString[:-7] # remove last ||RCP|| delimiter
+        return HttpResponse(responseString)
+        
+def test(request):
+    #recipe = Recipe.objects.get(id=1)
+    return render(request, "cookhub/test.html", {"debuggingInformation":""})
