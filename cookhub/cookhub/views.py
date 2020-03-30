@@ -43,15 +43,11 @@ class Homepage(View):
         return response
 
 def register(request):
-    # A boolean telling the template whether the registration was succesful, 
-    # set initially to false. Code changes it to true 
-    # once the registration is complete.
-    registered = False
 
     # If it is a HTTP post, we are interested in processing form data.
     if request.method == "POST":
         # Attempt to grap information from the raw form information.
-        # Note that we make use of both UserForm and UserProfileForm.
+        # We make use of both UserForm and UserProfileForm.
         user_form = UserForm(request.POST)
         profile_form = UserProfileForm(request.POST, request.FILES)
 
@@ -82,7 +78,6 @@ def register(request):
 
             # Update our variable to indicate that the template
             # registration was successful.
-            registered = True
             login(request, user)
             return redirect(reverse("cookhub:homepage"))
         else:
@@ -97,8 +92,7 @@ def register(request):
 
     # Render the template depending on the context.
     return render(request, "registration/register.html", context={"user_form": user_form,
-                                                                  "profile_form": profile_form,
-                                                                  "registered": registered})
+                                                                  "profile_form": profile_form})
 
 
 def user_login(request):
@@ -127,10 +121,12 @@ def user_login(request):
             # Is the account active? It could have been disabled.
             if user.is_active:
                 # If the account is valid and active, we can log the user in.
-                # We'll send the user back to the homepage.
                 login(request, user)
+                # If "Remember Me" is not ticked, the session will expiry when the user
+                # closes the browser.
                 if remember!="remember-me":
                     request.session.set_expiry(0)
+                # We'll send the user back to the homepage.
                 return redirect(reverse('cookhub:homepage'))
             else:
                 # An inactive account was used - no logging in!
@@ -154,21 +150,23 @@ def get_server_side_cookie(request, cookie, default_val=None):
         val = default_val
     return val
 
-# Updated the function definition
-def visitor_cookie_handler(request):
+# Handles the "visit" cookie
+def visitor_cookie_handler(request, recipe):
     visits = int(get_server_side_cookie(request, 'visits', '1'))
     last_visit_cookie = get_server_side_cookie(request,'last_visit',str(datetime.now()))
     last_visit_time = datetime.strptime(last_visit_cookie[:-7], '%Y-%m-%d %H:%M:%S')
-    # If it's been more than a day since the last visit...
-    if (datetime.now() - last_visit_time).days > 0:
+    # If it's been more than an hour since the last visit...
+    if (datetime.now() - last_visit_time).seconds > 3600:
+        print("Visits: " + str(visits))
         visits = visits + 1
         # Update the last visit cookie now that we have updated the count
         request.session['last_visit'] = str(datetime.now())
     else:
         # Set the last visit cookie
         request.session['last_visit'] = last_visit_cookie
-        # Update/set the visits cookie
-        request.session['visits'] = visits
+    # Update/set the visits cookie
+    request.session['visits'] = visits
+    recipe.views = visits
 
 
 @login_required
@@ -192,7 +190,6 @@ class EditProfileView(View):
 
     @method_decorator(login_required)
     def get(self, request, username):
-        print("here edit\n")
         try:
             (user, user_profile, form) = self.get_user_details(username)
         except TypeError:
@@ -210,6 +207,7 @@ class EditProfileView(View):
         except TypeError:
             return redirect(reverse('cookhub:homepage'))
 
+        # We update the profile, so we pass some values already
         form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
             form.save(commit=True)
@@ -244,18 +242,20 @@ class ProfileView(View):
         context_dict = {'user_profile': user_profile,
                         'selected_user': user, }
         
+        # We need to return the number of pages for 3 recipes per page
+        # for both my
         MyRecipeList = Recipe.objects.filter(user=user).order_by('-creationDate')        
         n = len(MyRecipeList)
         context_dict["MyRecipePages"] = n//3
         if n//3!=n/3:
             context_dict["MyRecipePages"] += 1
         
+        # and saved recipes.
         savedRecipeList = user_profile.saved_recipes.all()
         n = len(savedRecipeList)
         context_dict["SavedRecipePages"] = n//3
         if n//3!=n/3:
             context_dict["SavedRecipePages"] += 1
-        print("saved recipes: " + str(3//3))
         
         return render(request, 'cookhub/profile.html', context_dict)
 
@@ -304,7 +304,6 @@ def change_password(request, username):
     else:
         # Not a HTTP post, so we render the form
         form = ChangePasswordForm()
-    print("about to render change_password.html")
     return render(request, "registration/change_password.html", context = {"form":form})
   
 
@@ -342,7 +341,7 @@ class RecipeView(View):
         except TypeError:
             return redirect(reverse('cookhub:homepage'))
         if request.user!=context_dict['creator']:
-            context_dict['recipe'].views+=1
+            visitor_cookie_handler(request, context_dict['recipe'])
             context_dict['rpresent'] = (request.user.is_authenticated and not context_dict['ratings'].filter(user=request.user))
         Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
         if request.user.is_authenticated:
@@ -524,6 +523,7 @@ class SavedRecipesView(View):
     @method_decorator(login_required)
     # saves a recipe
     def get(self, request):
+        # retrieve the recipe id
         recipeID = request.GET["recipeID"]
         try:
             recipe = Recipe.objects.get(id=int(recipeID))
@@ -540,6 +540,7 @@ class SavedRecipesView(View):
     @method_decorator(login_required)
     # removes a saved recipe
     def post(self, request):
+        # retrieve the recipe id
         recipeID = request.POST["recipeID"]
         try:
             recipe = Recipe.objects.get(id=int(recipeID))
@@ -551,8 +552,8 @@ class SavedRecipesView(View):
         userProfile = UserModel.objects.get(user=request.user)
         userProfile.saved_recipes.remove(recipe)
         userProfile.save()
+        # Remaining saved recipes
         n = len(userProfile.saved_recipes.all())
-        print("Saved recipes left: " + str(n))
         return HttpResponse("correct"+str(n))
 
 
@@ -594,7 +595,6 @@ class PaginationView(View):
         
         # deal with the RecipesPerPage and pages
         n = len(recipes)-1 # end index of the number of queryset
-        print("recipes: "+ str(n+1))
         if n<0:
             return HttpResponse("empty")
         if n<(page-1)*RecipesPerPage:
@@ -604,6 +604,7 @@ class PaginationView(View):
         else:
             recipes = recipes[(page-1)*RecipesPerPage:n+1]
         
+        # deals with the single
         if single==0:
             pass
         elif single<0:
@@ -622,7 +623,8 @@ class PaginationView(View):
             responseString += str(recipes.photo) + ";;"
             responseString += str(recipes.id) + ";;"
             responseString += recipes.title + ";;"
-            responseString += str(recipes.averageRating)
+            responseString += str(recipes.averageRating) + ";;"
+            responseString += recipes.user.username
             if buttons=="yes" and request.user.is_authenticated:
                 userProfile = UserModel.objects.get(user=request.user)
                 savedRecipes = userProfile.saved_recipes.all()
@@ -636,7 +638,8 @@ class PaginationView(View):
                 responseString += str(recipe.photo) + ";;"
                 responseString += str(recipe.id) + ";;"
                 responseString += recipe.title + ";;"
-                responseString += str(recipe.averageRating)
+                responseString += str(recipe.averageRating) + ";;"
+                responseString += recipe.user.username
                 if buttons=="yes" and request.user.is_authenticated:
                     userProfile = UserModel.objects.get(user=request.user)
                     savedRecipes = userProfile.saved_recipes.all()
@@ -648,10 +651,6 @@ class PaginationView(View):
         else:
             return HttpResponse("error: no recipes returned")
         
-        print("recipes: "+ str(n+1))
         responseString = responseString[:-7] # remove last ||RCP|| delimiter
         return HttpResponse(responseString)
         
-def test(request):
-    #recipe = Recipe.objects.get(id=1)
-    return render(request, "cookhub/test.html", {"debuggingInformation":""})
