@@ -8,270 +8,171 @@
 {% block body_block %}
     <main role="main">
 
-        
-
-        <div class="album py-5 bg-light">
+        <div class="album p-0 m-0 py-5">
             <div class="container">
-            <!--
-                <h2> Newest recipes  <br /></h2>
-                <div class="row">
-                    {% if newestRecipes %}
-                        {% for recipe in newestRecipes %}
-                            <div class="col-md-4">
-                                <div class="card mb-4 box-shadow">
-                                    <img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;"
-                                         src="{{ MEDIA_URL }}{{ recipe.photo }}" data-holder-rendered="true">
-                                    <div class="card-body">
-                                        <a class="card-text" href="recipe/{{ recipe.id }}">{{ recipe.title }}</a>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <a>Author: {{ recipe.user }}</a>
-                                            <a>Rating: {{ recipe.averageRating }}</a>
-                                            {% if user.is_authenticated %}
-                                            <div class="btn-group">
-                                                <button type="button"
-                                                        id="addRecipeButton"
-                                                        class="btn btn-sm btn-outline-secondary"
-                                                        data-recipeid="{{ recipe.id }}" 
-                                                        {% if recipe.id in saved %}
-                                                        disabled="true">
-                                                    Saved
-                                                        {% else %}
-                                                        >
-                                                    Save
-                                                        {% endif %}
-                                                </button>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-                <h2> Most popular recipes  <br /></h2>
-                <div class="row">
-                    {% if popularRecipes %}
-                        {% for recipe in popularRecipes %}
-                            <div class="col-md-4">
-                                <div class="card mb-4 box-shadow">
-                                    <img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;"
-                                         src="{{ MEDIA_URL }}{{ recipe.photo }}" data-holder-rendered="true">
-                                    <div class="card-body">
-                                        <a class="card-text" href="recipe/{{ recipe.id }}">{{ recipe.title }}</a>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <a>Author: {{ recipe.user }}</a>
-                                            <a>Rating: {{ recipe.averageRating }}</a>
-                                            {% if user.is_authenticated %}
-                                            <div class="btn-group">
-                                                <button type="button"
-                                                        id="addRecipeButton"
-                                                        class="btn btn-sm btn-outline-secondary"
-                                                        data-recipeid="{{ recipe.id }}" 
-                                                        {% if recipe.id in saved %}
-                                                        disabled="true">
-                                                    Saved
-                                                        {% else %}
-                                                        >
-                                                    Save
-                                                        {% endif %}
-                                                </button>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-                -->
-                
                 <table>
                 <tbody>
-                <tr>
-                    <h2> Newest recipes </h2> <a href="#" id="viewAllNewestRecipes">View All</a>
-                </tr>
-                <tr>
-                    <div class="row" id="newest">
-                    </div>
-                </tr>
-                <tr>
-                        <div align="center" >
-                        <button class="previous round" id="newest" >&laquo; Previous</button>
-                        <strong><em id="NewestRecipePage" >   1   </em></strong>
-                        <button class="next round" id="newest" >Next &raquo;</button>
+                    <tr>
+                        <h2 class="card-section p-1"> NEWEST RECIPES </h2><a href="#" id="viewAllNewestRecipes">View All</a><br/>
+                    </tr>
+                    <tr>
+                        <div class="row" id="newest">
                         </div>
-                </tr>
-                    </div>
-                <hr />
-                <tr>
-                    <h2> Popular recipes </h2> <a href="#" id="viewAllPopularRecipes">View All</a>
-                </tr>
-                <tr>
-                    <div class="row" id="popular">
-                    </div>
-                    
-                </tr>
-                <tr>
-                        <div align="center" >
-                        <button class="previous round" id="popular" >&laquo; Previous</button>
-                        <strong><em id="PopularRecipePage" >   1   </em></strong>
-                        <button class="next round" id="popular" >Next &raquo;</button>
+                    </tr>
+                    <tr>
+                        <div align="center">
+                            <button class="previous btn btn-outline-warning my-2 my-sm-0" id="newest">&laquo; Previous</button>
+                            <strong><em class="pr-2 pl-2" id="NewestRecipePage" style="color: white"> 1 </em></strong>
+                            <button class="next btn btn-outline-warning my-2 my-sm-0" id="newest">Next &raquo;</button>
                         </div>
-                </tr>
-                    </div>
-                </tbody>
-                </table>
-            </div>
+                    </tr>
+            <hr/>
+            <tr>
+                <h2 class="card-section p-1"> POPULAR RECIPES </h2> <a href="#" id="viewAllPopularRecipes">View All</a><br/>
+            </tr>
+            <tr>
+                <div class="row" id="popular">
+                </div>
+
+            </tr>
+            <tr>
+                <div align="center">
+                    <button class="previous btn btn-outline-warning my-2 my-sm-0" id="popular">&laquo; Previous</button>
+                    <strong><em class="pr-2 pl-2" id="PopularRecipePage" style="color: white"> 1 </em></strong>
+                    <button class="next btn btn-outline-warning my-2 my-sm-0" id="popular">Next &raquo;</button>
+                </div>
+            </tr>
+            </tbody>
+            </table>
+        </div>
         </div>
 
     </main>
-    <style>
-    .card-text { color: #272727; font-weight: 500} /* CSS link color */
-    a {
-         text-decoration: none;
-         display: inline-block;
-         padding: 8px 16px;
-    }
-        
-    a.previous:hover {
-          background-color: #ddd;
-          color: black;
-    }
-        
-    .previous .next {
-          background-color: #f1f1f1;
-          color: black;
-    }
-        
-    .round {
-          border-radius: 50%;
-    }
-    </style>
-    <script type="text/javascript" >
-    $(document).ready(function () {
-        $("button.previous").attr("disabled", true);
-        
-        var RecipesPerPage = "3";
-        var author = "#";
-        var which = "newest";
-        var nextPageNumber = 1;
-        var page = nextPageNumber.toString();
-        var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-        var element = "div.row#newest";
-        var url = "{% url 'cookhub:recipe_pagination' %}"; 
-        {% if user.is_authenticated %}
-        var buttons = "yes";
-        {% else %}
-        var buttons = "";
-        {% endif %}
-        if (nextPageNumber=={{ NewestRecipePages }}) {
-            $("button.next#newest").attr("disabled", true);
-        }
-        $("em#NewestRecipePage").text("   "+page+"   ");
-        RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-        
-        which = "popular";
-        element = "div.row#popular";
-        if (nextPageNumber=={{ PopularRecipePages }}) {
-            $("button.next#popular").attr("disabled", true);
-        }
-        $("em#PopularRecipePage").text("   "+page+"   ");
-        RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-    
-    
-        // retrieve next "Newest Recipes" page
-        $("button.next#newest").click(function () {
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("button.previous").attr("disabled", true);
+
             var RecipesPerPage = "3";
             var author = "#";
             var which = "newest";
-            var nextPageNumber = parseInt($("em#NewestRecipePage").html().replace(/ /g,''), 10) + 1;
+            var nextPageNumber = 1;
             var page = nextPageNumber.toString();
             var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
             var element = "div.row#newest";
             var url = "{% url 'cookhub:recipe_pagination' %}";
-            var buttons = "yes";
-            $("button.previous#newest").attr("disabled", false);
-            if (nextPageNumber=={{ NewestRecipePages }}) {
+            {% if user.is_authenticated %}
+                var buttons = "yes";
+            {% else %}
+                var buttons = "";
+            {% endif %}
+            if (nextPageNumber =={{ NewestRecipePages }}) {
                 $("button.next#newest").attr("disabled", true);
             }
-            $("em#NewestRecipePage").text("   "+page+"   ");
-            RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);   
-        });
-        
-        // retrieve previous "Newest Recipes" page
-        $("button.previous#newest").click(function () {
-            var RecipesPerPage = "3";
-            var author = "#";
-            var which = "newest";
-            var nextPageNumber = parseInt($("em#NewestRecipePage").html().replace(/ /g,''), 10) - 1;
-            var page = nextPageNumber.toString();
-            var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-            var element = "div.row#newest";
-            var url = "{% url 'cookhub:recipe_pagination' %}";
-            var buttons = "yes";
-            $("button.next#newest").attr("disabled", false);
-            if (nextPageNumber==1) {
-                $("button.previous#newest").attr("disabled", true);
-            }
-            $("em#NewestRecipePage").text("   "+page+"   ");
+            $("em#NewestRecipePage").text("   " + page + "   ");
             RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-        });
-    
-        // retrieve next "Popular Recipes" page
-        $("button.next#popular").click(function () {
-            var RecipesPerPage = "3";
-            var author = "#";
-            var which = "popular";
-            var nextPageNumber = parseInt($("em#PopularRecipePage").html().replace(/ /g,''), 10) + 1;
-            var page = nextPageNumber.toString();
-            var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-            var element = "div.row#popular";
-            var url = "{% url 'cookhub:recipe_pagination' %}";
-            var buttons = "yes";
-            $("button.previous#popular").attr("disabled", false);
-            if (nextPageNumber=={{ NewestRecipePages }}) {
+
+            which = "popular";
+            element = "div.row#popular";
+            if (nextPageNumber =={{ PopularRecipePages }}) {
                 $("button.next#popular").attr("disabled", true);
             }
-            $("em#PopularRecipePage").text("   "+page+"   ");
-            RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);   
-        });
-        
-        // retrieve previous "Popular Recipes" page
-        $("button.previous#popular").click(function () {
-            var RecipesPerPage = "3";
-            var author = "#";
-            var which = "popular";
-            var nextPageNumber = parseInt($("em#PopularRecipePage").html().replace(/ /g,''), 10) - 1;
-            var page = nextPageNumber.toString();
-            var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-            var element = "div.row#popular";
-            var url = "{% url 'cookhub:recipe_pagination' %}";
-            var buttons = "yes";
-            $("button.next#popular").attr("disabled", false);
-            if (nextPageNumber==1) {
-                $("button.previous#popular").attr("disabled", true);
-            }
-            $("em#PopularRecipePage").text("   "+page+"   ");
+            $("em#PopularRecipePage").text("   " + page + "   ");
             RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-        });    
-    
-    
-    
 
-        {% if user.is_authenticated %}
-        // save recipes
-        $("body").on("click", "button.addRecipeButton", function() {
-            var recipeID = $(this).attr("data-recipeid");
-            $(this).attr("disabled", true);
-            $(this).html("Saved");
-            $.get("{% url 'cookhub:save_recipe' %}",
-                    {"recipeID": recipeID})
+
+            // retrieve next "Newest Recipes" page
+            $("button.next#newest").click(function () {
+                var RecipesPerPage = "3";
+                var author = "#";
+                var which = "newest";
+                var nextPageNumber = parseInt($("em#NewestRecipePage").html().replace(/ /g, ''), 10) + 1;
+                var page = nextPageNumber.toString();
+                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
+                var element = "div.row#newest";
+                var url = "{% url 'cookhub:recipe_pagination' %}";
+                var buttons = "yes";
+                $("button.previous#newest").attr("disabled", false);
+                if (nextPageNumber =={{ NewestRecipePages }}) {
+                    $("button.next#newest").attr("disabled", true);
+                }
+                $("em#NewestRecipePage").text("   " + page + "   ");
+                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
+            });
+
+            // retrieve previous "Newest Recipes" page
+            $("button.previous#newest").click(function () {
+                var RecipesPerPage = "3";
+                var author = "#";
+                var which = "newest";
+                var nextPageNumber = parseInt($("em#NewestRecipePage").html().replace(/ /g, ''), 10) - 1;
+                var page = nextPageNumber.toString();
+                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
+                var element = "div.row#newest";
+                var url = "{% url 'cookhub:recipe_pagination' %}";
+                var buttons = "yes";
+                $("button.next#newest").attr("disabled", false);
+                if (nextPageNumber == 1) {
+                    $("button.previous#newest").attr("disabled", true);
+                }
+                $("em#NewestRecipePage").text("   " + page + "   ");
+                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
+            });
+
+            // retrieve next "Popular Recipes" page
+            $("button.next#popular").click(function () {
+                var RecipesPerPage = "3";
+                var author = "#";
+                var which = "popular";
+                var nextPageNumber = parseInt($("em#PopularRecipePage").html().replace(/ /g, ''), 10) + 1;
+                var page = nextPageNumber.toString();
+                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
+                var element = "div.row#popular";
+                var url = "{% url 'cookhub:recipe_pagination' %}";
+                var buttons = "yes";
+                $("button.previous#popular").attr("disabled", false);
+                if (nextPageNumber =={{ NewestRecipePages }}) {
+                    $("button.next#popular").attr("disabled", true);
+                }
+                $("em#PopularRecipePage").text("   " + page + "   ");
+                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
+            });
+
+            // retrieve previous "Popular Recipes" page
+            $("button.previous#popular").click(function () {
+                var RecipesPerPage = "3";
+                var author = "#";
+                var which = "popular";
+                var nextPageNumber = parseInt($("em#PopularRecipePage").html().replace(/ /g, ''), 10) - 1;
+                var page = nextPageNumber.toString();
+                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
+                var element = "div.row#popular";
+                var url = "{% url 'cookhub:recipe_pagination' %}";
+                var buttons = "yes";
+                $("button.next#popular").attr("disabled", false);
+                if (nextPageNumber == 1) {
+                    $("button.previous#popular").attr("disabled", true);
+                }
+                $("em#PopularRecipePage").text("   " + page + "   ");
+                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
+            });
+
+
+
+
+            {% if user.is_authenticated %}
+                // save recipes
+                $("body").on("click", "button.addRecipeButton", function () {
+                    var recipeID = $(this).attr("data-recipeid");
+                    $(this).attr("disabled", true);
+                    $(this).html("Saved");
+                    $.get("{% url 'cookhub:save_recipe' %}",
+                        {"recipeID": recipeID})
+                });
+            {% endif %}
+
         });
-        {% endif %}
-        
-    });
     </script>
 {% endblock %}
 

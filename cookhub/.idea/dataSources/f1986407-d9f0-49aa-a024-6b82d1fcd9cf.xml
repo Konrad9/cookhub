@@ -48,7 +48,6 @@
     <index id="28" parent="6" name="sqlite_autoindex_auth_group_1">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>name</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <key id="29" parent="6">
@@ -78,16 +77,13 @@
     <index id="34" parent="7" name="auth_group_permissions_group_id_permission_id_0cd325b0_uniq">
       <ColNames>group_id
 permission_id</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="35" parent="7" name="auth_group_permissions_group_id_b120cbf9">
       <ColNames>group_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="36" parent="7" name="auth_group_permissions_permission_id_84c5c92e">
       <ColNames>permission_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="37" parent="7">
       <ColNames>id</ColNames>
@@ -131,12 +127,10 @@ permission_id</ColNames>
     <index id="44" parent="8" name="auth_permission_content_type_id_codename_01ab375a_uniq">
       <ColNames>content_type_id
 codename</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="45" parent="8" name="auth_permission_content_type_id_2f476e4b">
       <ColNames>content_type_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="46" parent="8">
       <ColNames>id</ColNames>
@@ -207,7 +201,6 @@ codename</ColNames>
     <index id="59" parent="9" name="sqlite_autoindex_auth_user_1">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>username</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <key id="60" parent="9">
@@ -237,16 +230,13 @@ codename</ColNames>
     <index id="65" parent="10" name="auth_user_groups_user_id_group_id_94350c0c_uniq">
       <ColNames>user_id
 group_id</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="66" parent="10" name="auth_user_groups_user_id_6a12ed8b">
       <ColNames>user_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="67" parent="10" name="auth_user_groups_group_id_97559544">
       <ColNames>group_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="68" parent="10">
       <ColNames>id</ColNames>
@@ -285,16 +275,13 @@ group_id</ColNames>
     <index id="74" parent="11" name="auth_user_user_permissions_user_id_permission_id_14a6b632_uniq">
       <ColNames>user_id
 permission_id</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="75" parent="11" name="auth_user_user_permissions_user_id_a95ead1b">
       <ColNames>user_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="76" parent="11" name="auth_user_user_permissions_permission_id_1fbb5f2c">
       <ColNames>permission_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="77" parent="11">
       <ColNames>id</ColNames>
@@ -357,11 +344,9 @@ permission_id</ColNames>
     </column>
     <index id="88" parent="13" name="cookhub_comment_recipe_id_3d5c7c19">
       <ColNames>recipe_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="89" parent="13" name="cookhub_comment_user_id_f0741264">
       <ColNames>user_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="90" parent="13">
       <ColNames>id</ColNames>
@@ -409,7 +394,6 @@ permission_id</ColNames>
     </column>
     <index id="98" parent="14" name="cookhub_ingredient_recipe_id_0c8235fb">
       <ColNames>recipe_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="99" parent="14">
       <ColNames>id</ColNames>
@@ -461,16 +445,13 @@ permission_id</ColNames>
     <index id="108" parent="16" name="cookhub_rating_user_id_recipe_id_f329b940_uniq">
       <ColNames>user_id
 recipe_id</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="109" parent="16" name="cookhub_rating_recipe_id_a195f4ba">
       <ColNames>recipe_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="110" parent="16" name="cookhub_rating_user_id_2cd87987">
       <ColNames>user_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="111" parent="16">
       <ColNames>id</ColNames>
@@ -543,7 +524,6 @@ recipe_id</ColNames>
     </column>
     <index id="124" parent="17" name="cookhub_recipe_user_id_b2f67f6f">
       <ColNames>user_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="125" parent="17">
       <ColNames>id</ColNames>
@@ -575,16 +555,13 @@ recipe_id</ColNames>
     <index id="130" parent="18" name="cookhub_recipe_categories_recipe_id_category_id_415d331a_uniq">
       <ColNames>recipe_id
 category_id</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="131" parent="18" name="cookhub_recipe_categories_recipe_id_527eaf6f">
       <ColNames>recipe_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="132" parent="18" name="cookhub_recipe_categories_category_id_9d0cd5a1">
       <ColNames>category_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="133" parent="18">
       <ColNames>id</ColNames>
@@ -666,11 +643,9 @@ category_id</ColNames>
     </column>
     <index id="148" parent="20" name="django_admin_log_content_type_id_c4bce8eb">
       <ColNames>content_type_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="149" parent="20" name="django_admin_log_user_id_c564eba6">
       <ColNames>user_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="150" parent="20">
       <ColNames>id</ColNames>
@@ -712,7 +687,6 @@ category_id</ColNames>
     <index id="157" parent="21" name="django_content_type_app_label_model_76bd3d3b_uniq">
       <ColNames>app_label
 model</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <key id="158" parent="21">
@@ -762,12 +736,10 @@ model</ColNames>
     <index id="167" parent="23" name="sqlite_autoindex_django_session_1">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>session_key</ColNames>
-      <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="168" parent="23" name="django_session_expire_date_a5c62663">
       <ColNames>expire_date</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="169" parent="23">
       <ColNames>session_key</ColNames>
