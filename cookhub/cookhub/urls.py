@@ -1,6 +1,6 @@
 from django.urls import path
 from cookhub import views
-from cookhub.views import Homepage, EditProfileView, ProfileView, RecipeView, EditRecipeView, DeleteRecipeView, SavedRecipesView, PaginationView
+from cookhub.views import Homepage, EditProfileView, ProfileView, RecipeView, EditRecipeView, DeleteRecipeView, SavedRecipesView, PaginationView, RemoveSavedRecipesView
 
 app_name = 'cookhub'
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path("getRecipesPagination/", PaginationView.as_view(), name="recipe_pagination"),
     path('recipe/<recipe_id>/', RecipeView.as_view(),  name='recipe'),
     path("save_recipe/", SavedRecipesView.as_view(), name="save_recipe"),
+    path("remove_saved_recipe/", RemoveSavedRecipesView.as_view(), name="remove_saved_recipe"),
     path('add_recipe/', views.create_recipe, name='create_recipe'),
     path('add_recipe/<recipe_id>/', views.add_recipe, name='add_recipe'),
     path('add_recipe/<recipe_id>/<ingredient_id>/', views.del_ingredient, name = 'del_ingredient'),

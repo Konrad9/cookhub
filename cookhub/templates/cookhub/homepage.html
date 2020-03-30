@@ -21,9 +21,11 @@
                     </tr>
                     <tr>
                         <div align="center">
+                            <button class="first btn btn-outline-warning my-2 my-sm-0" id="newest">First Page</button>
                             <button class="previous btn btn-outline-warning my-2 my-sm-0" id="newest">&laquo; Previous</button>
                             <strong><em class="pr-2 pl-2" id="NewestRecipePage" style="color: white"> 1 </em></strong>
                             <button class="next btn btn-outline-warning my-2 my-sm-0" id="newest">Next &raquo;</button>
+                            <button class="last btn btn-outline-warning my-2 my-sm-0" id="newest">Last Page</button>
                         </div>
                     </tr>
             <hr/>
@@ -37,9 +39,11 @@
             </tr>
             <tr>
                 <div align="center">
+                    <button class="first btn btn-outline-warning my-2 my-sm-0" id="popular">First Page</button>
                     <button class="previous btn btn-outline-warning my-2 my-sm-0" id="popular">&laquo; Previous</button>
                     <strong><em class="pr-2 pl-2" id="PopularRecipePage" style="color: white"> 1 </em></strong>
                     <button class="next btn btn-outline-warning my-2 my-sm-0" id="popular">Next &raquo;</button>
+                    <button class="last btn btn-outline-warning my-2 my-sm-0" id="popular">Last Page</button>
                 </div>
             </tr>
             </tbody>
@@ -57,7 +61,8 @@
             var NewestRecipePages = {{ NewestRecipePages }};
             var PopularRecipePages = {{ PopularRecipePages }};
             var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
-            start(authenticated, NewestRecipePages, PopularRecipePages, recipe_pagination);
+            var csrf_token = "{{ csrf_token }}";
+            start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages, recipe_pagination);
             
             {% if user.is_authenticated %}
                 // save recipes, only possible if the user is authenticated
@@ -65,8 +70,8 @@
                     var recipeID = $(this).attr("data-recipeid");
                     $(this).attr("disabled", true);
                     $(this).html("Saved");
-                    $.get("{% url 'cookhub:save_recipe' %}",
-                        {"recipeID": recipeID})
+                    $.post("{% url 'cookhub:save_recipe' %}",
+                        {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"})
                 });
             {% endif %}
 

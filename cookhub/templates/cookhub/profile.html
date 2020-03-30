@@ -7,8 +7,8 @@ My Profile
 {% else %}
 Profile of {{ selected_user.username }}
 {% endifequal %}
-<!-- Depending on who's watching, "My Profile" or the username is displayed -->
 {% endblock %}
+<!-- Depending on who's watching, "My Profile" or the username is displayed -->
 
 {% block body_block %}
 <div class="jumbotron p-4">
@@ -53,9 +53,11 @@ Profile of {{ selected_user.username }}
     </tr>
     <tr>
             <div align="center" >
-            <button class="previous round" id="my" >&laquo; Previous</button>
-            <strong><em id="MyRecipePage" >   1   </em></strong>
-            <button class="next round" id="my" >Next &raquo;</button>
+                <button class="first btn btn-outline-warning my-2 my-sm-0" id="my">First Page</button>
+                <button class="previous btn btn-outline-warning my-2 my-sm-0" id="my">&laquo; Previous</button>
+                <strong><em class="pr-2 pl-2" id="MyRecipePage" <!--style="color: white"-->> 1 </em></strong>
+                <button class="next btn btn-outline-warning my-2 my-sm-0" id="my">Next &raquo;</button>
+                <button class="last btn btn-outline-warning my-2 my-sm-0" id="my">Last Page</button>
             </div>
     </tr>
         </div>
@@ -73,9 +75,11 @@ Profile of {{ selected_user.username }}
     </tr>
     <tr>
             <div align="center" >
-            <button class="previous round" id="saved" >&laquo; Previous</button>
-            <strong><em id="SavedRecipePage" >   1   </em></strong>
-            <button class="next round" id="saved" >Next &raquo;</button>
+                <button class="first btn btn-outline-warning my-2 my-sm-0" id="saved">First Page</button>  
+                <button class="previous btn btn-outline-warning my-2 my-sm-0" id="saved">&laquo; Previous</button>
+                <strong><em class="pr-2 pl-2" id="SavedRecipePage" <!--style="color: white"-->> 1 </em></strong>
+                <button class="next btn btn-outline-warning my-2 my-sm-0" id="saved">Next &raquo;</button>
+                <button class="last btn btn-outline-warning my-2 my-sm-0" id="saved">Last Page</button>
             </div>
     </tr>
         </div>
@@ -96,9 +100,9 @@ Profile of {{ selected_user.username }}
         var SavedRecipePages = {{ SavedRecipePages }};
         var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
         var selected_user = "{{ selected_user.username }}";
-        var save_recipe = "{% url 'cookhub:save_recipe' %}";
+        var remove_saved_recipe = "{% url 'cookhub:remove_saved_recipe' %}";
         var csrf_token = "{{ csrf_token }}";
-        start(authenticated, MyRecipePages, SavedRecipePages, recipe_pagination, selected_user, save_recipe, csrf_token);
+        start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recipe_pagination, selected_user, remove_saved_recipe);
            
     });
     </script>
