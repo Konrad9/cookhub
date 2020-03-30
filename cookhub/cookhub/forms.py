@@ -45,9 +45,9 @@ class RecipeForm(forms.ModelForm):
     title = forms.CharField(max_length=40, help_text="Name of your recipe:")
     description = forms.CharField(widget=forms.Textarea, max_length=4000, help_text="How to make your recipe:")
     photo = forms.ImageField(required=False, help_text="Upload a photo of your recipe:")
-    time = forms.IntegerField(help_text="How long it takes to prepare your recipe:")
+    time = forms.IntegerField(help_text="How long it takes to prepare your recipe:", min_value=1)
     averageRating = forms.FloatField(widget=forms.HiddenInput(), initial=0, required=False)
-    servings = forms.IntegerField(help_text="The number of people your recipe serves:")
+    servings = forms.IntegerField(help_text="The number of people your recipe serves:", min_value=1)
     creationDate = forms.DateTimeField(widget=forms.HiddenInput(), initial=timezone.now(), required=False)
     views = forms.IntegerField(required=False, widget=forms.HiddenInput(), initial=0)
     categories = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Category.objects.all(), required=False, help_text="Categories your recipe belongs to:")
@@ -80,7 +80,7 @@ class CategoryForm(forms.ModelForm):
 
 class IngredientForm(forms.ModelForm):
     name = forms.CharField(max_length=20, help_text='Name of the ingredient:')
-    quantity = forms.IntegerField(help_text='How many units of ingredient are there')
+    quantity = forms.IntegerField(help_text='How many units of ingredient are there', min_value=0)
     unit = forms.CharField(max_length=20, help_text='Unit used for the ingredient (can be blank)', required=False)
     
     class Meta:
