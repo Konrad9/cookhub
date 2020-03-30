@@ -1,11 +1,12 @@
 directory.txt
-loremipsum.txt
-pagination req overview.txt
 db.sqlite3
 *.pdf
 *.key
 *.docx
-cookhub/media/profile_images/
-cookhub/media/recipe_images/
+cookhub/media/profile_images/*
+cookhub/media/recipe_images/*
 *.pyc
 *.time
+.idea/
+cookhub/cookhub/migrations/*
+!cookhub/cookhub/migrations/__init__.py

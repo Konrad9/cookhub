@@ -15,9 +15,11 @@ import random
 def populate():
     
     # create a new superuser
+    superUsername = "cookhubSuperUser"
+    superPassword = "Cookhub-app"
     print("Creating new superuser...\n")
-    superUser = User.objects.get_or_create(username="konradgrudzinski")[0]
-    superUser.set_password("Cookhub-app")
+    superUser = User.objects.get_or_create(username=superUsername)[0]
+    superUser.set_password(superPassword)
     superUser.is_superuser = True
     superUser.is_staff = True
     superUser.save()
@@ -56,6 +58,7 @@ def populate():
     
     commentsList = ["Great", "Good", "Tasty", "can recommend!", "Would do it again, very tasty"]
     
+    # get the lorem ipsum recipe descriptions
     recipeDescriptions = []
     with open(os.path.join(STATIC_DIR, "population\\"+"loremipsum.txt"), "r") as f:
         recipeDescriptions = f.read().split("\n\n")
@@ -74,7 +77,7 @@ def populate():
                                         last_name=last_name,
                                         email=email,
                                         password=password)
-        if not exists:
+        if not exists: # if the user already exists (since the script has been run already), resume with next user
             continue
         userList += [user]
         usrMdl = UserModel.objects.get_or_create(user=user)[0]
@@ -111,7 +114,7 @@ def populate():
         time = random.randrange(1,100)
         averageRating = float("{:.1f}".format(random.uniform(0.0, 5.0)))
         servings = random.randrange(1, 10)
-        views = random.randrange(0, 1000)
+        views = random.randrange(1, 1000)
         user = random.choice(userList)
         length = len(categoriesList)
         categories = [categoriesList[random.randrange(0, length)%(length-1)], 
@@ -123,7 +126,7 @@ def populate():
                         description=description,
                         servings=servings,
                         views=views)
-        if not exists:
+        if not exists: # if the recipe already exists (since the script has been run already), resume with next recipe
             continue
         recipe.averageRating = averageRating
         # add the to categories
@@ -133,7 +136,7 @@ def populate():
         recipe.photo.save(photoSource, photoFile, save=True)
         recipeList += [recipe]
         
-        # add it to a saved list
+        # add it to a saved list of a random user
         usrMdl = UserModel.objects.get(user=random.choice(userList))
         usrMdl.saved_recipes.add(recipe)
         usrMdl.save()
@@ -154,6 +157,8 @@ def populate():
         comment.save()
         
         print("- "+title)
+        
+    print("\nPopulation successfully executed.")
 
 
 if __name__ == '__main__':

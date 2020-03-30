@@ -49,120 +49,18 @@
 
     </main>
 
-
+    <script type="text/javascript" src="{% static 'js/homepage.js' %}"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            $("button.previous").attr("disabled", true);
-
-            var RecipesPerPage = "3";
-            var author = "#";
-            var which = "newest";
-            var nextPageNumber = 1;
-            var page = nextPageNumber.toString();
-            var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-            var element = "div.row#newest";
-            var url = "{% url 'cookhub:recipe_pagination' %}";
+            // parameters for homepage.js
+            var authenticated = "{{ user.is_authenticated }}";
+            var NewestRecipePages = {{ NewestRecipePages }};
+            var PopularRecipePages = {{ PopularRecipePages }};
+            var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
+            start(authenticated, NewestRecipePages, PopularRecipePages, recipe_pagination);
+            
             {% if user.is_authenticated %}
-                var buttons = "yes";
-            {% else %}
-                var buttons = "";
-            {% endif %}
-            if (nextPageNumber =={{ NewestRecipePages }}) {
-                $("button.next#newest").attr("disabled", true);
-            }
-            $("em#NewestRecipePage").text("   " + page + "   ");
-            RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-
-            which = "popular";
-            element = "div.row#popular";
-            if (nextPageNumber =={{ PopularRecipePages }}) {
-                $("button.next#popular").attr("disabled", true);
-            }
-            $("em#PopularRecipePage").text("   " + page + "   ");
-            RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-
-
-            // retrieve next "Newest Recipes" page
-            $("button.next#newest").click(function () {
-                var RecipesPerPage = "3";
-                var author = "#";
-                var which = "newest";
-                var nextPageNumber = parseInt($("em#NewestRecipePage").html().replace(/ /g, ''), 10) + 1;
-                var page = nextPageNumber.toString();
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#newest";
-                var url = "{% url 'cookhub:recipe_pagination' %}";
-                var buttons = "yes";
-                $("button.previous#newest").attr("disabled", false);
-                if (nextPageNumber =={{ NewestRecipePages }}) {
-                    $("button.next#newest").attr("disabled", true);
-                }
-                $("em#NewestRecipePage").text("   " + page + "   ");
-                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-            });
-
-            // retrieve previous "Newest Recipes" page
-            $("button.previous#newest").click(function () {
-                var RecipesPerPage = "3";
-                var author = "#";
-                var which = "newest";
-                var nextPageNumber = parseInt($("em#NewestRecipePage").html().replace(/ /g, ''), 10) - 1;
-                var page = nextPageNumber.toString();
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#newest";
-                var url = "{% url 'cookhub:recipe_pagination' %}";
-                var buttons = "yes";
-                $("button.next#newest").attr("disabled", false);
-                if (nextPageNumber == 1) {
-                    $("button.previous#newest").attr("disabled", true);
-                }
-                $("em#NewestRecipePage").text("   " + page + "   ");
-                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-            });
-
-            // retrieve next "Popular Recipes" page
-            $("button.next#popular").click(function () {
-                var RecipesPerPage = "3";
-                var author = "#";
-                var which = "popular";
-                var nextPageNumber = parseInt($("em#PopularRecipePage").html().replace(/ /g, ''), 10) + 1;
-                var page = nextPageNumber.toString();
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#popular";
-                var url = "{% url 'cookhub:recipe_pagination' %}";
-                var buttons = "yes";
-                $("button.previous#popular").attr("disabled", false);
-                if (nextPageNumber =={{ NewestRecipePages }}) {
-                    $("button.next#popular").attr("disabled", true);
-                }
-                $("em#PopularRecipePage").text("   " + page + "   ");
-                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-            });
-
-            // retrieve previous "Popular Recipes" page
-            $("button.previous#popular").click(function () {
-                var RecipesPerPage = "3";
-                var author = "#";
-                var which = "popular";
-                var nextPageNumber = parseInt($("em#PopularRecipePage").html().replace(/ /g, ''), 10) - 1;
-                var page = nextPageNumber.toString();
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#popular";
-                var url = "{% url 'cookhub:recipe_pagination' %}";
-                var buttons = "yes";
-                $("button.next#popular").attr("disabled", false);
-                if (nextPageNumber == 1) {
-                    $("button.previous#popular").attr("disabled", true);
-                }
-                $("em#PopularRecipePage").text("   " + page + "   ");
-                RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons);
-            });
-
-
-
-
-            {% if user.is_authenticated %}
-                // save recipes
+                // save recipes, only possible if the user is authenticated
                 $("body").on("click", "button.addRecipeButton", function () {
                     var recipeID = $(this).attr("data-recipeid");
                     $(this).attr("disabled", true);
