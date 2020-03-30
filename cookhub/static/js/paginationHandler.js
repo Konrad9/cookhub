@@ -19,8 +19,9 @@ function RecipeGetter(RecipesPerPage, author, which, page, single, element, url,
                          recipeInformation.id = recipe[1];
                          recipeInformation.title = recipe[2];
                          recipeInformation.averageRating = recipe[3];
+                         recipeInformation.creator = recipe[4];
                          if (buttons=="yes") {
-                                recipeInformation.button = recipe[4];
+                                recipeInformation.button = recipe[5];
                          }
 
                          if (buttons=="remove") {
@@ -28,18 +29,19 @@ function RecipeGetter(RecipesPerPage, author, which, page, single, element, url,
                          }
                          recipesArray[i] = recipeInformation;       // add the dictionary to the array of recipe dictionaries
                  }
-                 displayRecipes(element, recipesArray, buttons);
+                 displayRecipes(element, recipesArray, buttons, which);
              }
     });
 }
 
 // now to the representation
-function displayRecipes(element, recipesArray, buttons) {
+function displayRecipes(element, recipesArray, buttons, which) {
     var part1 = "<div class='col-md-4'><div class='card mb-4 box-shadow'><img class='card-img-top' alt='Thumbnail [100%x225]' style='height: 225px; width: 100%; display: block;' src='";
     var part2 = "' data-holder-rendered='true'><div class='card-body'><a class='card-text-title p-0 m-0' href='/recipe/";
     var part3 = "'>";
-    var part4 = "</a><div class='d-flex justify-content-between align-items-center'><p class=\"card-text-author mt-2 mb-2\">Author: ";
-    var part41 = "</p><p class=\"card-text-rating mt-2 mb-2\">Rating: ";
+    var part4 = "</a><div class='d-flex justify-content-between align-items-center'>";
+    var part4Creator = "";
+    var part4Rating = "<p class='card-text-rating mt-2 mb-2'>Rating: ";
     var part5 = "</p>";
     var part6 = "</div></div></div></div>";
     var recipeHTMLpiece = "";
@@ -54,7 +56,10 @@ function displayRecipes(element, recipesArray, buttons) {
         else if (recipesArray[i].button=="saved") {
             buttonPart = "<div class='btn-group'><button type='button' id='" + recipesArray[i].id + "' class='btn btn-sm btn-outline-warning addRecipeButton' data-recipeid='" + recipesArray[i].id + "' disabled='true' >Saved</button></div>";
         }
-        recipeHTMLpiece += part1 + recipesArray[i].photoSource + part2 + recipesArray[i].id + part3 + recipesArray[i].title + part4 + recipesArray[i].author + part41 + recipesArray[i].averageRating + part5 + buttonPart + part6;
+        if (which!="my") {
+            part4Creator  = "<p class='card-text-author mt-2 mb-2'>Creator:<a href='/profile/" + recipesArray[i].creator + "/'>" + recipesArray[i].creator + "</a></p>";
+        }
+        recipeHTMLpiece += part1 + recipesArray[i].photoSource + part2 + recipesArray[i].id + part3 + recipesArray[i].title + part4 + part4Creator + part4Rating + recipesArray[i].averageRating + part5 + buttonPart + part6;
     }
     $(element).html(recipeHTMLpiece);
 }

@@ -155,7 +155,7 @@ def get_server_side_cookie(request, cookie, default_val=None):
     return val
 
 # Updated the function definition
-def visitor_cookie_handler(request):
+def visitor_cookie_handler(request, recipe):
     visits = int(get_server_side_cookie(request, 'visits', '1'))
     last_visit_cookie = get_server_side_cookie(request,'last_visit',str(datetime.now()))
     last_visit_time = datetime.strptime(last_visit_cookie[:-7], '%Y-%m-%d %H:%M:%S')
@@ -169,6 +169,7 @@ def visitor_cookie_handler(request):
         request.session['last_visit'] = last_visit_cookie
         # Update/set the visits cookie
         request.session['visits'] = visits
+        recipe.views = visits
 
 
 @login_required
@@ -342,7 +343,7 @@ class RecipeView(View):
         except TypeError:
             return redirect(reverse('cookhub:homepage'))
         if request.user!=context_dict['creator']:
-            context_dict['recipe'].views+=1
+            visitor_cookie_handler(request, context_dict['recipe'])
             context_dict['rpresent'] = (request.user.is_authenticated and not context_dict['ratings'].filter(user=request.user))
         Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
         if request.user.is_authenticated:
@@ -622,7 +623,8 @@ class PaginationView(View):
             responseString += str(recipes.photo) + ";;"
             responseString += str(recipes.id) + ";;"
             responseString += recipes.title + ";;"
-            responseString += str(recipes.averageRating)
+            responseString += str(recipes.averageRating) + ";;"
+            responseString += recipes.user.username
             if buttons=="yes" and request.user.is_authenticated:
                 userProfile = UserModel.objects.get(user=request.user)
                 savedRecipes = userProfile.saved_recipes.all()
@@ -636,7 +638,8 @@ class PaginationView(View):
                 responseString += str(recipe.photo) + ";;"
                 responseString += str(recipe.id) + ";;"
                 responseString += recipe.title + ";;"
-                responseString += str(recipe.averageRating)
+                responseString += str(recipe.averageRating) + ";;"
+                responseString += recipe.user.username
                 if buttons=="yes" and request.user.is_authenticated:
                     userProfile = UserModel.objects.get(user=request.user)
                     savedRecipes = userProfile.saved_recipes.all()
