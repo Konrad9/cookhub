@@ -522,9 +522,9 @@ def del_editingredient(request, recipe_id, ingredient_id):
 class SavedRecipesView(View):
     @method_decorator(login_required)
     # saves a recipe
-    def get(self, request):
+    def post(self, request):
         # retrieve the recipe id
-        recipeID = request.GET["recipeID"]
+        recipeID = request.POST["recipeID"]
         try:
             recipe = Recipe.objects.get(id=int(recipeID))
         except Recipe.DoesNotExist:
@@ -536,7 +536,8 @@ class SavedRecipesView(View):
         userProfile.saved_recipes.add(recipe)
         userProfile.save()
         return HttpResponse()
-    
+
+class RemoveSavedRecipesView(View): 
     @method_decorator(login_required)
     # removes a saved recipe
     def post(self, request):
@@ -558,14 +559,13 @@ class SavedRecipesView(View):
 
 
 class PaginationView(View):
-    def get(self, request):
-        RecipesPerPage = int(request.GET["RecipesPerPage"])
-        author = request.GET["author"]
-        which = request.GET["which"]
-        page = int(request.GET["page"])
-        print("Page to get: "+str(page))
-        single = int(request.GET["single"])
-        buttons = request.GET.get("buttons", None)
+    def post(self, request):
+        RecipesPerPage = int(request.POST["RecipesPerPage"])
+        author = request.POST["author"]
+        which = request.POST["which"]
+        page = int(request.POST["page"])
+        single = int(request.POST["single"])
+        buttons = request.POST.get("buttons", None)
         # deal with the author
         if author!="#":
             try:

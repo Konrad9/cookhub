@@ -1,5 +1,5 @@
-function RecipeGetter(RecipesPerPage, author, which, page, single, element, url, buttons, attributes) {
-    $.get(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes},
+function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes) {
+    $.post(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes, "csrfmiddlewaretoken": csrf_token},
           function(data) {
               if (data.startsWith("error")) {
                       alert(data);
@@ -62,4 +62,25 @@ function displayRecipes(element, recipesArray, buttons, which) {
         recipeHTMLpiece += part1 + recipesArray[i].photoSource + part2 + recipesArray[i].id + part3 + recipesArray[i].title + part4 + part4Creator + part4Rating + recipesArray[i].averageRating + part5 + buttonPart + part6;
     }
     $(element).html(recipeHTMLpiece);
+    
+/*
+Element displayed by the function "displayRecipes", with some minor changes depending on the context:
+
+<div class="card mb-4 box-shadow">
+<img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;" src="/media/{{ recipe.photo }}" data-holder-rendered="true">
+	<div class="card-body">
+		<a class="card-text-title p-0 m-0" href="/recipe/{{ recipe id }}">{{ recipe.title }}</a>
+		<div class="d-flex justify-content-between align-items-center">
+			<p class="card-text-author mt-2 mb-2">Creator:<a href="/profile/{{ username }}/">{{ username }}</a></p>
+			<p class="card-text-rating mt-2 mb-2">Rating: {{ recipe.rating }}</p>
+			<div class="btn-group">
+				<button type="button" id="{{ recipe.id }}" class="btn btn-sm btn-outline-warning addRecipeButton" data-recipeid="{{ recipe.id }}">
+				Save
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+*/
 }
