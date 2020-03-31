@@ -7,8 +7,8 @@ from datetime import datetime
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, IngredientArrayForm, ChangePasswordForm
-from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category, IngredientArray
+from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, ChangePasswordForm
+from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category
 from django.utils import timezone
 
 
@@ -371,10 +371,9 @@ class RecipeView(View):
             rating.user = user
             recipe = context_dict['recipe']
             rating.recipe = recipe
-            print(str(rating_form))
             num = context_dict['recipe'].averageRating*len(context_dict['ratings']) + int(rating.rating)
             if len(context_dict['ratings']):
-                rnum = ((num))/(len(context_dict['ratings']))
+                rnum = ((num))/(len(context_dict['ratings'])+1)
             else:
                 rnum = num
             Recipe.objects.filter(id=recipe_id).update(averageRating=rnum)
@@ -383,7 +382,6 @@ class RecipeView(View):
             return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
         
         if comment_form.is_valid():
-            print(str(not context_dict['ratings'].filter(user=request.user)))
             comment = comment_form.save(commit=False)
             comment.user = request.user
             comment.recipe = context_dict['recipe']

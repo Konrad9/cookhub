@@ -17,7 +17,7 @@ class Recipe(models.Model):
     title = models.CharField(max_length=40, blank=True, default='')
     description = models.TextField(max_length=4000, blank=True, default='')
     photo = models.ImageField(upload_to="recipe_images/", blank=True, default='default.jpg')
-    time = models.IntegerField(blank=True, default=0)
+    time = models.IntegerField(blank=True, default=1)
     averageRating = models.FloatField(blank=True, default=0)
     servings = models.IntegerField(blank=True, default=1)
     creationDate = models.DateTimeField(blank=True, default=timezone.now)
@@ -65,9 +65,4 @@ class Comment(models.Model):
     
     def __str__(self):
         return self.text + str(self.id)
-    
-class IngredientArray(models.Model):
-    text = models.TextField()
-    
-    def __str__(self):
-        return self.text
+
