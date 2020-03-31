@@ -16,7 +16,9 @@ class Homepage(View):
     def get(self, request):
         context_dict = {}
         saved = []
-        
+
+        # ADD SORTING TO CATEGORIES
+        context_dict['categories'] = Category.objects.order_by()[:10]
         context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')
         context_dict['popularRecipes'] = Recipe.objects.order_by('-views')
         n = len(Recipe.objects.order_by('-creationDate'))
