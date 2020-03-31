@@ -2,24 +2,30 @@
 {% load staticfiles %}
 
 {% block title_block %}
-Edit Profile for {{ selected_user.username }}
+{% ifequal user.username selected_user.username %}
+My Profile
+{% else %}
+Profile of {{ selected_user.username }}
+{% endifequal %}
 {% endblock %}
+<!-- Depending on who's watching, "My Profile" or the username is displayed -->
 
 {% block body_block %}
 <div class="jumbotron p-4">
     <div class="container">
-        <h1 class="jumbotron-heading">{{ selected_user.username }}'s Profile</h1>
+        <h1 class="jumbotron-heading">{% ifequal user.username selected_user.username %}My{% else %}{{ selected_user.username }}'s{% endifequal %} Profile</h1>
+        <!-- Depending on who's watching, "My" or the username is displayed -->
     </div>
 </div>
 
 <div class="container">
     <div class="row">
         <img src="{{ MEDIA_URL }}{{ user_profile.picture }}"
-                width="300"
-                height="300"
+                width="150"
+                height="150"
                 alt="{{ selected_user.username }}'s profile image" />
             <br />
-        <div>
+        <div class="card-text-title" >
             First Name: {{ selected_user.first_name }}<br />
             Last Name: {{ selected_user.last_name }}<br />
             User Name: {{ selected_user.username }}<br />
@@ -27,8 +33,98 @@ Edit Profile for {{ selected_user.username }}
             {% if selected_user == user %}
                     <a href="{% url 'cookhub:edit_profile' user.username %}">Edit Profile</a>   
             {% endif %}
-        </div>
-        
+        </div> 
     </div>
 </div>
+
+
+<div class="album py-5 bg-light">
+    <div class="container">
+    
+    <table>
+    <tbody>
+    <tr>
+        <h2> {% ifequal user.username selected_user.username %}My{% else %}{{ selected_user.username }}'s{% endifequal %} recipes </h2>
+        <!-- Depending on who's watching, "My" or the username is displayed -->
+    </tr>
+    <tr>
+        <div class="row" id="my">
+        </div>
+    </tr>
+    <tr>
+            <div align="center" >
+                <button class="first btn btn-outline-warning my-2 my-sm-0" id="my">First Page</button>
+                <button class="previous btn btn-outline-warning my-2 my-sm-0" id="my">&laquo; Previous</button>
+                <strong><em class="pr-2 pl-2" id="MyRecipePage" <!--style="color: white"-->> 1 </em></strong>
+                <button class="next btn btn-outline-warning my-2 my-sm-0" id="my">Next &raquo;</button>
+                <button class="last btn btn-outline-warning my-2 my-sm-0" id="my">Last Page</button>
+            </div>
+    </tr>
+        </div>
+    <hr />
+        {% ifequal user.username selected_user.username %}
+        {% if user.is_authenticated %}
+        <!-- only available if the user looking at the profile is the owner -->  
+    <tr>
+        <h2> Saved recipes </h2>
+    </tr>
+    <tr>
+        <div class="row" id="saved">
+        </div>
+        
+    </tr>
+    <tr>
+            <div align="center" >
+                <button class="first btn btn-outline-warning my-2 my-sm-0" id="saved">First Page</button>  
+                <button class="previous btn btn-outline-warning my-2 my-sm-0" id="saved">&laquo; Previous</button>
+                <strong><em class="pr-2 pl-2" id="SavedRecipePage" <!--style="color: white"-->> 1 </em></strong>
+                <button class="next btn btn-outline-warning my-2 my-sm-0" id="saved">Next &raquo;</button>
+                <button class="last btn btn-outline-warning my-2 my-sm-0" id="saved">Last Page</button>
+            </div>
+    </tr>
+        </div>
+        {% endif %}
+        {% endifequal %}
+    </tbody>
+    </table>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="{% static 'js/profile.js' %}"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        // parameters for profile.js
+        var authenticated = "{{ user.is_authenticated }}";
+        var MyRecipePages = {{ MyRecipePages }};
+        var SavedRecipePages = {{ SavedRecipePages }};
+        var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
+        var selected_user = "{{ selected_user.username }}";
+        var remove_saved_recipe = "{% url 'cookhub:remove_saved_recipe' %}";
+        var csrf_token = "{{ csrf_token }}";
+        start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recipe_pagination, selected_user, remove_saved_recipe);
+           
+    });
+    </script>
+<style>
+    a {
+         text-decoration: none;
+         display: inline-block;
+         padding: 8px 16px;
+    }
+        
+    a.previous:hover {
+          background-color: #ddd;
+          color: black;
+    }
+        
+    .previous .next {
+          background-color: #f1f1f1;
+          color: black;
+    }
+        
+    .round {
+          border-radius: 50%;
+    }
+</style>
 {% endblock %}
