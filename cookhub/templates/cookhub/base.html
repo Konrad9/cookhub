@@ -28,7 +28,7 @@
 
 <body style="background-color:#343434">
 <header>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top p-3" style="background-color:#252525">
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top p-3" style="background-color:#1c1c1c">
         <a class="navbar-brand p-0" href="{% url 'cookhub:homepage' %}"><img src="{{ MEDIA_URL }}logo.png"/></a>
         <div class="collapse navbar-collapse pr-3" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
@@ -47,7 +47,7 @@
                                name="query"
                                id="query"
 
-                               style="border-radius:10rem; background-color: #1b2125; color: #f8f9fa;"
+                               style="border-radius:10rem; background-color: #252525; color: #f8f9fa; border-color: #252525"
                                 {% if query %}
                                value={{ query }}>
                                 {% endif %}
@@ -112,16 +112,16 @@
 
 
     .jumbotron{
-        background-color: #343434;
+        background-color: #252525;
     }
 
     .container {
-        background-color: #343434;
+        background-color: #252525;
     }
 
 
     .container-fluid {
-        background-color: #343434;
+        background-color: #252525;
     }
 
     .card-text {
@@ -151,15 +151,16 @@
     }
 
     .album {
-        background-color: #343434;
+        background-color: #252525;
     }
 
     .card {
-        background-color: #252525;
+        background-color: #1c1c1c;
     }
 
     .card-text-title {
         color: #ffd32d;
+        font-weight: 500;
     }
 
     .card-text-author {

@@ -11,40 +11,43 @@ Profile of {{ selected_user.username }}
 <!-- Depending on who's watching, "My Profile" or the username is displayed -->
 
 {% block body_block %}
-<div class="jumbotron p-4">
+<div class="jumbotron p-4 m-0">
     <div class="container">
-        <h1 class="jumbotron-heading">{% ifequal user.username selected_user.username %}My{% else %}{{ selected_user.username }}'s{% endifequal %} Profile</h1>
+        <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">{% ifequal user.username selected_user.username %}My{% else %}{{ selected_user.username }}'s{% endifequal %} Profile</h1>
         <!-- Depending on who's watching, "My" or the username is displayed -->
     </div>
 </div>
 
-<div class="container">
-    <div class="row">
-        <img src="{{ MEDIA_URL }}{{ user_profile.picture }}"
+<div class="container" style="background-color: #1c1c1c; border-radius: 1.2rem">
+    <div class="row p-3">
+        <img class="profile-pic" src="{{ MEDIA_URL }}{{ user_profile.picture }}"
                 width="150"
                 height="150"
                 alt="{{ selected_user.username }}'s profile image" />
             <br />
-        <div class="card-text-title" >
+        <div class="card-text-title pl-4" >
             First Name: {{ selected_user.first_name }}<br />
             Last Name: {{ selected_user.last_name }}<br />
             User Name: {{ selected_user.username }}<br />
             Email: {{ selected_user.email }}<br />
             {% if selected_user == user %}
-                    <a href="{% url 'cookhub:edit_profile' user.username %}">Edit Profile</a>   
+            <div class="pt-2">
+            <a class="btn btn-outline-warning my-2 my-sm-0"
+                href="{% url 'cookhub:edit_profile' user.username %}"
+            >Edit Profile</a></div>
             {% endif %}
         </div> 
     </div>
 </div>
 
 
-<div class="album py-5 bg-light">
+<div class="album py-5">
     <div class="container">
     
     <table>
     <tbody>
     <tr>
-        <h2> {% ifequal user.username selected_user.username %}My{% else %}{{ selected_user.username }}'s{% endifequal %} recipes </h2>
+        <h2 style="color: white; text-transform: uppercase"> {% ifequal user.username selected_user.username %}My{% else %}{{ selected_user.username }}'s{% endifequal %} recipes </h2>
         <!-- Depending on who's watching, "My" or the username is displayed -->
     </tr>
     <tr>
@@ -66,7 +69,7 @@ Profile of {{ selected_user.username }}
         {% if user.is_authenticated %}
         <!-- only available if the user looking at the profile is the owner -->  
     <tr>
-        <h2> Saved recipes </h2>
+        <h2 style="color: white; text-transform: uppercase"> Saved recipes </h2>
     </tr>
     <tr>
         <div class="row" id="saved">
@@ -125,6 +128,12 @@ Profile of {{ selected_user.username }}
         
     .round {
           border-radius: 50%;
+    }
+
+    .profile-pic {
+        border: black;
+        border-style: solid;
+        border-width: thin;
     }
 </style>
 {% endblock %}
