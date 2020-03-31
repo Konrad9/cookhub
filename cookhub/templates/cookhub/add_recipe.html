@@ -5,13 +5,9 @@
 	Add Recipe
 {% endblock %}
 
-{% block head_block %}
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-{% endblock %}
-
 {% block body_block %}
 {% if recipe.user == user %}
-	<div>
+	<div class="container" style="color: white;" >
 		<form id="recipe_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}" enctype="multipart/form-data"> 
 			{% csrf_token %}
 			{% for hidden in recipe_form.hidden_fields %}
@@ -24,8 +20,7 @@
 				{{ field }} <br />
 			{% endfor %}
 			<img src="" id="preview" width="200px" />
-<script type="text/javascript">
-
+<script type="text/javascript"> // displays the uploaded photo right away
     function readURL(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -43,39 +38,49 @@
 </script>
 		<input type="submit" name="addRecipe" value="Finished Recipe" />
 		</form>
-			<form id="category_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}">
+			<form id="category_form">
 				{% csrf_token %}
 				{% for field in  category_form.visible_fields %}
 					{{ field.errors }}
 					{{ field.help_text }}
 					{{ field }} <br />
 				{% endfor %}
-				<input type="submit" name="addCategory" value="Add category" />
+				<button id="addCategory" >Add Category</button>
 			</form>
+			<script src="{% static 'js/recipeAddCategory.js' %}"></script>
+			<script>
+        			$("button#addCategory").click( function(event) {
+            			event.preventDefault();
+            			addCat("{% url 'cookhub:add_category' %}");
+            		});
+			</script>
 			
-			<h2>Ingredients for {{ recipe.title }}</h2>
-			{% if ingredients %}
-			{% for ingredient in ingredients %}
-				<form method="get" action="{% url 'cookhub:del_ingredient' recipe.id ingredient.id %}">
-					{% csrf_token %}
-					{{ ingredient.quantity }} 
-					{% if ingredient.unit %}
-						{{ ingredient.unit }} of 
-					{% endif %}
-					{{ ingredient.name }}
-					<input type='submit' value="Delete" type='deleteIngredient'/>
-				</form>
-			{% endfor %}
-			{% endif %}
-			<form id="ingredient_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}">
+			<h2>Ingredients for the recipe</h2>
+			<ul id="ingredientList">
+			</ul>
+			<script src="{% static 'js/recipeIngredientRemove.js' %}" ></script>
+			<script>
+			$("body").on("click", "button.removeIngredient", function () {
+    			remIng("{% url 'cookhub:remove_ingredient' %}", "{{ csrf_token }}", this);
+    		});
+    		</script>
+			
+			<form id="ingredient_form">
 				{% csrf_token %}
 				{% for field in ingredient_form.visible_fields %}
 					{{ field.errors }}
 					{{ field.help_text }}
 					{{ field }} <br />
 				{% endfor %}
-				<input type='submit' value='Add ingredient' name='addIngredient'/>
+				<button id="addIngredient" >Add Ingredient</button>
 			</form>
+			<script src="{% static 'js/recipeAddIngredient.js' %}"></script>
+			<script>
+        			$("button#addIngredient").click( function(event) {
+            			event.preventDefault();
+            			addIng("{% url 'cookhub:add_ingredient' %}", this, "{{ recipe.id }}");
+            		});
+			</script>
 		
 		
 	</div>

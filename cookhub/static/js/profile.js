@@ -127,7 +127,7 @@ function start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recip
             $("button.next#my").attr("disabled", false);
             if (nextPageNumber==1) { // if we are on the first page again
                 $(this).attr("disabled", true);
-                $("button.last#my").attr("disabled", true);
+                $("button.first#my").attr("disabled", true);
             }
             shorty(csrf_token, RecipesPerPage, author, which, page, single, element, url);
         });

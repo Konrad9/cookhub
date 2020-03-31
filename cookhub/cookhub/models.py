@@ -5,6 +5,7 @@ from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
+    number_of_recipes = models.IntegerField(blank=True, default=0)
     
     class Meta:
         verbose_name_plural = 'categories'
