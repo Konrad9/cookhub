@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
@@ -457,37 +457,17 @@ def create_recipe(request):
 def add_recipe(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
     recipe_form = RecipeForm(instance=recipe)
-    category_form = CategoryForm()
-    ingredient_form = IngredientForm()
-    if request.method == 'POST':
-        if 'addCategory' in request.POST:
-            category_form = CategoryForm(request.POST)
-            if category_form.is_valid():
-                category_form.save()
-            return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
-            
-        if 'addRecipe' in request.POST:
-            recipe_form = RecipeForm(request.POST, request.FILES, instance=recipe)
-            if recipe_form.is_valid():
-                recipe = recipe_form.save(commit=False)
-                recipe.save()
-                recipe_form.save_m2m()
-                for cat in recipe.categories.all():
-                    cat.number_of_recipes += 1
-                    cat.save()
-                return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
-            else:
-                print(recipe_form.errors)
-        
-        if 'addIngredient' in request.POST:
-            ingredient_form = IngredientForm(request.POST)
-            if ingredient_form.is_valid():
-                ingredient = ingredient_form.save(commit=False)
-                ingredient.recipe = recipe
-                ingredient.save()
-            return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
-            
-    return render(request, 'cookhub/add_recipe.html', context={'recipe_form':recipe_form, 'category_form':category_form, 'recipe':recipe, 'ingredient_form':ingredient_form, 'ingredients':Ingredient.objects.filter(recipe=recipe)})
+    recipe_form = RecipeForm(request.POST, request.FILES, instance=recipe)
+    if recipe_form.is_valid():
+        recipe = recipe_form.save(commit=False)
+        recipe.save()
+        recipe_form.save_m2m()
+        for cat in recipe.categories.all():
+            cat.number_of_recipes += 1
+            cat.save()
+    else:
+        print(recipe_form.errors)   
+    return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
 
 
 class DeleteRecipeView(View):
@@ -660,4 +640,56 @@ class PaginationView(View):
         
         responseString = responseString[:-7] # remove last ||RCP|| delimiter
         return HttpResponse(responseString)
-        
+ 
+
+class CreateRecipeView(View):
+    def get(self, request):
+        recipe = Recipe(user=request.user)
+        recipe.save()
+        recipe_form = RecipeForm(instance=recipe)
+        category_form = CategoryForm()
+        ingredient_form = IngredientForm()
+        print(recipe.id)
+        return render(request, 'cookhub/add_recipe.html', context={'recipe_form':recipe_form, 'category_form':category_form, 'recipe':recipe, 'ingredient_form':ingredient_form, "recipe":recipe})
+    
+    
+class AddCategoryView(View):
+    def post(self, request):
+        name = request.POST.get('name')
+        cat, exists = Category.objects.get_or_create(name=name)
+        if not exists:
+            return JsonResponse({"alreadyExists":"yes"})
+        cat.save()
+        return JsonResponse({"alreadyExists": "no", 
+                             "id": cat.id, 
+                             "name": cat.name})
+
+class AddIngredientView(View):
+    def post(self, request):
+        name = request.POST.get('name')
+        quantity = request.POST.get('quantity')
+        unit = request.POST.get('unit')
+        recipeID = int(request.POST.get("recipeID"))
+        recipe = Recipe.objects.get(id=recipeID)
+        ingredient = Ingredient(recipe=recipe,
+                                quantity=quantity,
+                                name=name)
+        if len(unit)>0:
+            ingredient.unit = unit
+        ingredient.save()
+        return JsonResponse({"name":name,
+                             "quantity":quantity,
+                             "unit":unit,
+                             "id":ingredient.id})
+    
+class RemoveIngredientView(View):
+    def post(self, request):
+        ingredientID = int(request.POST.get("ingredientID"))
+        try:
+            ingredient = Ingredient.objects.get(id=ingredientID)
+            ingredient.delete()
+            return HttpResponse("correct")
+        except Ingredient.DoesNotExist:
+            return HttpResponse("error - ingredient does not exist")
+        except:
+            return HttpResponse("error")
