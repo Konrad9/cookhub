@@ -1,2 +1,13 @@
-The WAD2 team project;
-I suggest that we all have a seperate branch, like I called mine "konrad", crazy I know, so that only fully functional features will be added to the master branch.
+The WAD2 team project
+
+External sources:
+- Bootstrap
+- Stackoverflow
+- Django documentation
+- Tango with Django book
+- revsys.com
+- Python documentation
+- w3schools.com
+- developer.mozilla.org
+- eloquentjavascript.net
+- jQuery documentation

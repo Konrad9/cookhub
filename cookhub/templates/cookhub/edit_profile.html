@@ -23,7 +23,7 @@ Edit Profile for {{ selected_user.username }}
                 height="300"
                 alt="{{ selected_user.username }}'s profile image"
                 id="previous" />
-        <div>
+        <div class="card-text-title" >
             {% if selected_user == user %}
                 <form method="post" action="." enctype="multipart/form-data">
                     {% csrf_token %}

@@ -1,0 +1,3 @@
+django version==2.2.3
+pillow
+requests

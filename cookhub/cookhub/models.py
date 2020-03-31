@@ -30,7 +30,7 @@ class Recipe(models.Model):
     
 class UserModel(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    picture = models.ImageField(upload_to="profile_images", blank=True, default="default.jpg")
+    picture = models.ImageField(upload_to="profile_images/", blank=True, default="default.jpg")
     saved_recipes = models.ManyToManyField(Recipe, blank=True)
     
     def __str__(self):
@@ -38,7 +38,7 @@ class UserModel(models.Model):
     
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=40)
     quantity = models.IntegerField(default=0)
     unit = models.CharField(max_length=20, blank=True)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
