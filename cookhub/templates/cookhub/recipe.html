@@ -72,7 +72,7 @@
 			</table>
 		</tr>
 		<tr>
-			Cooking time: {{ recipe.time }} <br />
+			Cooking time: {{ recipe.time }} minute{% ifnotequal recipe.time 1 %}s{% endifnotequal %}<br />
 			Serving(s) {{ recipe.servings }} <br />
 		</tr>
 		<tr>
@@ -154,26 +154,28 @@
 	</tr>
 	</table>
 </div>
-<script type="text/javascript">
+<script type="text/javascript"> // left inline script because the recipe ID has to be inserted by the Django rendering engine
     function deleteRecipe() {
           if (confirm("Delete Recipe?\nPress OK to confirm deletion.")) {
               window.open("/recipe/{{ recipe.id }}/delete/", "_self");
           }
     }
     
-    $("button#saveRecipeButton").click(function () {
-            $(this).attr("disabled", true);
-            $(this).html("Saved");
-            $.get("{% url 'cookhub:save_recipe' %}",
-                    {"recipeID": {{ recipe.id }}});
-    });
-    
+    {% if saved %}
     $("button#removeRecipeButton").click(function () {
             $(this).attr("disabled", true);
             $(this).html("Removed");
             $.post("{% url 'cookhub:save_recipe' %}",
                     {"recipeID": {{ recipe.id }}, "csrfmiddlewaretoken": "{{ csrf_token }}"});
     });
+    {% else %}
+    $("button#saveRecipeButton").click(function () {
+            $(this).attr("disabled", true);
+            $(this).html("Saved");
+            $.get("{% url 'cookhub:save_recipe' %}",
+                    {"recipeID": {{ recipe.id }}});
+    });
+    {% endif %}
 </script>
 {% endblock %}
 		

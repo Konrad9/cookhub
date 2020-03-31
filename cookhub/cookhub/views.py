@@ -152,21 +152,17 @@ def get_server_side_cookie(request, cookie, default_val=None):
 
 # Handles the "visit" cookie
 def visitor_cookie_handler(request, recipe):
-    visits = int(get_server_side_cookie(request, 'visits', '1'))
-    last_visit_cookie = get_server_side_cookie(request,'last_visit',str(datetime.now()))
+    # get the information, when the recipe was last viewed
+    last_visit_cookie = get_server_side_cookie(request,'last_visit_'+str(recipe.id),str(datetime.now()))
     last_visit_time = datetime.strptime(last_visit_cookie[:-7], '%Y-%m-%d %H:%M:%S')
     # If it's been more than an hour since the last visit...
     if (datetime.now() - last_visit_time).seconds > 3600:
-        print("Visits: " + str(visits))
-        visits = visits + 1
+        recipe.views += 1
         # Update the last visit cookie now that we have updated the count
-        request.session['last_visit'] = str(datetime.now())
+        request.session['last_visit_'+str(recipe.id)] = str(datetime.now())
     else:
         # Set the last visit cookie
-        request.session['last_visit'] = last_visit_cookie
-    # Update/set the visits cookie
-    request.session['visits'] = visits
-    recipe.views = visits
+        request.session['last_visit_'+str(recipe.id)] = last_visit_cookie
 
 
 @login_required
@@ -369,6 +365,7 @@ class RecipeView(View):
             rating.user = user
             recipe = context_dict['recipe']
             rating.recipe = recipe
+            rating.save()
             print(str(rating_form))
             num = context_dict['recipe'].averageRating*len(context_dict['ratings']) + int(rating.rating)
             if len(context_dict['ratings']):
@@ -376,7 +373,6 @@ class RecipeView(View):
             else:
                 rnum = num
             Recipe.objects.filter(id=recipe_id).update(averageRating=rnum)
-            rating.save()
             context_dict = self.get_recipe_details(recipe_id=recipe_id)
             return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
         
@@ -476,6 +472,9 @@ def add_recipe(request, recipe_id):
                 recipe = recipe_form.save(commit=False)
                 recipe.save()
                 recipe_form.save_m2m()
+                for cat in recipe.categories.all():
+                    cat.number_of_recipes += 1
+                    cat.save()
                 return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
             else:
                 print(recipe_form.errors)
@@ -495,7 +494,13 @@ class DeleteRecipeView(View):
     @method_decorator(login_required)
     def get(self, request, recipe_id):
         try:
-            Recipe.objects.get(id=int(recipe_id)).delete()
+            recipe = Recipe.objects.get(id=int(recipe_id))
+            categoriesList = recipe.categories.all()
+            for category in categoriesList:
+                if category.number_of_recipes > 0:
+                    category.number_of_recipes -= 1
+                    category.save()
+            recipe.delete()
             return redirect(reverse('cookhub:profile', kwargs={'username':request.user.username}))
         except Recipe.DoesNotExist:
             return HttpResponse("An error occurred and the recipe could not be found. <a href='/profile/"+request.user.username+"/'>Return to your profile page.</a>")
@@ -518,7 +523,7 @@ def del_editingredient(request, recipe_id, ingredient_id):
     return render(request, 'cookhub/del_editingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
 
 
-
+# adds a recipe to the user's saved recipes
 class SavedRecipesView(View):
     @method_decorator(login_required)
     # saves a recipe
@@ -537,6 +542,7 @@ class SavedRecipesView(View):
         userProfile.save()
         return HttpResponse()
 
+# removes a recipe from a user's saved recipes
 class RemoveSavedRecipesView(View): 
     @method_decorator(login_required)
     # removes a saved recipe
@@ -550,6 +556,7 @@ class RemoveSavedRecipesView(View):
         except ValueError:
             return HttpResponse("Error - bad recipe ID.")
         
+        # remove from saved recipes
         userProfile = UserModel.objects.get(user=request.user)
         userProfile.saved_recipes.remove(recipe)
         userProfile.save()
@@ -557,7 +564,7 @@ class RemoveSavedRecipesView(View):
         n = len(userProfile.saved_recipes.all())
         return HttpResponse("correct"+str(n))
 
-
+# handles the pagination 
 class PaginationView(View):
     def post(self, request):
         RecipesPerPage = int(request.POST["RecipesPerPage"])
