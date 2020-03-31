@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from cookhub.models import UserModel, Recipe, Comment, Rating, Category, Ingredient, IngredientArray
+from cookhub.models import UserModel, Recipe, Comment, Rating, Category, Ingredient
 from django.utils import timezone
 
 class UserForm(forms.ModelForm):
@@ -87,12 +87,5 @@ class IngredientForm(forms.ModelForm):
         model = Ingredient
         exclude = ('recipe',)
 
-class IngredientArrayForm(forms.ModelForm):
-    text = forms.CharField(widget=forms.Textarea, max_length = 2000)
-    
-    class Meta:
-        model = IngredientArray
-        fields = ('text',)
-        
 
     

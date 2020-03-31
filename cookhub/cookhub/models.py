@@ -65,9 +65,4 @@ class Comment(models.Model):
     
     def __str__(self):
         return self.text + str(self.id)
-    
-class IngredientArray(models.Model):
-    text = models.TextField()
-    
-    def __str__(self):
-        return self.text
+

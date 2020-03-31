@@ -7,8 +7,8 @@ from datetime import datetime
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, IngredientArrayForm, ChangePasswordForm
-from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category, IngredientArray
+from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, ChangePasswordForm
+from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category
 from django.utils import timezone
 
 
