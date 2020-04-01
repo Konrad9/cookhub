@@ -7,6 +7,7 @@
 
 {% block head_block %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/homepage.css' %}" />
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block body_block %}
@@ -81,7 +82,7 @@
                 </li>
                 {% endfor %}
                 <li class="pl-3 pr-3 pb-2">
-                    <a class="btn btn-warning warning my-2 my-sm-0 ml-4 mr-4" style="color: #ffc107; border-radius:10rem; background-color: #252525"
+                    <a class="btn btn-warning warning my-2 my-sm-0 btn-block ml-2 mr-4" style="color: #ffc107; border-radius:10rem; background-color: #252525"
                             href="{% url 'cookhub:all_categories' %}">View all Categories
                     </a>
                 </li>

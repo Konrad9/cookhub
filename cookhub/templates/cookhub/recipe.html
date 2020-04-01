@@ -2,180 +2,361 @@
 {% load staticfiles %}
 
 {% block title_block %}
-	{{ recipe.title }}
+    {{ recipe.title }}
 {% endblock %}
 
 {% block body_block %}
-<div class="container card-text-title" >
-	<table>
-	<tr>
-		<td>
-		<img src="{{ MEDIA_URL }}{{ recipe.photo }}" width = "600" height = "300" /><br />
-		{{ recipe.title }} <br />
-		
-		<h3> Ingredients </h3> <br />
-		
-		{% if ingredients %}
-		<ul>
-		{% for ingredient in ingredients %}
-			<li>
-			{{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}
-			</li>
-		{% endfor %}
-		</ul>
-		{% else %}
-			<strong> No ingredients in this recipe </strong>
-		{% endif %}
-		</td>
-	
-		<td>
-		<table>
-		<tr>
-			<table>
-			<tr>
-				<td>
-				<img src="{{ MEDIA_URL }}{{ profile_picture }}" width = "150" height "150" />
-				</td>
+    <div class="container p-4">
+        <h1 id="heading" style="text-transform: uppercase" class="jumbotron-heading">"{{ recipe.title }}"</h1>
+    </div>
+    <div id="block" class="container p-4" style="background-color: #1c1c1c; color: white; border-radius: 1.2rem">
+        <table>
+            <tr>
+                <td>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <h3 id="categories" class="ml-3"> Description </h3>
+                                <hr id="hr2">
+                            </div>
+                            <p class="mt-2 ml-1" id="description">
+                                {% if recipe.description %}
+                                    {{ recipe.description }}</p>
+                                {% else %}
+                                    <strong>There is no description for this recipe</strong> <br/>
+                                {% endif %}
+                        </div>
+
+                        <div class="col-md-6 p-0 pl-4">
+                            <img class="ml-2 mt-2" id="image" src="{{ MEDIA_URL }}{{ recipe.photo }}" width="500"
+                                 style="max-width: 500px; max-height: 500px"/>
+                        </div>
+
+
+                    </div>
+                    <hr id="hr_orange" class="mr-2">
+                </td>
             </tr>
             <tr>
-				<td>
-				<a href="{% url 'cookhub:profile' creator.username %}">
-				{{ creator.username }}</a> <br />
-				Views: {{ recipe.views }} <br />
-				Rating: {{ recipe.averageRating }} <br />
-				</td>
-			</tr>
-			{% ifequal user creator %}
-			{% if user.is_authenticated %}
-			<tr>
-				<td>
-				<button onclick="deleteRecipe()" >Delete Recipe</button>
-				</td>
-			</tr>
-			{% endif %}
-			{% endifequal %}
-			{% if user.is_authenticated %}
-			{% if saved %}
-			<tr>
-				<td>
-				<button id="removeRecipeButton" >Remove Recipe</button>
-				</td>
-			</tr>
-			{% else %}
-			<tr>
-				<td>
-				<button id="saveRecipeButton" >Save Recipe</button>
-				</td>
-			</tr>
-			{% endif %}
-			{% endif %}
-			</table>
-		</tr>
-		<tr>
-			Cooking time: {{ recipe.time }} minute{% ifnotequal recipe.time 1 %}s{% endifnotequal %}<br />
-			Serving(s) {{ recipe.servings }} <br />
-		</tr>
-		<tr>
-			<h3>Categories</h3> <br />
-			{% if categories %}
-				<ul>
-				{% for category in categories %}
-					<li>
-					{{ category.name }} <br />
-					</li>
-				{% endfor %}
-				</ul>
-			{% else %}
-				<strong>This recipe is not part of any categories</strong><br />
-			{% endif %}
-		</tr>
-		</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-		<h2> Description </h2>
-		{% if recipe.description %}
-			{{ recipe.description }} <br />
-		{% else %}
-			<strong>There is no description for this recipe</strong> <br />
-		{% endif %}
-		</td>
-	</tr>
-	<tr>
-		<td>
-		{% if user.is_authenticated %}
-		{% if rpresent %}
-		Rate: <br /> 
-		<form id="rating_form" method="post" action=".">
-			{% csrf_token %}
-			{% for field in rating_form.visible_fields %}
-				{{ field.errors }}
-				{{ field }}
-			{% endfor %}
-			<input type="submit" name="submit" value="Submit Rating" />
-		</form> 
+                <td>
+                    {% if user.is_authenticated %}
+                        {% if rpresent %}
+                            Rate: <br/>
+                            <form id="rating_form" method="post" action=".">
+                                {% csrf_token %}
+                                {% for field in rating_form.visible_fields %}
+                                    {{ field.errors }}
+                                    {{ field }}
+                                {% endfor %}
+                                <input type="submit" name="submit" value="Submit Rating"/>
+                            </form>
 
-		{% endif %}
-		{% endif %}
-		</td>
-	</tr>
-	<tr>
-		<td>
-		<h2>Comments:</h2> <br />
-		{% if user.is_authenticated %} 
-		<form id="comment_form" method="post" action=".">
-			{% csrf_token %}
-			{% for field in comment_form.visible_fields %}
-				{{ field.errors }}
-				{{ field }}
-			{% endfor %}
-			<input type="submit" name="submit" value="Submit Comment" />
-		</form>
-		{% endif %}
-		</td>
-	</tr>
-	<tr>
-		<td>
-		{% if comments %}
-			<table>
-			{% for comment in comments %}
-				<tr>
-					<td>
-					{{ comment.user.username }} {{ comment.creationDate }}: {{ comment.text }}
-					</td>
-				</tr>
-			{% endfor %}
-			</table>
-		{% else %}
-			<strong>There are no comments on this recipe</strong><br />
-		{% endif %}
-		</td>
-	</tr>
-	</table>
-</div>
-<script type="text/javascript"> // left inline script because the recipe ID has to be inserted by the Django rendering engine
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3 id="categories" class="mb-3">Comments</h3>
+                    {% if user.is_authenticated %}
+                        <form class="row" id="comment_form" method="post" action=".">
+                            {% csrf_token %}
+                            {% for field in comment_form.visible_fields %}
+                                {{ field.errors }}
+                                {{ field }}
+                            {% endfor %}
+                            <div class="pl-3">
+                                <input class="btn btn-outline-warning my-2 my-sm-0" type="submit"
+                                       style="border-radius:10rem" name="submit" value="Submit Comment"/>
+                            </div>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {% if comments %}
+                        <table>
+                            {% for comment in comments %}
+                                <tr>
+                                    <div class="row">
+                                        <a class="m-0 p-0 ml-3 mr-2" id="comment_user" href="{% url 'cookhub:profile' creator.username %}">{{ comment.user.username }}</a>
+                                        <p class="m-0 p-0" id="comment_date"> {{ comment.creationDate }}:</p>
+                                        <p class="m-0 p-0 ml-3">{{ comment.text }}</p>
+
+                                    </div>
+                                    <hr id="comment_hr">
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <strong>There are no comments on this recipe</strong><br/>
+                    {% endif %}
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+    <div class="sidenav pt-5 mt-5">
+
+        <div class="row">
+            <img id="profile" src="{{ MEDIA_URL }}{{ profile_picture }}" width="200" height="200"/>
+
+            <div class="mt-3">
+                <a id="author" class="pl-3 pt-0" href="{% url 'cookhub:profile' creator.username %}">
+                    {{ creator.username }}</a>
+                <p class="p-0 m-0 ml-3">
+                    Views: {{ recipe.views }} </p>
+                <p class="p-0 m-0 ml-3">Rating: {{ recipe.averageRating }}</p>
+                <div class="row ml-3 pt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-clock mr-2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <p class="p-0 m-0">Cooking: {{ recipe.time }}
+                        minute{% ifnotequal recipe.time 1 %}s{% endifnotequal %}</p>
+                </div>
+                <div class="row ml-3 mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-hash">
+                        <line x1="4" y1="9" x2="20" y2="9"/>
+                        <line x1="4" y1="15" x2="20" y2="15"/>
+                        <line x1="10" y1="3" x2="8" y2="21"/>
+                        <line x1="16" y1="3" x2="14" y2="21"/>
+                    </svg>
+                    <p class="p-0 m-0 ml-2">Servings: {{ recipe.servings }}</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="buttons" class="mt-3 ml-4">
+            {% ifequal user creator %}
+                {% if user.is_authenticated %}
+                    <tr>
+                        <td>
+                            <button class="btn btn-outline-warning my-2 my-sm-0 mr-1" type="submit"
+                                    style="border-radius:10rem" onclick="deleteRecipe()">Delete Recipe
+                            </button>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endifequal %}
+            {% if user.is_authenticated %}
+                {% if saved %}
+                    <tr>
+                        <td>
+                            <button class="btn btn-outline-warning my-2 my-sm-0" type="submit"
+                                    style="border-radius:10rem" id="removeRecipeButton">Remove Recipe
+                            </button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td>
+                            <button class="btn btn-outline-warning my-2 my-sm-0" type="submit"
+                                    style="border-radius:10rem" id="saveRecipeButton">Save Recipe
+                            </button>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endif %}
+            <hr id="hr1">
+        </div>
+
+        <div style="color: white" class="mt-3 ml-4">
+            <h3 id="categories" class="pb-2">Categories</h3>
+            {% if categories %}
+                <ul>
+                    {% for category in categories %}
+                        <li>
+                            {{ category.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <strong>This recipe is not part of any categories</strong><br/>
+            {% endif %}
+        </div>
+
+        <div style="color: white" class="mt-3 ml-4">
+            <h3 id="categories" class="pb-2"> Ingredients </h3>
+
+            {% if ingredients %}
+                <ul>
+                    {% for ingredient in ingredients %}
+                        <li>
+                            {{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <strong> No ingredients in this recipe </strong>
+            {% endif %}
+        </div>
+
+
+    </div>
+
+
+    <script type="text/javascript"> // left inline script because the recipe ID has to be inserted by the Django rendering engine
     function deleteRecipe() {
-          if (confirm("Delete Recipe?\nPress OK to confirm deletion.")) {
-              window.open("/recipe/{{ recipe.id }}/delete/", "_self");
-          }
+        if (confirm("Delete Recipe?\nPress OK to confirm deletion.")) {
+            window.open("/recipe/{{ recipe.id }}/delete/", "_self");
+        }
     }
-    
+
     {% if saved %}
-    $("button#removeRecipeButton").click(function () {
+        $("button#removeRecipeButton").click(function () {
             $(this).attr("disabled", true);
             $(this).html("Removed");
             $.post("{% url 'cookhub:save_recipe' %}",
-                    {"recipeID": {{ recipe.id }}, "csrfmiddlewaretoken": "{{ csrf_token }}"});
-    });
+                {"recipeID": {{ recipe.id }}, "csrfmiddlewaretoken": "{{ csrf_token }}"});
+        });
     {% else %}
-    $("button#saveRecipeButton").click(function () {
+        $("button#saveRecipeButton").click(function () {
             $(this).attr("disabled", true);
             $(this).html("Saved");
             $.get("{% url 'cookhub:save_recipe' %}",
-                    {"recipeID": {{ recipe.id }}});
-    });
+                {"recipeID": {{ recipe.id }}});
+        });
     {% endif %}
-</script>
+    </script>
+
+    <style>
+
+
+        /* The sidebar menu */
+        .sidenav {
+            height: 100%; /* Full-height: remove this if you want "auto" height */
+            width: 450px; /* Set the width of the sidebar */
+            position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+            z-index: 1; /* Stay on top */
+            top: 0; /* Stay at the top */
+            right: 0;
+            background-color: #1c1c1c; /* Black */
+            overflow-x: hidden; /* Disable horizontal scroll */
+            padding-top: 20px;
+        }
+
+        /* The navigation menu links */
+        .sidenav a {
+            padding: 6px 8px 6px 16px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+        }
+
+        /* When you mouse over the navigation links, change their color */
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+        /* Style page content */
+        .main {
+            margin-left: 160px; /* Same as the width of the sidebar */
+            padding: 0px 10px;
+        }
+
+        /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+        @media screen and (max-height: 1000px) {
+            .sidenav {
+                padding-top: 50px;
+            }
+
+            .sidenav a {
+                font-size: 18px;
+            }
+        }
+
+        #block {
+            margin-left: 200px;
+        }
+
+        #heading {
+            margin-left: -170px;
+            color: #ffc107;
+        }
+
+        #profile {
+            margin-left: 40px;
+            border-style: solid;
+            border-color: #ffc107;
+        {#border-radius: 1rem;#}
+        }
+
+        #author {
+            font-weight: 500;
+            font-size: 20px;
+            color: #ffc107;
+        }
+
+        p {
+            color: white;
+        }
+
+        hr {
+            border: 0.5px solid #2f2e2e;
+        }
+
+        #hr1 {
+            margin-right: 30px;
+        }
+
+        #hr_orange {
+            border-color: #ffc107;
+        }
+
+        #hr2 {
+            width: 370px;
+            border-color: #ffc107;
+            margin-left: 20px;
+        }
+
+
+
+        #categories {
+            color: #ffc107;
+        }
+
+        #image {
+            border: solid #ffc107 2px;
+        }
+
+        #description {
+            max-width: 1000px;
+            width: 550px;
+        }
+
+        textarea {
+            width: 700px;
+            height: 130px;
+            color: white;
+            background-color: #1f1f1f;
+            border-color: #2f2e2e;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        #comment_user {
+            color: #ffc107;
+        }
+
+        #comment_date {
+            color: #929292;
+        }
+
+        #comment_hr {
+            width: 1070px;
+            border-color: #2f2e2e;
+            margin-left: 10px;
+        }
+
+    </style>
 {% endblock %}
 		
