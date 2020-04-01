@@ -82,7 +82,7 @@
                                     <div class="row">
                                         <a class="m-0 p-0 ml-3 mr-2" id="comment_user" href="{% url 'cookhub:profile' creator.username %}">{{ comment.user.username }}</a>
                                         <p class="m-0 p-0" id="comment_date"> {{ comment.creationDate }}:</p>
-                                        <p class="m-0 p-0 ml-3">{{ comment.text }}</p>
+                                        <p class="m-0 p-0 ml-3" id="comment_text">{{ comment.text }}</p>
 
                                     </div>
                                     <hr id="comment_hr">
@@ -352,9 +352,13 @@
         }
 
         #comment_hr {
-            width: 1070px;
+            width: 1080px;
             border-color: #2f2e2e;
-            margin-left: 10px;
+            margin-left: 0px;
+        }
+
+        #comment_text{
+            max-width: 1080px;
         }
 
     </style>
