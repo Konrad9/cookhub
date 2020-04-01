@@ -13,7 +13,6 @@ from django.utils import timezone
 
 def deleteEmptyRecipes():
     recipes = Recipe.objects.filter(title="")
-    print(recipes)
     if recipes:
         recipes.delete()
 
@@ -380,7 +379,7 @@ class RecipeView(View):
                 rnum = ((num))/(len(context_dict['ratings'])+1)
             else:
                 rnum = num
-            Recipe.objects.filter(id=recipe_id).update(averageRating=rnum)
+            Recipe.objects.filter(id=recipe_id).update(averageRating=float("{:.1f}".format(rnum)))
             context_dict = self.get_recipe_details(recipe_id=recipe_id)
             return redirect(reverse('cookhub:recipe', kwargs={'recipe_id':recipe_id}))
         
