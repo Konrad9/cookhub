@@ -13,14 +13,24 @@
 			{% for hidden in recipe_form.hidden_fields %}
 				{{ hidden }}
 			{% endfor %}
+			<img src="" id="preview" width="200px" />
+
 			
 			{% for field in recipe_form.visible_fields %}
 				{{ field.errors }}
 				{{ field.help_text }}
 				{{ field }} <br />
 			{% endfor %}
-			<img src="" id="preview" width="200px" />
-<script type="text/javascript"> // displays the uploaded photo right away
+			<style>
+    		#id_categories {
+        		columns: 3; 
+        		webkit-columns: 3; 
+        		moz-columns: 3;
+        	}
+		</style>
+			
+		<input type="submit" name="addRecipe" value="Finished Recipe" />
+		<script type="text/javascript"> // displays the uploaded photo right away
     function readURL(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -36,7 +46,6 @@
     });
 
 </script>
-		<input type="submit" name="addRecipe" value="Finished Recipe" />
 		</form>
 			<form id="category_form">
 				{% csrf_token %}

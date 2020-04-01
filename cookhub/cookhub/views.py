@@ -11,9 +11,15 @@ from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, Com
 from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category
 from django.utils import timezone
 
+def deleteEmptyRecipes():
+    recipes = Recipe.objects.filter(title="")
+    print(recipes)
+    if recipes:
+        recipes.delete()
 
 class Homepage(View):
     def get(self, request):
+        deleteEmptyRecipes()
         context_dict = {}
         saved = []
 
@@ -232,6 +238,7 @@ class ProfileView(View):
         return (user, user_profile, form)
 
     def get(self, request, username):
+        deleteEmptyRecipes()
         try:
             (user, user_profile, form) = self.get_user_details(username)
         except TypeError:

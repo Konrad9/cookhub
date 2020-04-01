@@ -42,8 +42,8 @@ class ChangePasswordForm(forms.ModelForm):
 
 
 class RecipeForm(forms.ModelForm):
-    title = forms.CharField(max_length=40, help_text="Name of your recipe:")
-    description = forms.CharField(widget=forms.Textarea, max_length=4000, help_text="How to make your recipe:")
+    title = forms.CharField(max_length=40, help_text="Name of your recipe:", min_length=1)
+    description = forms.CharField(widget=forms.Textarea, min_length=1, max_length=4000, help_text="How to make your recipe:")
     photo = forms.ImageField(required=False, help_text="Upload a photo of your recipe:")
     time = forms.IntegerField(help_text="How long it takes to prepare your recipe:", min_value=1)
     averageRating = forms.FloatField(widget=forms.HiddenInput(), initial=0, required=False)
