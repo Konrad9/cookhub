@@ -14,45 +14,57 @@ class="text-center"
 {% endblock %}
 
 {% block body_block %}
-<div class="jumbotron p-4">
+<div class="jumbotron p-4 m-0">
     <div class="container">
-        <h1 class="jumbotron-heading">Register Here</h1>
+        <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Register Here</h1>
     </div>
 </div>
-{% if user.is_authenticated %}
-    You are already registered!
-    <a href="{% url 'cookhub:homepage' %}">Return to the homepage.</a><br />
-{% else %}
-    <form id="user_form" method="post" action="{% url 'cookhub:register' %}"
-        enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ profile_form.as_p }}
-        <img src="" id="preview" width="200px" />
-        {{ user_form.as_p }}
-   <script type="text/javascript">
 
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $("#preview").attr("src", e.target.result);
+    <div class="container p-4" style="background-color: #1c1c1c; border-radius: 1.2rem">
+    {% if user.is_authenticated %}
+        You are already registered!
+        <a href="{% url 'cookhub:homepage' %}">Return to the homepage.</a><br />
+    {% else %}
+        <form id="user_form" method="post" action="{% url 'cookhub:register' %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ profile_form.as_p }}
+            <img src="" id="preview" width="200px" />
+            {{ user_form.as_p }}
+            <script type="text/javascript">
+
+                function readURL(input) {
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $("#preview").attr("src", e.target.result);
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+
+                $("#id_picture").change(function(){
+                    readURL(this);
+                });
+
+                window.onload = function() {
+                    document.getElementById("register_link").remove();
+
+                }
+
+            </script>
+
+            <input class="btn btn-outline-warning my-2 my-sm-0 btn-block" style="border-radius:10rem; width:30%" type="submit" name="submit" value="Register" />
+        </form>
+        <style>
+            p {
+                color: white;
             }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
 
-    $("#id_picture").change(function(){
-        readURL(this);
-    });
-
-window.onload = function() {
-    document.getElementById("register_link").remove();
-    
-}
-
-</script>
-        
-        <input type="submit" name="submit" value="Register" />
-</form>
-{% endif %}
+            #preview {
+                margin-bottom: 20px;
+            }
+        </style>
+    {% endif %}
 {% endblock %}
+    </div>
