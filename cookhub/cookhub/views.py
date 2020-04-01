@@ -496,7 +496,7 @@ class DeleteRecipeView(View):
 def del_ingredient(request, recipe_id, ingredient_id):
     if request.method == 'POST':
         if ingredient_id:
-            ingredient = Ingredient.objects.get(id=ingredient_id).delete()
+            Ingredient.objects.get(id=ingredient_id).delete()
         return redirect(reverse('cookhub:add_recipe', kwargs={'recipe_id':recipe_id}))
     return render(request, 'cookhub/del_ingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
 
@@ -504,7 +504,7 @@ def del_ingredient(request, recipe_id, ingredient_id):
 def del_editingredient(request, recipe_id, ingredient_id):
     if request.method == 'POST':
         if ingredient_id:
-            ingredient = Ingredient.objects.get(id=ingredient_id).delete()
+            Ingredient.objects.get(id=ingredient_id).delete()
         return redirect(reverse('cookhub:edit_recipe', kwargs={'recipe_id':recipe_id}))
     return render(request, 'cookhub/del_editingredient.html', context={'recipe_id':recipe_id, 'ingredient':Ingredient.objects.get(id=ingredient_id)})
 

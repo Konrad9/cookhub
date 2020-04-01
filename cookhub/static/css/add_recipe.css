@@ -1,0 +1,9 @@
+#id_categories {
+    columns: 3; 
+    webkit-columns: 3; 
+    moz-columns: 3;
+}
+
+input {
+    margin-bottom: 10px;
+}
