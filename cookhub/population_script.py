@@ -8,7 +8,7 @@ django.setup()
 from django.core.files import File
 from cookhub_project.settings import STATIC_DIR
 
-from cookhub.models import UserModel, Recipe, Ingredient, Comment, Category
+from cookhub.models import UserModel, Recipe, Ingredient, Comment, Category, Rating
 from django.contrib.auth.models import User
 import random
 
@@ -23,6 +23,7 @@ def populate():
     superUser.is_superuser = True
     superUser.is_staff = True
     superUser.save()
+    UserModel.objects.get_or_create(user=superUser)[0].save()
     
     photoFiles = {
         "users": ["user1DEMO.jpg", "user2DEMO.jpg", "user3DEMO.jpg", "user4DEMO.jpg", "user5DEMO.jpg"],
@@ -75,10 +76,11 @@ def populate():
         user, exists = User.objects.get_or_create(username=username,
                                         first_name=first_name,
                                         last_name=last_name,
-                                        email=email,
-                                        password=password)
+                                        email=email)
+        user.set_password(password)
         if not exists: # if the user already exists (since the script has been run already), resume with next user
             continue
+        user.save()
         userList += [user]
         usrMdl = UserModel.objects.get_or_create(user=user)[0]
         photoSource = photoFiles.get("users")[i]
@@ -115,7 +117,8 @@ def populate():
         averageRating = float("{:.1f}".format(random.uniform(0.0, 5.0)))
         servings = random.randrange(1, 10)
         views = random.randrange(1, 1000)
-        user = random.choice(userList)
+        userListIndex = random.randrange(0, len(userList))
+        user = userList[userListIndex]
         length = len(categoriesList)
         categories = [categoriesList[random.randrange(0, length)%(length-1)], 
                       categoriesList[random.randrange(0, length)%(length-1)-1]
@@ -128,6 +131,10 @@ def populate():
                         views=views)
         if not exists: # if the recipe already exists (since the script has been run already), resume with next recipe
             continue
+        rating = Rating.objects.get_or_create(user=userList[userListIndex-1],
+                                              recipe=recipe,
+                                              rating=averageRating)[0]
+        rating.save()
         recipe.averageRating = averageRating
         # add the to categories
         for cat in categories:
