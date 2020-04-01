@@ -7,7 +7,11 @@
 
 {% block body_block %}
 {% if recipe.user == user %}
-	<div class="container" style="color: white;" >
+    <div class="container p-4">
+        <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Create a recipe</h1>
+    </div>
+
+    <div class="container p-4" style="background-color: #1c1c1c; color:white; border-radius: 1.2rem">
 		<form id="recipe_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}" enctype="multipart/form-data"> 
 			{% csrf_token %}
 			{% for hidden in recipe_form.hidden_fields %}
@@ -84,5 +88,10 @@
 		
 		
 	</div>
+    <style>
+    input {
+        margin-bottom: 10px;
+    }
+    </style>
 {% endif %}
 {% endblock %}
