@@ -18,7 +18,7 @@ class Homepage(View):
         saved = []
 
         # ADD SORTING TO CATEGORIES
-        context_dict['categories'] = Category.objects.order_by('-number_of_recipes')[:10]
+        context_dict['categories'] = Category.objects.order_by("-number_of_recipes")[:10]
         context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')
         context_dict['popularRecipes'] = Recipe.objects.order_by('-views')
         n = len(Recipe.objects.order_by('-creationDate'))
@@ -693,3 +693,8 @@ class RemoveIngredientView(View):
             return HttpResponse("error - ingredient does not exist")
         except:
             return HttpResponse("error")
+        
+class CategoriesView(View):
+    def get(self, request):
+        cats = Category.objects.order_by("name")
+        return render(request, "cookhub/categories.html", {"categories":cats})

@@ -1,0 +1,22 @@
+{% extends 'cookhub/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+    Categories
+{% endblock %}
+
+{% block body_block %}
+<main role="main">
+<div class="container">
+{% if categories %}
+<ul id="categoryList" style="color: white; columns: 3; webkit-columns: 3; moz-columns: 3;" >
+    {% for category in categories %}
+        <li><a href="#" style="color: #ffc107;">{{ category.name }}</a> ({{ category.number_of_recipes }} recipe{% ifnotequal category.number_of_recipes 1 %}s{% endifnotequal %}) </li>
+    {% endfor %}
+</ul>
+{% else %}
+No categories present at this time.
+{% endif %}
+</div>
+</main>
+{% endblock %}
