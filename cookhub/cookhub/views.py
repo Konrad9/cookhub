@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, CommentForm, IngredientForm, CategoryForm, ChangePasswordForm
 from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category
 from django.utils import timezone
+import json
+import math
 
 def deleteEmptyRecipes():
     recipes = Recipe.objects.filter(title="")
@@ -28,11 +30,13 @@ class Homepage(View):
         context_dict['popularRecipes'] = Recipe.objects.order_by('-views')
         n = len(Recipe.objects.order_by('-creationDate'))
         context_dict["NewestRecipePages"] = n//3
-        if n//3!=n/3:
+        RecipesPerPage = 3
+        context_dict["RecipesPerPage"] = RecipesPerPage
+        if n//RecipesPerPage!=n/RecipesPerPage:
             context_dict["NewestRecipePages"] += 1
         n = len(Recipe.objects.order_by('-views'))
-        context_dict["PopularRecipePages"] = n//3
-        if n//3!=n/3:
+        context_dict["PopularRecipePages"] = n//RecipesPerPage
+        if n//RecipesPerPage!=n/RecipesPerPage:
             context_dict["PopularRecipePages"] += 1
         if request.user.is_authenticated:
             userProfile = UserModel.objects.get(user=request.user)
@@ -250,16 +254,18 @@ class ProfileView(View):
         # for both my
         MyRecipeList = Recipe.objects.filter(user=user).order_by('-creationDate')        
         n = len(MyRecipeList)
-        context_dict["MyRecipePages"] = n//3
-        if n//3!=n/3:
-            context_dict["MyRecipePages"] += 1
+        RecipesPerPage = 3
+        context_dict["RecipesPerPage"] = RecipesPerPage
+        context_dict["MyRecipePages"] = math.ceil(n/RecipesPerPage)
+        #if n//RecipesPerPage!=n/RecipesPerPage:
+        #    context_dict["MyRecipePages"] += 1
         
         # and saved recipes.
         savedRecipeList = user_profile.saved_recipes.all()
         n = len(savedRecipeList)
-        context_dict["SavedRecipePages"] = n//3
-        if n//3!=n/3:
-            context_dict["SavedRecipePages"] += 1
+        context_dict["SavedRecipePages"] = math.ceil(n/RecipesPerPage)
+        #if n//RecipesPerPage!=n/RecipesPerPage:
+        #    context_dict["SavedRecipePages"] += 1
         
         return render(request, 'cookhub/profile.html', context_dict)
 
@@ -565,11 +571,11 @@ class PaginationView(View):
                 user = User.objects.get(username=author)
                 recipes = Recipe.objects.filter(user=user)
             except User.DoesNotExist:
-                return HttpResponse("error: User does not exist")
+                return JsonResponse({"error": "User does not exist"})
             except Recipe.DoesNotExist:
-                return HttpResponse("error: Recipe does not exist")
+                return JsonResponse({"error": "Recipe does not exist"})
             except ValueError:
-                return HttpResponse("error: value error")
+                return JsonResponse({"error":"value error"})
         else:
             recipes = Recipe.objects.all()
         
@@ -583,15 +589,20 @@ class PaginationView(View):
         elif which=="saved":
             user_profile = UserModel.objects.get(user=user)
             recipes = user_profile.saved_recipes.all()
+        elif which=="query":
+            query = request.POST.get("attributes")
+            recipesTitle = Recipe.objects.filter(title__contains=query)
+            recipesDescription = Recipe.objects.filter(description__contains=query)
+            recipes = recipesTitle.union(recipesDescription)
         else:
-            return HttpResponse("error: Wrong 'which' parameter")
+            return JsonReponse({"error": "Wrong 'which' parameter"})
         
         # deal with the RecipesPerPage and pages
         n = len(recipes)-1 # end index of the number of queryset
         if n<0:
-            return HttpResponse("empty")
+            return JsonResponse({"error": "no", "data": "empty"})
         if n<(page-1)*RecipesPerPage:
-            return HttpResponse("error: not this many recipes exist for "+str(page) +" pages and "+str(RecipesPerPage)+" recipes per page")
+            return JsonResponse({"error": "not this many recipes exist for "+str(page) +" pages and "+str(RecipesPerPage)+" recipes per page"})
         if n+1>page*RecipesPerPage:
             recipes = recipes[(page-1)*RecipesPerPage:page*RecipesPerPage] 
         else:
@@ -601,9 +612,9 @@ class PaginationView(View):
         if single==0:
             pass
         elif single<0:
-            return HttpResponse("error: single bellow 0")
+            return JsonResponse({"error": "single bellow 0"})
         elif single>RecipesPerPage:
-            return HttpResponse("error: single larger than RecipesPerPage")
+            return JsonResponse({"error": "single larger than RecipesPerPage"})
         else:
             recipes = recipes[single-1]
         
@@ -642,10 +653,12 @@ class PaginationView(View):
                         responseString += ";;" + "save" + ";;"
                 responseString += "||RCP||"
         else:
-            return HttpResponse("error: no recipes returned")
+            return JsonResponse({"error": "no recipes returned"})
         
         responseString = responseString[:-7] # remove last ||RCP|| delimiter
-        return HttpResponse(responseString)
+        pages = math.ceil((n+1)/RecipesPerPage)
+        response = {"error": "no", "pages":pages, "data": responseString}
+        return JsonResponse(response)
  
 
 class CreateRecipeView(View):
@@ -704,3 +717,53 @@ class CategoriesView(View):
     def get(self, request):
         cats = Category.objects.order_by("name")
         return render(request, "cookhub/categories.html", {"categories":cats})
+    
+    
+class SearchView(View):
+    RecipesPerPage = 9
+    
+    def get(self, request):
+        context_dict = {}
+        context_dict["test"] = ""
+        categories = Category.objects.order_by("-number_of_recipes")[:4]
+        context_dict["categories"] = categories
+        context_dict["RecipesPerPage"] = self.RecipesPerPage # just so the template does not fail
+        return render(request, "cookhub/search.html", context_dict)
+    
+class SearchQueryView(View):
+    RecipesPerPage = 9
+    
+    def get(self, request):
+        context_dict = {}
+        query = request.GET.get("query").lower()
+        context_dict["query"] = query
+        context_dict["RecipesPerPage"] = self.RecipesPerPage
+        context_dict["do"] = "yes";
+        categories = Category.objects.order_by("-number_of_recipes")[:4]
+        context_dict["categories"] = categories
+        recipesTitle = Recipe.objects.filter(title__contains=query)
+        recipesDescription = Recipe.objects.filter(description__contains=query)
+        recipes = recipesTitle.union(recipesDescription)
+        n = len(recipes)
+        context_dict["NumberOfPages"] = math.ceil(n/self.RecipesPerPage)
+        #if n//self.RecipesPerPage!=n/self.RecipesPerPage:
+        #    context_dict["NumberOfPages"] += 1
+        return render(request, "cookhub/search.html", context_dict)
+    
+
+class GetAllCategoriesView(View):
+    def post(self , request):
+        cat_dict = {}
+        cats = Category.objects.order_by("-number_of_recipes")
+        for cat in cats:
+            cat_dict[cat.id] = cat.name
+        return JsonResponse(cat_dict)
+    
+class Test(View):
+    def post(self, request):
+        attributes = json.loads(request.POST.get("attributes"))
+        rating = attributes.get("rating")
+        print(attributes)
+        print(rating)
+        print(request.POST.get("csrfmiddlewaretoken"))
+        return HttpResponse()

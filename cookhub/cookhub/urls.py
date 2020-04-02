@@ -24,4 +24,8 @@ urlpatterns = [
     path('recipe/<recipe_id>/edit/<ingredient_id>/', views.del_editingredient, name='del_editingredient'),
     path("recipe/<recipe_id>/delete/", views.DeleteRecipeView.as_view(), name="deleteRecipe"),
     path("categories/", views.CategoriesView.as_view(), name="all_categories"),
+    path("search/", views.SearchView.as_view(), name="search"),
+    path("search_query/", views.SearchQueryView.as_view(), name="search_query"),
+    path("get_all_categories/", views.GetAllCategoriesView.as_view(), name="getAllCategories"),
+    path("test/", views.Test.as_view(), name="test"),
 ]

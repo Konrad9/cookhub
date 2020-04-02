@@ -58,7 +58,7 @@ Profile of {{ selected_user.username }}
             <div align="center" >
                 <button class="first btn btn-outline-warning my-2 my-sm-0" id="my">First Page</button>
                 <button class="previous btn btn-outline-warning my-2 my-sm-0" id="my">&laquo; Previous</button>
-                <strong><em class="pr-2 pl-2" id="MyRecipePage" <!--style="color: white"-->> 1 </em></strong>
+                <strong><em class="pr-2 pl-2" id="MyRecipePage" style="color: white;"> 1 </em></strong>
                 <button class="next btn btn-outline-warning my-2 my-sm-0" id="my">Next &raquo;</button>
                 <button class="last btn btn-outline-warning my-2 my-sm-0" id="my">Last Page</button>
             </div>
@@ -80,7 +80,7 @@ Profile of {{ selected_user.username }}
             <div align="center" >
                 <button class="first btn btn-outline-warning my-2 my-sm-0" id="saved">First Page</button>  
                 <button class="previous btn btn-outline-warning my-2 my-sm-0" id="saved">&laquo; Previous</button>
-                <strong><em class="pr-2 pl-2" id="SavedRecipePage" <!--style="color: white"-->> 1 </em></strong>
+                <strong><em class="pr-2 pl-2" id="SavedRecipePage" style="color: white;"> 1 </em></strong>
                 <button class="next btn btn-outline-warning my-2 my-sm-0" id="saved">Next &raquo;</button>
                 <button class="last btn btn-outline-warning my-2 my-sm-0" id="saved">Last Page</button>
             </div>
@@ -105,7 +105,8 @@ Profile of {{ selected_user.username }}
         var selected_user = "{{ selected_user.username }}";
         var remove_saved_recipe = "{% url 'cookhub:remove_saved_recipe' %}";
         var csrf_token = "{{ csrf_token }}";
-        start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recipe_pagination, selected_user, remove_saved_recipe);
+        var RecipesPerPage = {{ RecipesPerPage }};
+        start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recipe_pagination, selected_user, remove_saved_recipe, RecipesPerPage);
            
     });
     </script>

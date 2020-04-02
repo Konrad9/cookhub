@@ -1,8 +1,8 @@
-function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages, recipe_pagination) {   
+function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages, recipe_pagination, RecipesPerPage) {   
             // set up of the initial look
             $("button.previous").attr("disabled", true);
             $("button.first").attr("disabled", true);
-            var RecipesPerPage = "3"; // set globally
+            var RecipesPerPage = RecipesPerPage; // set globally
             var author = "#"; // also global; we are on the homepage, so profile author is not specified
             var which = "newest";
             var nextPageNumber = 1; // this is on load up obviously the first page
@@ -23,7 +23,12 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 $("button.last#newest").attr("disabled", true);
             }
             $("em#NewestRecipePage").text("   " + page + "   "); // set the page counter
-            RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons);
+            var n = -1;
+            RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, "dummy", function (value) {
+                console.log("Callback: " + value);
+                n = value;
+            });
+            
 
             which = "popular";
             element = "div.row#popular";
@@ -36,13 +41,17 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
             $("em#PopularRecipePage").text("   " + page + "   "); // set the page counter
             RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons);
             
-            var which = "newest"; // setting the variable for the section of "newest" buttons
+            setTimeout(function after() {
+                console.log("n is now: " + n);
+            }, 500)
+            
             // retrieve last "Newest Recipes" page
             $("button.last#newest").click(function () {
                 var nextPageNumber = NewestRecipePages;
                 var page = nextPageNumber.toString();
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#newest";
+                var which = "newest";
                 $("button.first#newest").attr("disabled", false); // we could click on "last", 
                 $("button.previous#newest").attr("disabled", false); // so there is a "previous" and "first"
                 $("button.next#newest").attr("disabled", true); // we are on the last page,
@@ -57,6 +66,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 var page = nextPageNumber.toString();
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#newest";
+                var which = "newest";
                 $("button.previous#newest").attr("disabled", false); // we could click on "next", 
                 $("button.first#newest").attr("disabled", false); // so there is a "previous" and "first"
                 if (nextPageNumber == NewestRecipePages) { // "next" and "first" disabled if we reach the last page
@@ -73,6 +83,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 var page = nextPageNumber.toString();
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#newest";
+                var which = "newest";
                 $("button.last#newest").attr("disabled", false);
                 $("button.next#newest").attr("disabled", false);
                 if (nextPageNumber == 1) { // if we are on the first page again
@@ -89,6 +100,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 var page = "1";
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#newest";
+                var which = "newest";
                 $(this).attr("disabled", true); // we are already on the first page
                 $("button.previous#newest").attr("disabled", true); // disable "previous", we are already on the first page
                 $("button.next#newest").attr("disabled", false);     // we could click on "first", so there is a next
@@ -97,13 +109,13 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons);
             });
             
-            var which = "popular"; // setting the variable for the section of "popular" buttons
             // retrieve last "Popular Recipes" page
             $("button.last#popular").click(function () {
                 var nextPageNumber = PopularRecipePages;
                 var page = nextPageNumber.toString();
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#popular";
+                var which = "popular";
                 $("button.first#popular").attr("disabled", false);
                 $("button.previous#popular").attr("disabled", false);
                 $("button.next#popular").attr("disabled", true);
@@ -118,6 +130,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 var page = nextPageNumber.toString();
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#popular";
+                var which = "popular";
                 $("button.first#popular").attr("disabled", false);
                 $("button.previous#popular").attr("disabled", false);
                 if (nextPageNumber == PopularRecipePages) { // next disabled if we reach the last page
@@ -134,6 +147,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 var page = nextPageNumber.toString();
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#popular";
+                var which = "popular";
                 $("button.last#popular").attr("disabled", false);
                 $("button.next#popular").attr("disabled", false);
                 if (nextPageNumber == 1) {  // if we are on the first page again
@@ -150,6 +164,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 var page = "1";
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#popular";
+                var which = "popular";
                 $("button.first#popular").attr("disabled", false);
                 $("button.next#popular").attr("disabled", false);
                 $("button.previous#popular").attr("disabled", true);

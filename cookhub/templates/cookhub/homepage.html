@@ -107,7 +107,8 @@
             var PopularRecipePages = {{ PopularRecipePages }};
             var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
             var csrf_token = "{{ csrf_token }}";
-            start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages, recipe_pagination);
+            var RecipesPerPage = {{ RecipesPerPage }};
+            start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages, recipe_pagination, RecipesPerPage);
             
             {% if user.is_authenticated %}
                 // save recipes, only possible if the user is authenticated
