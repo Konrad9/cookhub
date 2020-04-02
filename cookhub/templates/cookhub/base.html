@@ -35,7 +35,7 @@
         <a class="navbar-brand p-0" href="{% url 'cookhub:homepage' %}"><img src="{% static 'images/logo.png' %}"/
             id="logoImage"></a>
         <div class="collapse navbar-collapse pr-3" id="navbarCollapse">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mr-auto mb-0 mt-0">
 
                 {# TODO: Search function #}
                 <form class="form-inline mt-2 mt-md-0"
@@ -44,9 +44,9 @@
                       style="width: 570px; min-width: 570px;"
                       action="">
                     {% csrf_token %}
-                    <li class="form-group">
+                    <div class="form-group">
 
-                        <input class="form-control mr-sm-2"
+                        <input class="form-control mr-sm-2 mb-0 ml-0"
                                type="text"
                                name="query"
                                id="query"
@@ -54,8 +54,7 @@
                                {% if query %}
                                value={{ query }}>
                                {% endif %}
-                    </li>
-                    <li class="nav-item">
+                    </div>
                         <button class="btn btn-outline-warning my-2 my-sm-0"
                                 type="submit"
                                 style="border-radius:10rem"
@@ -63,7 +62,6 @@
                                 formmethod="GET"
                                 formaction="{% url 'cookhub:search' %}">Search
                         </button>
-                    </li>
                 </form>
             </ul>
             <ul class="navbar-nav mt-2 mt-md-0">{% if user.is_authenticated %}
