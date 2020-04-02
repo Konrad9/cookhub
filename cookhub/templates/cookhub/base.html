@@ -57,7 +57,9 @@
                         <button class="btn btn-outline-warning my-2 my-sm-0"
                                 type="submit"
                                 style="border-radius:10rem"
-                                name="submit">Search
+                                name="submit"
+                                formmethod="GET"
+                                formaction="{% url 'cookhub:search' %}">Search
                         </button>
                     </li>
                 </form>
