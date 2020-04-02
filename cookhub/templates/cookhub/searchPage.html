@@ -2,8 +2,7 @@
 {% load staticfiles %}
 
 {% block title_block %}
-<!--TODO: make dynamic title-->
-Recipes - Search
+Recipes - {{ querySTR }}
 {% endblock %}
 
 {% block body_block %}
@@ -17,7 +16,13 @@ Recipes - Search
 
                 <tr><!-- text for search query -->
                     <div class="mb-4 mt-2">
-                        <h1 class="card-section p-1 align-middle" style="display:inline"> SEARCH RESULTS FOR: {{ querySTR }} </h1>
+                        <h1 class="card-section p-1 align-middle" style="display:inline">SEARCH RESULTS FOR: {{ querySTR }}
+                        {% if rating > 0 %}
+                            <br>
+                            Recipes rated: {{ rating }}+
+                        {% endif %}
+
+                        </h1>
                     </div>
                 </tr>
 
@@ -48,7 +53,7 @@ Recipes - Search
 
                     <li class="pl-3 pr-3 pb-2">
                         <a class="bugged"
-                           href="#">{{ category.name }}
+                           href="{% url 'cookhub:searchCats' category.name %}">{{ category.name }}
                         </a>
                     </li>
                     {% endfor %}
@@ -58,8 +63,21 @@ Recipes - Search
                 {% endif %}
                 <a class="btn btn-warning warning my-2 my-sm-0 ml-4 mr-4"
                    style="color: #ffc107; border-radius:10rem; background-color: #252525"
-                   href="#">View all Categories
+                   href="{% url 'cookhub:all_categories' %}">View all Categories
                 </a>
+                <hr style="color: white">
+
+                <!-- rating filter (sorting) -->
+                <h2 class="pl-5 pb-3" style="color: white">RATINGS</h2>
+                <span style="color: white; ">
+                <form action="">
+                  <label for="rating">0</label>
+                  <input type="range" id="rating" name="rating" min="0" max="5" step="0.1" value="{{ rating }}">
+                    <label for="rating">5</label>
+                    <br>
+                  <input type="submit" style="color: #ffc107; border-radius:10rem; background-color: #252525">
+                </form>
+                </span>
 
             </div>
         </div>
@@ -72,12 +90,13 @@ Recipes - Search
     $(document).ready(function () {
         // parameters for searchPage.js
         let authenticated = "{{ user.is_authenticated }}";
-        let recipePages = {{ recipePages }};
+        let recipePages = {{ recipePages}};
         let querySTR = "{{ querySTR }}";
         let recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
         let csrf_token = "{{ csrf_token }}";
+        let rating = {{ rating }};
 
-        search(csrf_token, authenticated, recipePages, recipe_pagination, querySTR);
+        search(csrf_token, authenticated, recipePages, recipe_pagination, querySTR, rating);
 
         {% if user.is_authenticated %}
         // save recipes, only possible if the user is authenticated
@@ -91,6 +110,8 @@ Recipes - Search
 
         {% endif %}
     });
+
+
 </script>
 
 <style>

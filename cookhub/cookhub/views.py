@@ -348,7 +348,7 @@ class RecipeView(View):
         if request.user != context_dict['creator']:
             visitor_cookie_handler(request, context_dict['recipe'])
             context_dict['rpresent'] = (
-                        request.user.is_authenticated and not context_dict['ratings'].filter(user=request.user))
+                    request.user.is_authenticated and not context_dict['ratings'].filter(user=request.user))
         Recipe.objects.filter(id=recipe_id).update(views=context_dict['recipe'].views)
         if request.user.is_authenticated:
             userProfile = UserModel.objects.get(user=request.user)
@@ -568,6 +568,7 @@ class PaginationView(View):
         single = int(request.POST["single"])
         buttons = request.POST.get("buttons", None)
         categories = request.POST.get('categories', '').split(", ")
+        rating = request.POST.get('rating', None)
         # deal with the author
         if author != "#":
             try:
@@ -593,8 +594,18 @@ class PaginationView(View):
             user_profile = UserModel.objects.get(user=user)
             recipes = user_profile.saved_recipes.all()
         elif which == "search":
-            categories = Category.objects.filter(name__in=categories)[:]
-            recipes = recipes.filter(categories__in=categories)
+            # empty search returns all recipes (rating filter still applies)
+            if categories[0] != '':
+                if rating is not None:
+                    categories = Category.objects.filter(name__in=categories)[:]
+                    categories = list(set(categories))  # remove duplicate recipes
+                    recipes = recipes.filter(categories__in=categories, averageRating__range=(float(rating), 5.0))
+                else:
+                    categories = Category.objects.filter(name__in=categories)[:]
+                    categories = list(set(categories))  # remove duplicate recipes
+                    recipes = recipes.filter(categories__in=categories)
+            else:
+                recipes = recipes.filter(averageRating__range=(float(rating), 5.0))
         else:
             return HttpResponse("error: Wrong 'which' parameter")
 
@@ -725,25 +736,40 @@ class CategoriesView(View):
 
 
 class Search(View):
-    def get(self, request):
+    def get(self, request, query=""):
         n = 6  # number of recipes per page
         context_dict = dict()
         saved = []
 
-        # fetch query string and process it
-        query_string = request.GET.get('query', '')
-        query_list = query_string.split(" ")
-        query = [q.capitalize() for q in query_list]
-        query_passable = ", ".join(query)
+        if query == "":
 
-        context_dict['querySTR'] = query_passable
+            # fetch query string and process it
+            query_string = request.GET.get('query', '')
+            query_list = query_string.split(" ")
+            query = [q.capitalize() for q in query_list]
+            query_passable = ", ".join(query)
 
+            context_dict['querySTR'] = query_passable
+        else:
+            context_dict['querySTR'] = query
 
+        rating = request.GET.get('rating')
+
+        if rating is not None:
+            rating = float(rating)
+        else:
+            rating = 0
+        context_dict['rating'] = rating
+        
         # get all the categories
         category = Category.objects.filter(name__in=query)[:]
 
-        # get all the recipes
-        recipes = Recipe.objects.filter(categories__in=category)[:]
+        # if empty search return all recipes
+        if query == [""]:
+            # get all the recipes
+            recipes = Recipe.objects.filter(averageRating__range=(float(rating), 5.0))
+        else:
+            recipes = Recipe.objects.filter(categories__in=category, averageRating__range=(float(rating), 5.0))
         # set page number
         n_recipes = len(recipes)
         if n_recipes // n != n_recipes / n:
@@ -751,8 +777,6 @@ class Search(View):
         else:
             context_dict['recipePages'] = n_recipes // n
         context_dict['recipes'] = recipes
-
-        print(context_dict['recipes'])
 
         if request.user.is_authenticated:
             userProfile = UserModel.objects.get(user=request.user)

@@ -1,5 +1,5 @@
-function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, categories) {
-    $.post(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes, "csrfmiddlewaretoken": csrf_token, "categories": categories},
+function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, categories, rating) {
+    $.post(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes, "csrfmiddlewaretoken": csrf_token, "categories": categories, "rating": rating},
           function(data) {
               if (data.startsWith("error")) {
                       alert(data);

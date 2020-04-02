@@ -52,7 +52,7 @@
 
                                {% if query %}
                                value={{ query }}>
-                               {% endif %}
+                        {% endif %}
                     </li>
                     <li class="nav-item">
                         <button class="btn btn-outline-warning my-2 my-sm-0"
@@ -110,10 +110,10 @@
                 {% endif %}
                 <p class="closebtn pointer" onclick="closeNavbar()">&times;</p>
                 <p>
-                <form class="form-inline mt-2 mt-md-0"
+                <form action=""
+                      class="form-inline mt-2 mt-md-0"
                       id="user-form"
-                      method="post"
-                      action="">
+                      method="post">
                     {% csrf_token %}
 
                     <input class="form-control"
@@ -122,13 +122,14 @@
                            id="query"
                            {% if query %}
                            value={{ query }}
-                           {% endif %}
-                    >
+                           {% endif %}}>
 
                     <button class="btn btn-outline-warning my-2 my-sm-0"
                             type="submit"
                             style="border-radius:8rem; color:white;"
-                            name="submit">Search
+                            name="submit"
+                            formmethod="GET"
+                            formaction="{% url 'cookhub:search' %}">Search
                     </button>
 
                 </form>
