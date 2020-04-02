@@ -1,5 +1,6 @@
 from django.urls import path
 from cookhub import views
+from cookhub.views import Search
 
 app_name = 'cookhub'
 
@@ -24,4 +25,5 @@ urlpatterns = [
     path('recipe/<recipe_id>/edit/<ingredient_id>/', views.del_editingredient, name='del_editingredient'),
     path("recipe/<recipe_id>/delete/", views.DeleteRecipeView.as_view(), name="deleteRecipe"),
     path("categories/", views.CategoriesView.as_view(), name="all_categories"),
+    path('search/', Search.as_view(), name="search"),
 ]
