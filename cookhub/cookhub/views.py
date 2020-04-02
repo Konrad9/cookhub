@@ -735,21 +735,12 @@ class Search(View):
         query_list = query_string.split(" ")
         query = [q.capitalize() for q in query_list]
         query_passable = ", ".join(query)
-        #
-        # print("+++++++++++++++++++++++++++++")
-        # print(query_list)
-        # print(query)
-        # print(query_passable)
-        # print("+++++++++++++++++++++++++++++")
+
         context_dict['querySTR'] = query_passable
 
-        # if query_string != "":
 
-        # TODO: implement keyword searching
         # get all the categories
-        categories = Category.objects.order_by()[:]
         category = Category.objects.filter(name__in=query)[:]
-        # context_dict['query'] = 'Lunch, Soup'
 
         # get all the recipes
         recipes = Recipe.objects.filter(categories__in=category)[:]
