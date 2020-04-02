@@ -1,0 +1,129 @@
+    /* The sidebar menu */
+    .sidenav {
+        height: 100%; /* Full-height: remove this if you want "auto" height */
+        width: 450px; /* Set the width of the sidebar */
+        position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+        z-index: 1; /* Stay on top */
+        top: 0; /* Stay at the top */
+        right: 0;
+        background-color: #1c1c1c; /* Black */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        padding-top: 20px;
+    }
+
+    /* The navigation menu links */
+    .sidenav a {
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+    }
+
+    /* When you mouse over the navigation links, change their color */
+    .sidenav a:hover {
+        color: #f1f1f1;
+    }
+
+    /* Style page content */
+    .main {
+        margin-left: 160px; /* Same as the width of the sidebar */
+        padding: 0px 10px;
+    }
+
+    /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+    @media screen and (max-height: 1000px) {
+        .sidenav {
+            padding-top: 50px;
+        }
+
+        .sidenav a {
+            font-size: 18px;
+        }
+    }
+
+    #block {
+        margin-left: 200px;
+    }
+
+    #heading {
+        margin-left: -170px;
+        color: #ffc107;
+    }
+
+    #profile {
+        margin-left: 40px;
+        border-style: solid;
+        border-color: #ffc107;
+    }
+
+    #author {
+        font-weight: 500;
+        font-size: 20px;
+        color: #ffc107;
+    }
+
+    p {
+        color: white;
+    }
+
+    hr {
+        border: 0.5px solid #2f2e2e;
+    }
+
+    #hr1 {
+        margin-right: 30px;
+    }
+
+    #hr_orange {
+        border-color: #ffc107;
+    }
+
+    #hr2 {
+        width: 370px;
+        border-color: #ffc107;
+        margin-left: 20px;
+    }
+
+
+
+    #categories {
+        color: #ffc107;
+    }
+
+    #image {
+        border: solid #ffc107 2px;
+    }
+
+    #description {
+        max-width: 1000px;
+        width: 550px;
+    }
+
+    textarea {
+        width: 700px;
+        height: 130px;
+        color: white;
+        background-color: #1f1f1f;
+        border-color: #2f2e2e;
+        margin-left: 20px;
+        margin-bottom: 20px;
+    }
+
+    #comment_user {
+        color: #ffc107;
+    }
+
+    #comment_date {
+        color: #929292;
+    }
+
+    #comment_hr {
+        width: 1080px;
+        border-color: #2f2e2e;
+        margin-left: 0px;
+    }
+
+    #comment_text{
+        max-width: 1080px;
+    }
