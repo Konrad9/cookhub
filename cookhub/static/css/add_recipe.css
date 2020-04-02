@@ -1,0 +1,44 @@
+input {
+    margin-bottom: 10px;
+}
+
+a {
+    color: #ffd32d;
+}
+
+input {
+    background-color: #2f2e2e;
+    color: white;
+    border: 0px;
+    border-radius: 10rem;
+    padding-left: 10px;
+    margin-left: 15px;
+}
+
+textarea {
+    background-color: #2f2e2e;
+    color: white;
+    border: 0px;
+    border-radius: 1rem;
+    padding-left: 10px;
+    width: 900px;
+    height: 200px;
+    margin-right: 30px;
+    margin-top: 10px;
+}
+
+#preview {
+    margin-bottom: 20px;
+}
+
+hr {
+    border-color: #ffd32d;
+}
+
+ul {
+    margin-top: 15px;
+    margin-bottom: 0px;
+}
+
+
+

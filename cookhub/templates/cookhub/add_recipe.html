@@ -5,6 +5,11 @@
 	Add Recipe
 {% endblock %}
 
+{% block head_block %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/add_recipe.css' %}" />
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block body_block %}
 {% if recipe.user == user %}
     <div class="container p-4">
@@ -12,12 +17,13 @@
     </div>
 
     <div class="container p-4" style="background-color: #1c1c1c; color:white; border-radius: 1.2rem">
+        <img src="" id="preview" width="200px" />
 		<form id="recipe_form" method="post" action="{% url 'cookhub:add_recipe' recipe.id %}" enctype="multipart/form-data"> 
 			{% csrf_token %}
 			{% for hidden in recipe_form.hidden_fields %}
 				{{ hidden }}
 			{% endfor %}
-			<img src="" id="preview" width="200px" />
+
 
 			
 			{% for field in recipe_form.visible_fields %}
@@ -33,7 +39,7 @@
         	}
 		</style>
 			
-		<input type="submit" name="addRecipe" value="Finished Recipe" />
+
 		<script type="text/javascript"> // displays the uploaded photo right away
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -51,14 +57,15 @@
 
 </script>
 		</form>
-			<form id="category_form">
+			<form class="row " id="category_form">
 				{% csrf_token %}
 				{% for field in  category_form.visible_fields %}
 					{{ field.errors }}
 					{{ field.help_text }}
 					{{ field }} <br />
 				{% endfor %}
-				<button id="addCategory" >Add Category</button>
+				<button class="btn btn-outline-warning my-2 my-sm-0 ml-3"
+                        style="border-radius:10rem" id="addCategory" >Add Category</button>
 			</form>
 			<script src="{% static 'js/recipeAddCategory.js' %}"></script>
 			<script>
@@ -67,7 +74,8 @@
             			addCat("{% url 'cookhub:add_category' %}");
             		});
 			</script>
-			
+
+            <hr>
 			<h2>Ingredients for the recipe</h2>
 			<ul id="ingredientList">
 			</ul>
@@ -78,15 +86,18 @@
     		});
     		</script>
 			
-			<form id="ingredient_form">
+			<form class="mb-4" id="ingredient_form">
 				{% csrf_token %}
 				{% for field in ingredient_form.visible_fields %}
 					{{ field.errors }}
 					{{ field.help_text }}
 					{{ field }} <br />
 				{% endfor %}
-				<button id="addIngredient" >Add Ingredient</button>
+				<button class="btn btn-outline-warning my-2 my-sm-0"
+                        style="border-radius:10rem" id="addIngredient" >Add Ingredient</button>
 			</form>
+        <input class="btn btn-outline-warning my-2 my-sm-0 ml-0 btn-block"
+               style="border-radius:10rem; width: 500px" type="submit" name="addRecipe" value="Publish Recipe" />
 			<script src="{% static 'js/recipeAddIngredient.js' %}"></script>
 			<script>
         			$("button#addIngredient").click( function(event) {
@@ -97,10 +108,5 @@
 		
 		
 	</div>
-    <style>
-    input {
-        margin-bottom: 10px;
-    }
-    </style>
 {% endif %}
 {% endblock %}
