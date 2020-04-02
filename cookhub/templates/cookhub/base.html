@@ -41,6 +41,7 @@
                 <form class="form-inline mt-2 mt-md-0"
                       id="user-form"
                       method="post"
+                      style="width: 570px; min-width: 570px;"
                       action="">
                     {% csrf_token %}
                     <li class="form-group">
@@ -67,10 +68,10 @@
             </ul>
             <ul class="navbar-nav mt-2 mt-md-0">{% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link active pr-3">Welcome back, {{ user.username }}</a>
+                    <a id="greeting" style="width: 200px; min-width: 200px; text-align: right" class="nav-link active pr-3">Welcome back, {{ user.username }}</a>
                 </li>
-                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit"
-                                        style="border-radius:10rem" href="{% url 'cookhub:create_recipe' %}">
+                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit" id="btn1"
+                                        style="border-radius:10rem; width: 130px; min-width: 100%" href="{% url 'cookhub:create_recipe' %}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 27" fill="none"
                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                          class="feather feather-edit">
@@ -78,21 +79,21 @@
                         <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
                     </svg>
                     New Recipe</a></li>
-                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit"
-                                        style="border-radius:10rem" href="{% url 'cookhub:profile' user.username %}">My
+                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 ml-2" type="submit"
+                                        style="border-radius:10rem; width: 100px; min-width: 100%" href="{% url 'cookhub:profile' user.username %}">My
                     Profile</a></li>
-                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0" type="submit"
-                                        style="border-radius:10rem" href="{% url 'cookhub:logout' %}?next=/cookhub/">Logout</a>
+                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 ml-3" type="submit"
+                                        style="border-radius:10rem; width: 100px; min-width: 100%" href="{% url 'cookhub:logout' %}?next=/cookhub/">Logout</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link active pr-3">You are not logged in</a>
+                    <a  class="nav-link active pr-3" style=" width: 180px; min-width: 100%">You are not logged in</a>
                 </li>
                 <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit"
-                                        style="border-radius:10rem" href="{% url 'cookhub:register' %}" name="submit">Register</a>
+                                        style="border-radius:10rem; width: 100px; min-width: 100%" href="{% url 'cookhub:register' %}" name="submit">Register</a>
                 </li>
-                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0" type="submit"
-                                        style="border-radius:10rem" href="{% url 'cookhub:login' %}"
+                <li class="nav-item"><a class="btn btn-outline-warning my-2 my-sm-0 ml-2" type="submit"
+                                        style="border-radius:10rem; width: 100px; min-width: 100%" href="{% url 'cookhub:login' %}"
                                         name="submit">Login</a></li>
 
                 {% endif %}
