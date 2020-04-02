@@ -1,10 +1,4 @@
 function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, callback) {
-    var n = 0;
-    function setter(no) {
-        n = no;
-        console.log("no: " + no);
-    }
-    console.log("here");
     $.post(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes, "csrfmiddlewaretoken": csrf_token},
           function(json) {
               if (json.error!="no") {
@@ -38,16 +32,12 @@ function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, e
                          recipesArray[i] = recipeInformation;       // add the dictionary to the array of recipe dictionaries
                  }
                  displayRecipes(element, recipesArray, buttons, which);
-                 setter(NumberOfPages);
-                 console.log("NumerOfPages: "+ NumberOfPages);
+                 //console.log("NumberOfPages pagHand: "+ NumberOfPages);
                  if (callback) {
                      callback(NumberOfPages);
                 }
-                return;
              }
     });
-    console.log("n: "+ n);
-    return n;
 }
 
 // now to the representation

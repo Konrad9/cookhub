@@ -17,8 +17,213 @@ function searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPag
         var buttons = "";
     }
     var attributes = query;
+    console.log(nextPageNumber, NumberOfPages);
     if (nextPageNumber >= NumberOfPages) { // if we are on the only page, there is no next
-        console.log(nextPageNumber, NumberOfPages);
+        $("button.first#results").attr("disabled", true);
+        $("button.previous#results").attr("disabled", true);
+        $("button.next#results").attr("disabled", true);
+        $("button.last#results").attr("disabled", true);
+    }
+    $("em#ResultsRecipePage").text("   " + page + "   "); // set the page counter
+    RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);    
+    
+    $("button.last#results").bind("click", {"dict": searchdata.query}, lastResultButton);
+    $("button.next#results").bind("click", {"dict": searchdata.query}, nextResultButton);
+    $("button.previous#results").bind("click", {"dict": searchdata.query}, previousResultButton);
+    $("button.first#results").bind("click", {"dict": searchdata.query}, firstResultButton);
+               
+}
+
+function lastResultButton(e) {
+    dicti = e.data.dict;
+    var csrf_token = dicti.csrf_token;
+    var RecipesPerPage = dicti.RecipesPerPage;
+    var author = dicti.author;
+    var which = dicti.which;
+    var single = dicti.single;
+    var element = dicti.element;
+    var url = dicti.url;
+    var buttons = dicti.buttons;
+    var attributes = dicti.attributes;
+    var NumberOfPages = dicti.NumberOfPages;
+    var nextPageNumber = NumberOfPages;
+    var page = nextPageNumber.toString();
+    $("button.first#results").attr("disabled", false); // we could click on "last", 
+    $("button.previous#results").attr("disabled", false); // so there is a "previous" and "first"
+    $("button.next#results").attr("disabled", true); // we are on the last page,
+    $(this).attr("disabled", true);                 // so there is no next or last anymore
+    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
+    RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
+}
+
+function nextResultButton(e) {
+    dicti = e.data.dict;
+    var csrf_token = dicti.csrf_token;
+    var RecipesPerPage = dicti.RecipesPerPage;
+    var author = dicti.author;
+    var which = dicti.which;
+    var single = dicti.single;
+    var element = dicti.element;
+    var url = dicti.url;
+    var buttons = dicti.buttons;
+    var attributes = dicti.attributes;
+    var NumberOfPages = dicti.NumberOfPages;
+    var nextPageNumber = parseInt($("em#ResultsRecipePage").html().replace(/ /g, ''), 10) + 1;
+    var page = nextPageNumber.toString();
+    $("button.previous#results").attr("disabled", false); // we could click on "next", 
+    $("button.first#results").attr("disabled", false); // so there is a "previous" and "first"
+    if (nextPageNumber == NumberOfPages) { // "next" and "last" disabled if we reach the last page
+        $("button.next#results").attr("disabled", true);
+        $("button.last#results").attr("disabled", true);
+    }
+    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
+    RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
+}
+
+function previousResultButton(e) {
+    dicti = e.data.dict;
+    var csrf_token = dicti.csrf_token;
+    var RecipesPerPage = dicti.RecipesPerPage;
+    var author = dicti.author;
+    var which = dicti.which;
+    var single = dicti.single;
+    var element = dicti.element;
+    var url = dicti.url;
+    var buttons = dicti.buttons;
+    var attributes = dicti.attributes;
+    var NumberOfPages = dicti.NumberOfPages;
+    var nextPageNumber = parseInt($("em#ResultsRecipePage").html().replace(/ /g, ''), 10) - 1;
+    var page = nextPageNumber.toString();
+    $("button.last#results").attr("disabled", false);
+    $("button.next#results").attr("disabled", false);
+    if (nextPageNumber == 1) { // if we are on the first page again
+        $("button.previous#results").attr("disabled", true);
+        $("button.first#results").attr("disabled", true);
+    }
+    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
+    RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
+}
+
+function firstResultButton(e) {
+    dicti = e.data.dict;
+    var csrf_token = dicti.csrf_token;
+    var RecipesPerPage = dicti.RecipesPerPage;
+    var author = dicti.author;
+    var which = dicti.which;
+    var single = dicti.single;
+    var element = dicti.element;
+    var url = dicti.url;
+    var buttons = dicti.buttons;
+    var attributes = dicti.attributes;
+    var NumberOfPages = dicti.NumberOfPages;
+    var nextPageNumber = 1;
+    var page = "1";
+    $(this).attr("disabled", true); // we are already on the first page
+    $("button.previous#results").attr("disabled", true); // disable "previous", we are already on the first page
+    $("button.next#results").attr("disabled", false);     // we could click on "first", so there is a next
+    $("button.last#results").attr("disabled", false);    // and a last, too
+    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
+    RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
+}
+
+
+ 
+ // add an ingredient to the list
+ function addIngredient() {
+    var text = document.getElementById("ingredientInput").value;
+    $("ul#ingredientList").append("<li>"+ text + "</li>");
+    document.getElementById("ingredientInput").value = "";
+} 
+
+// clear all filters
+function clearFilters() {
+    clearResetup(searchdata.query);
+    $("input").removeAttr("checked");
+    $("input#ratingSlider").val("0");
+    $("em#sliderValue").html("0.0");
+    $("ul#ingredientList").empty();
+    $("button.last#results").unbind();
+    $("button.next#results").unbind();
+    $("button.previous#results").unbind();
+    $("button.first#results").unbind();
+    $("button.last#results").bind("click", {"dict": searchdata.query}, lastResultButton);
+    $("button.next#results").bind("click", {"dict": searchdata.query}, nextResultButton);
+    $("button.previous#results").bind("click", {"dict": searchdata.query}, previousResultButton);
+    $("button.first#results").bind("click", {"dict": searchdata.query}, firstResultButton);
+}     
+
+ // Update the current slider value
+function sliderFunction() {
+    var slider = document.getElementById("ratingSlider");
+    var output = document.getElementById("sliderValue");
+    output.innerHTML = (slider.value/10).toString();
+} 
+
+function searchfiltered(dicti) {
+    console.log("searching filtered");
+    console.log(dicti.attributes);
+    var csrf_token = dicti.csrf_token;
+    var RecipesPerPage = dicti.RecipesPerPage;
+    var author = dicti.author;
+    var which = dicti.which;
+    var single = dicti.single;
+    var element = dicti.element;
+    var url = dicti.url;
+    var buttons = dicti.buttons;
+    var attributes = dicti.attributes;
+    var nextPageNumber = 1;
+    var page = "1";
+    var NumberOfPages = -1;
+    RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, function (value) {
+                console.log("Callback: " + value);
+                NumberOfPages = value;
+    });
+    setTimeout(function () {
+        searchdata.filtered.NumberOfPages = NumberOfPages;
+        $("button.first#results").attr("disabled", true); // we are already on the first page
+        $("button.previous#results").attr("disabled", true); // disable "previous", we are already on the first page
+        if (nextPageNumber>=NumberOfPages) {
+            $("button.next#results").attr("disabled", true);     
+            $("button.last#results").attr("disabled", true);
+        }
+        else {
+            $("button.next#results").attr("disabled", false);     
+            $("button.last#results").attr("disabled", false);    
+        } 
+    }, 200); 
+      
+    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
+    
+    $("button.last#results").unbind();
+    $("button.next#results").unbind();
+    $("button.previous#results").unbind();
+    $("button.first#results").unbind();
+    $("button.last#results").bind("click", {"dict": searchdata.filtered}, lastResultButton);
+    $("button.next#results").bind("click", {"dict": searchdata.filtered}, nextResultButton);
+    $("button.previous#results").bind("click", {"dict": searchdata.filtered}, previousResultButton);
+    $("button.first#results").bind("click", {"dict": searchdata.filtered}, firstResultButton);
+    
+}
+
+
+function clearResetup(dicti) {
+    $("button.previous").attr("disabled", true);
+    $("button.first").attr("disabled", true);
+    $("button.next").attr("disabled", false);
+    $("button.last").attr("disabled", false);
+    var csrf_token = dicti.csrf_token;
+    var RecipesPerPage = dicti.RecipesPerPage;
+    var author = dicti.author;
+    var which = dicti.which;
+    var nextPageNumber = 1;
+    var page = "1";
+    var single = dicti.single;
+    var element = dicti.element;
+    var url = dicti.url;
+    var buttons = dicti.buttons;
+    var attributes = dicti.attributes;
+    var NumberOfPages = dicti.NumberOfPages;
+    if (nextPageNumber >= NumberOfPages) { // if we are on the only page, there is no next
         $("button.first#results").attr("disabled", true);
         $("button.previous#results").attr("disabled", true);
         $("button.next#results").attr("disabled", true);
@@ -26,113 +231,44 @@ function searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPag
     }
     $("em#ResultsRecipePage").text("   " + page + "   "); // set the page counter
     RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
+}
 
-
-            var which = "query"; // setting the variable for the section of "newest" buttons
-            // retrieve last page
-            $("button.last#results").click(function () {
-                var nextPageNumber = NumberOfPages;
-                var page = nextPageNumber.toString();
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#results";
-                $("button.first#results").attr("disabled", false); // we could click on "last", 
-                $("button.previous#results").attr("disabled", false); // so there is a "previous" and "first"
-                $("button.next#results").attr("disabled", true); // we are on the last page,
-                $(this).attr("disabled", true);                 // so there is no next or last anymore
-                $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
-                RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
-            });
-            
-            // retrieve next page
-            $("button.next#results").click(function () {
-                var nextPageNumber = parseInt($("em#ResultsRecipePage").html().replace(/ /g, ''), 10) + 1;
-                var page = nextPageNumber.toString();
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#results";
-                $("button.previous#results").attr("disabled", false); // we could click on "next", 
-                $("button.first#results").attr("disabled", false); // so there is a "previous" and "first"
-                if (nextPageNumber == NumberOfPages) { // "next" and "first" disabled if we reach the last page
-                    $("button.next#results").attr("disabled", true);
-                    $("button.last#results").attr("disabled", true);
+function applyFilters() {
+                // get checked boxes
+                var cdBoxes = document.getElementsByName("catBox");
+                var checkedBoxes = [];
+                for (var i=0; i<cdBoxes.length; i++) {
+                    console.log("checking boxes");
+                    if (cdBoxes[i].checked) {
+                        checkedBoxes.push(cdBoxes[i].value);
+                        console.log(cdBoxes[i].value);
+                    }
                 }
-                $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
-                RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
-            });
-            
-            // retrieve previous page
-            $("button.previous#results").click(function () {
-                var nextPageNumber = parseInt($("em#ResultsRecipePage").html().replace(/ /g, ''), 10) - 1;
-                var page = nextPageNumber.toString();
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#results";
-                $("button.last#results").attr("disabled", false);
-                $("button.next#results").attr("disabled", false);
-                if (nextPageNumber == 1) { // if we are on the first page again
-                    $("button.previous#results").attr("disabled", true);
-                    $("button.first#results").attr("disabled", true);
+                if (checkedBoxes.length==0) {
+                    checkedBoxes = null;
                 }
-                $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are previous pages
-                RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
-            });
-            
-            // retrieve first page
-            $("button.first#results").click(function () {
-                var nextPageNumber = 1; // go to the first page
-                var page = "1";
-                var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
-                var element = "div.row#results";
-                $(this).attr("disabled", true); // we are already on the first page
-                $("button.previous#results").attr("disabled", true); // disable "previous", we are already on the first page
-                $("button.next#results").attr("disabled", false);     // we could click on "first", so there is a next
-                $("button.last#results").attr("disabled", false);    // and a last, too
-                $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are previous pages
-                RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
-            });
- }
- 
- function addIngredient() {
-    var text = document.getElementById("ingredientInput").value;
-    $("ul#ingredientList").append("<li>"+ text + "</li>");
-    document.getElementById("ingredientInput").value = "";
-} 
-
-function clearFilters() {
-    console.log($("input.catCheckbox"));
-    $("input").removeAttr("checked");
-    $("input#ratingSlider").val("0");
-    $("em#sliderValue").html("0.0");
-    $("ul#ingredientList").html("");
-}     
-
- // Update the current slider value (each time you drag the slider handle)
-function sliderFunction() {
-    var slider = document.getElementById("ratingSlider");
-    var output = document.getElementById("sliderValue");
-    output.innerHTML = (slider.value/10).toString();
-} 
-
-function searchfiltered(csrf_token, authenticated, recipe_pagination, RecipesPerPage, query, NumberOfPages, checkedBoxes, rating, ingredients) {
-    console.log(checkedBoxes);
-    var author = "#";
-    var which = "filtered";
-    var nextPageNumber = 1;
-    var page = 1;
-    var single = "1";
-    var element = "div.row#results";
-    var url = recipe_pagination;
-    if (authenticated=="True") { // if the user is authenticated, then he can save the recipes, so we need buttons
-        var buttons = "yes";
-    }
-    else {
-        var buttons = "";
-    }
-   // RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
-    $.ajax({
-        url: recipe_pagination, 
-        data: {"csrfmiddlewaretoken": csrf_token, "attributes": JSON.stringify({"query": query, "rating": rating,"ingredients": ingredients})},
-        type: "post",
-        success: function(data) {
-            console.log(data);
-        }
-        });
+                
+                // get rating
+                var rating = document.getElementById("sliderValue").innerHTML;
+                
+                // get ingredients
+                var ingredients = [];
+                var ul = document.getElementById("ingredientList");
+                var items = ul.getElementsByTagName("li");
+                console.log(items.length);
+                for (var i=0; i<items.length; i++) {
+                    ingredients.push(items[i].innerHTML);
+                }
+                if (ingredients.length==0) {
+                    ingredients = null;
+                }
+                
+                // get sorting
+                var sortBy = "";
+                
+                // remember the query
+                var query = searchdata.query.attributes;
+                searchdata.filtered.attributes = JSON.stringify({"query": query, "checkedCategories": checkedBoxes, "rating": rating, "ingredients": ingredients, "sortBy": sortBy});
+                console.log(query, checkedBoxes, rating, ingredients);
+                searchfiltered(searchdata.filtered);
 }

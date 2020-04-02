@@ -23,11 +23,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 $("button.last#newest").attr("disabled", true);
             }
             $("em#NewestRecipePage").text("   " + page + "   "); // set the page counter
-            var n = -1;
-            RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, "dummy", function (value) {
-                console.log("Callback: " + value);
-                n = value;
-            });
+            RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons);
             
 
             which = "popular";
@@ -165,7 +161,7 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
                 var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
                 var element = "div.row#popular";
                 var which = "popular";
-                $("button.first#popular").attr("disabled", false);
+                $("button.last#popular").attr("disabled", false);
                 $("button.next#popular").attr("disabled", false);
                 $("button.previous#popular").attr("disabled", true);
                 $(this).attr("disabled", true);

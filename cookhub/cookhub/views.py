@@ -580,22 +580,92 @@ class PaginationView(View):
             recipes = Recipe.objects.all()
         
         # deal with the which
-        if which=="newest":
+        if which=="newest": # homepage newest recipes
             recipes = recipes.order_by("-creationDate")
-        elif which=="popular":
+        elif which=="popular": # homepage popular recipes
             recipes = recipes.order_by("-views")
-        elif which=="my":
+        elif which=="my": # profile own recipes
             pass # we already specified the author
-        elif which=="saved":
+        elif which=="saved": # profile saved recipes
             user_profile = UserModel.objects.get(user=user)
             recipes = user_profile.saved_recipes.all()
-        elif which=="query":
+        elif which=="query": # simple search by name
             query = request.POST.get("attributes")
             recipesTitle = Recipe.objects.filter(title__contains=query)
             recipesDescription = Recipe.objects.filter(description__contains=query)
             recipes = recipesTitle.union(recipesDescription)
+        elif which=="filtered": # advanced filtering
+            #print("filtering started...")
+            attributes = json.loads(request.POST.get("attributes"))
+            rating = float(attributes.get("rating"))
+            selectedCatIds = attributes.get("checkedCategories")
+            query = attributes.get("query")
+            ingredients = attributes.get("ingredients")
+            sortBy = attributes.get("sortBy")
+            #print("attributes got : " + str(rating) + str(selectedCatIds) + query + str(ingredients))
+            # get by query
+            recipesTitle = Recipe.objects.filter(title__icontains=query)
+            recipesDescription = Recipe.objects.filter(description__icontains=query)
+            recipes = recipesTitle.union(recipesDescription)
+            if not recipes:
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            #print("got by query...: " + query)
+            # get by rating
+            re = []
+            if rating>=0.0:
+                for r in recipes:
+                    if r.averageRating>=rating:
+                        re.append(r)
+            recipes = re
+            #print("got by rating...: " + str(rating))
+            #rint(recipes)
+            # get by cats
+            if not recipes:
+                #print("empty because of rating")
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            if selectedCatIds:
+                selectedCats = []
+                for ID in selectedCatIds:
+                    cat = Category.objects.get(id=ID)
+                    if cat:
+                        selectedCats.append(cat)
+                #print("Selected categories: " + str(selectedCats))
+                re = []
+                for recipe in recipes:
+                    contains = True
+                    for cat in selectedCats:
+                        if cat not in recipe.categories.all():
+                            contains = False
+                    if contains:
+                        re.append(recipe)
+                recipes = re # just for keeping the variable name for later operations
+                #print("got by categories...")
+            # get by ingredients
+            if not recipes:
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            if ingredients:
+                re = []
+                for recipe in recipes:
+                    contains = True
+                    for name in ingredients:
+                        #print("Ingredient query for " + name + ": " + str(Ingredient.objects.filter(recipe=recipe).filter(name__icontains=name)))
+                        if  not Ingredient.objects.filter(recipe=recipe).filter(name__icontains=name):
+                            contains = False
+                            break
+                    if contains:
+                        re.append(recipe)
+                recipes = re # just for keeping the variable name for later operations
+            if not recipes:
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            #print("got by ingredients...")
+            # sort the result
+            if sortBy:
+                if sortBy=="newest":
+                    recipes = recipes.order_by("-creationDate")
+                elif sortBy=="popular":
+                    recipes = recipes.order_by("-views")
         else:
-            return JsonReponse({"error": "Wrong 'which' parameter"})
+            return JsonResponse({"error": "Wrong 'which' parameter"})
         
         # deal with the RecipesPerPage and pages
         n = len(recipes)-1 # end index of the number of queryset
@@ -668,7 +738,6 @@ class CreateRecipeView(View):
         recipe_form = RecipeForm(instance=recipe)
         category_form = CategoryForm()
         ingredient_form = IngredientForm()
-        print(recipe.id)
         return render(request, 'cookhub/add_recipe.html', context={'recipe_form':recipe_form, 'category_form':category_form, 'recipe':recipe, 'ingredient_form':ingredient_form, "recipe":recipe})
     
     
@@ -724,7 +793,6 @@ class SearchView(View):
     
     def get(self, request):
         context_dict = {}
-        context_dict["test"] = ""
         categories = Category.objects.order_by("-number_of_recipes")[:4]
         context_dict["categories"] = categories
         context_dict["RecipesPerPage"] = self.RecipesPerPage # just so the template does not fail
@@ -736,6 +804,7 @@ class SearchQueryView(View):
     def get(self, request):
         context_dict = {}
         query = request.GET.get("query").lower()
+        print(query)
         context_dict["query"] = query
         context_dict["RecipesPerPage"] = self.RecipesPerPage
         context_dict["do"] = "yes";

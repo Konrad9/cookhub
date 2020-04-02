@@ -5,35 +5,34 @@
  Search
 {% endblock %}
 
+{% block head_block %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/search.css' %}" />
+{% endblock %}
+
 {% block body_block %}
 <div class="jumbotron p-4 m-0">
     <div class="container">
-        <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Search page</h1>
+        <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Search{% if query %} results for: '{{ query }}'{% else %} page{% endif %}</h1>
     </div>
 </div>
-<p style="color: white;">Test: {{ test }}</p>
 
 <div class="album py-5">
     <div class="container">
-    <hr style="border-color: white; margin-right: 170px;"/>
-                    <table>
-                        <tbody> 
-                        <tr>
-                            <div class="row" id="results">
+    
+                    <div style="text-align:center;">
+                    <hr style="border-color: white; margin-right: 250px;"/>
+                            <div class="row" id="results" style="margin-right: 250px;">
                             </div>
 
-                        </tr>
-                        <tr>
-                            <div align="center">
+                        
+                            <div style="margin-right:250px;">
                                 <button class="first btn btn-outline-warning my-2 my-sm-0" id="results">First Page</button>
                                 <button class="previous btn btn-outline-warning my-2 my-sm-0" id="results">&laquo; Previous</button>
                                 <strong><em class="pr-2 pl-2" id="ResultsRecipePage" style="color: white"> 1 </em></strong>
                                 <button class="next btn btn-outline-warning my-2 my-sm-0" id="results">Next &raquo;</button>
                                 <button class="last btn btn-outline-warning my-2 my-sm-0" id="results">Last Page</button>
                             </div>
-                        </tr>
-                        </tbody>
-                    </table>
+                       </div>
     </div>
 </div>
 
@@ -42,7 +41,7 @@
         <br />
         <h2 class="pl-5 pb-3" >Filter Results</h2>
         <hr />
-        <h5> Include Categories </h5>
+        <h5> By Categories </h5>
         <p>
         {% if categories %}
         <script>
@@ -51,10 +50,10 @@
             function getAllCategories() {
                 $.post(url, {"csrfmiddlewaretoken": csrf_token}, 
                     function(json) {
-                        $("ul#categories").html("");
+                        $("ul#categories").empty();
                         for (var id in json) {
                              $("ul#categories").append("<li><label for='category" +
-                             id + "' ><input class='catCheckbox' type='checkbox' value='" + 
+                             id + "'><input name='catBox' type='checkbox' value='" + 
                              id + "' id='category" +
                              id + "' />" +
                              json[id] +" </label></li>");
@@ -94,15 +93,7 @@
             Value: <em id="sliderValue">0.0</em>
         </div>
             <style>
-                .slidecontainer {
-                    width: 100%;
-                }
-                .slider {
-                    opacity: 0.7;
-                }
-                .slider:hover {
-                    opacity: 1;
-                }
+                
             </style>
         </p>
         <hr />
@@ -116,61 +107,23 @@
         <p>
         <button id="clearFilters" onclick="clearFilters();" >Clear Filters</button>
         <button id="applyFilters" onclick="applyFilters();" >Apply Filters</button>
-        <script>
-            function applyFilters() {
-                // get checked boxes
-                var cdBoxes = document.getElementsByName("catBox");
-                var checkedBoxes = [];
-                for (var i=0; i<cdBoxes.length; i++) {
-                    if (cdBoxes[i].checked) {
-                        checkedBoxes.push(cdBoxes[i].value);
-                    }
-                }
-                if (checkedBoxes.length==0) {
-                    checkedBoxes = null;
-                }
-                
-                // get rating
-                var rating = document.getElementById("sliderValue").innerHTML;
-                
-                // get ingredients
-                var ingredients = [];
-                var ul = document.getElementById("ingredientList");
-                var items = ul.getElementsByTagName("li");
-                console.log(items.length);
-                for (var i=0; i<items.length; i++) {
-                    ingredients.push(items[i].innerHTML);
-                }
-                if (ingredients.length==0) {
-                    ingredients = null;
-                }
-                
-                // remember the query
-                var query = "{{ query }}";
-                var authenticated = "{{ user.is_authenticated }}";
-                var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
-                var csrf_token = "{{ csrf_token }}";
-                var RecipesPerPage = {{ RecipesPerPage }};
-                var NumberOfPages = {{ NumberOfPages }};
-                searchfiltered(csrf_token, authenticated, recipe_pagination, RecipesPerPage, query, NumberOfPages, checkedBoxes, rating, ingredients);
-            }
-        </script>
         </p>
         <br />
 </div>
-
 <script>
 $(document).ready(function() {
-    if ("{{ do }}"=="yes") {
-        // for when we are redirected from the homepage
-        var query = "{{ query }}";
-        var authenticated = "{{ user.is_authenticated }}";
-        var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
-        var csrf_token = "{{ csrf_token }}";
-        var RecipesPerPage = {{ RecipesPerPage }};
-        var NumberOfPages = {{ NumberOfPages }};
-        searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPage, query, NumberOfPages);
-    }
+        if ("{{ do }}"=="yes") {
+            // for when we are redirected from the homepage
+            var query = "{{ query }}";
+            var authenticated = "{{ user.is_authenticated }}";
+            var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
+            var csrf_token = "{{ csrf_token }}";
+            var RecipesPerPage = {{ RecipesPerPage }};
+            var NumberOfPages = {{ NumberOfPages }};
+            searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPage, query, NumberOfPages);
+        }
+    
+    
     
     {% if user.is_authenticated %}
     // save recipes, only possible if the user is authenticated
@@ -183,46 +136,47 @@ $(document).ready(function() {
     });
    {% endif %}
 });
+
+</script>
+
+<script>
+var searchdata = {
+        "query": {
+            "csrf_token": "{{ csrf_token }}",
+            "RecipesPerPage": {{ RecipesPerPage }},
+            "author": "#",
+            "which": "query",
+            "NumberOfPages": {{ NumberOfPages }},
+            "single": "0",
+            "element":"div.row#results",
+            "url": "{% url 'cookhub:recipe_pagination' %}",
+            {% if user.is_authenticated %}
+            "buttons": "yes",
+            {% else %}
+            "buttons": "",
+            {% endif %}
+            "attributes": "{{ query }}"
+        },
+        "filtered": {
+            "csrf_token": "{{ csrf_token }}",
+            "RecipesPerPage": {{ RecipesPerPage }},
+            "author": "#",
+            "which": "filtered",
+            "NumberOfPages": "",
+            "single": "0",
+            "element":"div.row#results",
+            "url": "{% url 'cookhub:recipe_pagination' %}",
+            {% if user.is_authenticated %}
+            "buttons": "yes",
+            {% else %}
+            "buttons": "",
+            {% endif %}
+            "attributes": ""
+        }
+}
 </script>
 
 <style>
- /* The sidebar menu */
-.sidenav {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 250px; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  right: 0;
-  background-color: #111; /* Black */
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 20px;
-}
-
-/* The navigation menu links */
-.sidenav p {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
-}
-
-/* When you mouse over the navigation links, change their color */
-.sidenav p:hover {
-  color: #f1f1f1;
-}
-
-/* Style page content */
-.container {
-  margin-right: 250px; /* Same as the width of the sidebar */
-  padding: 0px 10px;
-}
-
-/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav p {font-size: 18px;}
-} 
+ 
 </style>
 {% endblock %}

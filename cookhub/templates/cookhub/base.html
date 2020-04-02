@@ -44,8 +44,9 @@
                                id="query"
                                 placeholder="Query..."
                                 {% if query %}
-                               value={{ query }}>
+                               value="{{ query }}"
                                 {% endif %}
+                                >
                     </li>
                     <li class="nav-item">
                         <button class="btn btn-outline-warning my-2 my-sm-0"
@@ -99,20 +100,18 @@
             {% endif %}
                   <p class="closebtn pointer" onclick="closeNavbar()">&times;</p>
                   <p>
-                  <form class="form-inline mt-2 mt-md-0"
-                      id="user-form"
-                      method="post"
-                      action="">
+                  <form class="form-inline mt-2 mt-md-0" id="searchForm" method="get" action="{% url 'cookhub:search_query' %}">
                     {% csrf_token %}
 
-                        <input class="form-control"
+                        <input class="form-control mr-sm-2"
                                type="text"
                                name="query"
                                id="query"
-                            {% if query %}
-                               value={{ query }}
-                            {% endif %}
-                            >
+                                placeholder="Query..."
+                                {% if query %}
+                               value="{{ query }}"
+                                {% endif %}
+                                >
                     
                         <button class="btn btn-outline-warning my-2 my-sm-0"
                                 type="submit"
