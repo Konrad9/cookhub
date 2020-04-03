@@ -6,10 +6,8 @@
 {% endblock %}
 
 {% block head_block %}
-
     <link href="{% static 'css/base.css' %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/add_recipe.css' %}" />
-
 {% endblock %}
 
 {% block body_block %}
@@ -29,39 +27,18 @@
 			{% for hidden in recipe_form.hidden_fields %}
 				{{ hidden }}
 			{% endfor %}
-
-
 			
 			{% for field in recipe_form.visible_fields %}
 				{{ field.errors }}
 				{{ field.help_text }}
 				{{ field }} <br />
 			{% endfor %}
-			<style>
-    		#id_categories {
-        		columns: 3; 
-        		webkit-columns: 3; 
-        		moz-columns: 3;
-        	}
-		</style>
 			
+		<input type="submit" id="addRecipe" value="Finished Recipe" style="display:none;" />
+		
+		<script type="text/javascript" src="{% static 'js/displayImageUpload.js' %}"> // displays the uploaded photo right away
+        </script>
 
-		<script type="text/javascript"> // displays the uploaded photo right away
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#preview').attr('src', e.target.result);
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    $("#id_photo").change(function(){
-        readURL(this);
-    });
-
-</script>
 		</form>
 			<form class="row " id="category_form">
 				{% csrf_token %}
@@ -72,13 +49,14 @@
 				{% endfor %}
 				<button class="btn btn-outline-warning my-2 my-sm-0 ml-3"
                         style="border-radius:10rem" id="addCategory" >Add Category</button>
+
 			</form>
 			<script src="{% static 'js/recipeAddCategory.js' %}"></script>
 			<script>
-        			$("button#addCategory").click( function(event) {
-            			event.preventDefault();
-            			addCat("{% url 'cookhub:add_category' %}");
-            		});
+        		$("button#addCategory").click( function(event) {
+            		event.preventDefault();
+            		addCat("{% url 'cookhub:add_category' %}");
+            	});
 			</script>
 
             <hr>
@@ -87,9 +65,9 @@
 			</ul>
 			<script src="{% static 'js/recipeIngredientRemove.js' %}" ></script>
 			<script>
-			$("body").on("click", "button.removeIngredient", function () {
-    			remIng("{% url 'cookhub:remove_ingredient' %}", "{{ csrf_token }}", this);
-    		});
+    			$("body").on("click", "button.removeIngredient", function () {
+        			remIng("{% url 'cookhub:remove_ingredient' %}", "{{ csrf_token }}", this);
+        		});
     		</script>
 			
 			<form class="mb-4" id="ingredient_form">
@@ -101,18 +79,17 @@
 				{% endfor %}
 				<button class="btn btn-outline-warning my-2 my-sm-0"
                         style="border-radius:10rem" id="addIngredient" >Add Ingredient</button>
+
 			</form>
-        <input class="btn btn-outline-warning my-2 my-sm-0 ml-0 btn-block"
-               style="border-radius:10rem; width: 500px" type="submit" name="addRecipe" value="Publish Recipe" />
+        <button class="btn btn-outline-warning my-2 my-sm-0 ml-0 btn-block" onclick="$('input#addRecipe').trigger('click');"
+               style="border-radius:10rem; width: 500px" name="addRecipe">Publish Recipe</button>
 			<script src="{% static 'js/recipeAddIngredient.js' %}"></script>
 			<script>
-        			$("button#addIngredient").click( function(event) {
-            			event.preventDefault();
-            			addIng("{% url 'cookhub:add_ingredient' %}", this, "{{ recipe.id }}");
-            		});
+            	$("button#addIngredient").click( function(event) {
+            		event.preventDefault();
+            		addIng("{% url 'cookhub:add_ingredient' %}", this, "{{ recipe.id }}");
+            	});
 			</script>
-		
-		
 	</div>
 {% endif %}
 {% endblock %}

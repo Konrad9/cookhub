@@ -8,29 +8,15 @@ Categories
 {% block body_block %}
 <main role="main">
     <div class="container">
-        {% if categories %}
-        <ul id="categoryList" style="color: white; columns: 3; webkit-columns: 3; moz-columns: 3;">
+    {% if categories %}
+        <ul id="categoryList" style="color: white; columns: 3; webkit-columns: 3; moz-columns: 3;" >
             {% for category in categories %}
-
-            <form class="form-check-inline"
-                  id="user-form"
-                  method="post"
-                  action="">
-
-                  {% csrf_token %}
-
-            <li><a href="{% url 'cookhub:searchCats' category.name %}" style="color: #ffc107;">
-                   <!--methods="GET"-->
-                   <!--id="query"--><!--&gt;-->
-                {{ category.name }}</a> ({{ category.number_of_recipes }}
-                recipe{% ifnotequal category.number_of_recipes 1 %}s{% endifnotequal %})
-            </li>
-            </form>
+                <li><a href="{% url 'cookhub:category' category.id %}" style="color: #ffc107;">{{ category.name }}</a> ({{ category.number_of_recipes }} recipe{% ifnotequal category.number_of_recipes 1 %}s{% endifnotequal %}) </li>
             {% endfor %}
         </ul>
-        {% else %}
+    {% else %}
         No categories present at this time.
-        {% endif %}
+    {% endif %}
     </div>
 </main>
 {% endblock %}

@@ -90,7 +90,7 @@ def populate():
         print("- "+username)
         
     if not userList:
-        print("The script has been run already, since all sample users already exist.\nExiting the population script.")
+        print("The script has been run already, since all sample users already exist.\nDelete database and migrate again to redo.\nExiting the population script.")
         return 
     
     random.seed(1)
@@ -140,6 +140,8 @@ def populate():
         for cat in categories:
             if not recipe.categories.filter(name=cat.name).exists():
                 recipe.categories.add(cat)
+                cat.number_of_recipes += 1
+                cat.save()
         recipe.photo.save(photoSource, photoFile, save=True)
         recipeList += [recipe]
         

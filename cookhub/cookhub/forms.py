@@ -50,7 +50,7 @@ class RecipeForm(forms.ModelForm):
     servings = forms.IntegerField(help_text="The number of people your recipe serves:", min_value=1)
     creationDate = forms.DateTimeField(widget=forms.HiddenInput(), initial=timezone.now(), required=False)
     views = forms.IntegerField(required=False, widget=forms.HiddenInput(), initial=0)
-    categories = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Category.objects.all(), required=False, help_text="Categories your recipe belongs to:")
+    categories = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Category.objects.order_by("name"), required=False, help_text="Categories your recipe belongs to:")
     
     class Meta:
         model = Recipe

@@ -1,13 +1,15 @@
-function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, categories, rating) {
-    $.post(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes, "csrfmiddlewaretoken": csrf_token, "categories": categories, "rating": rating},
-          function(data) {
-              if (data.startsWith("error")) {
-                      alert(data);
+function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, callback) {
+    $.post(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes, "csrfmiddlewaretoken": csrf_token},
+          function(json) {
+              if (json.error!="no") {
+                      alert(json.error);
               }
-              else if (data=="empty") {
+              else if (json.data=="empty") {
                   $(element).html("");
               }
               else {
+                  var data = json.data;
+                  var NumberOfPages = json.pages;
                   // firstly extract the information from the response
                   var recipes = data.split("||RCP||");           // each recipe is an array entry
                   var recipesArray = new Array(recipes.length);  // create the array of recipe objects
@@ -30,6 +32,10 @@ function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, e
                          recipesArray[i] = recipeInformation;       // add the dictionary to the array of recipe dictionaries
                  }
                  displayRecipes(element, recipesArray, buttons, which);
+                 //console.log("NumberOfPages pagHand: "+ NumberOfPages);
+                 if (callback) {
+                     callback(NumberOfPages);
+                }
              }
     });
 }

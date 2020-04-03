@@ -11,6 +11,8 @@ from cookhub.forms import UserForm, UserProfileForm, RecipeForm, RatingForm, Com
     ChangePasswordForm
 from cookhub.models import UserModel, Recipe, Rating, Comment, Ingredient, Category
 from django.utils import timezone
+import json
+import math
 
 
 def deleteEmptyRecipes():
@@ -30,12 +32,14 @@ class Homepage(View):
         context_dict['newestRecipes'] = Recipe.objects.order_by('-creationDate')
         context_dict['popularRecipes'] = Recipe.objects.order_by('-views')
         n = len(Recipe.objects.order_by('-creationDate'))
-        context_dict["NewestRecipePages"] = n // 3
-        if n // 3 != n / 3:
+        context_dict["NewestRecipePages"] = n//3
+        RecipesPerPage = 3
+        context_dict["RecipesPerPage"] = RecipesPerPage
+        if n//RecipesPerPage!=n/RecipesPerPage:
             context_dict["NewestRecipePages"] += 1
         n = len(Recipe.objects.order_by('-views'))
-        context_dict["PopularRecipePages"] = n // 3
-        if n // 3 != n / 3:
+        context_dict["PopularRecipePages"] = n//RecipesPerPage
+        if n//RecipesPerPage!=n/RecipesPerPage:
             context_dict["PopularRecipePages"] += 1
         if request.user.is_authenticated:
             userProfile = UserModel.objects.get(user=request.user)
@@ -254,18 +258,18 @@ class ProfileView(View):
         # for both my
         MyRecipeList = Recipe.objects.filter(user=user).order_by('-creationDate')
         n = len(MyRecipeList)
-        context_dict["MyRecipePages"] = n // 3
-        if n // 3 != n / 3:
-            context_dict["MyRecipePages"] += 1
 
+        RecipesPerPage = 3
+        context_dict["RecipesPerPage"] = RecipesPerPage
+        context_dict["MyRecipePages"] = math.ceil(n/RecipesPerPage)
+        
         # and saved recipes.
         savedRecipeList = user_profile.saved_recipes.all()
         n = len(savedRecipeList)
-        context_dict["SavedRecipePages"] = n // 3
-        if n // 3 != n / 3:
-            context_dict["SavedRecipePages"] += 1
-
+        context_dict["SavedRecipePages"] = math.ceil(n/RecipesPerPage)
+        
         return render(request, 'cookhub/profile.html', context_dict)
+
 
     @method_decorator(login_required)
     def post(self, request, username):
@@ -515,6 +519,7 @@ def del_editingredient(request, recipe_id, ingredient_id):
                   context={'recipe_id': recipe_id, 'ingredient': Ingredient.objects.get(id=ingredient_id)})
 
 
+
 # adds a recipe to the user's saved recipes
 class SavedRecipesView(View):
     @method_decorator(login_required)
@@ -575,49 +580,110 @@ class PaginationView(View):
                 user = User.objects.get(username=author)
                 recipes = Recipe.objects.filter(user=user)
             except User.DoesNotExist:
-                return HttpResponse("error: User does not exist")
+                return JsonResponse({"error": "User does not exist"})
             except Recipe.DoesNotExist:
-                return HttpResponse("error: Recipe does not exist")
+                return JsonResponse({"error": "Recipe does not exist"})
             except ValueError:
-                return HttpResponse("error: value error")
+                return JsonResponse({"error":"value error"})
         else:
             recipes = Recipe.objects.all()
 
         # deal with the which
-        if which == "newest":
+        if which=="newest": # homepage newest recipes
             recipes = recipes.order_by("-creationDate")
-        elif which == "popular":
+        elif which=="popular": # homepage popular recipes
             recipes = recipes.order_by("-views")
-        elif which == "my":
-            pass  # we already specified the author
-        elif which == "saved":
+        elif which=="my": # profile own recipes
+            pass # we already specified the author
+        elif which=="saved": # profile saved recipes
             user_profile = UserModel.objects.get(user=user)
             recipes = user_profile.saved_recipes.all()
-        elif which == "search":
-            # empty search returns all recipes (rating filter still applies)
-            if categories[0] != '':
-                if rating is not None:
-                    categories = Category.objects.filter(name__in=categories)[:]
-                    categories = list(set(categories))  # remove duplicate recipes
-                    recipes = recipes.filter(categories__in=categories, averageRating__range=(float(rating), 5.0))
-                else:
-                    categories = Category.objects.filter(name__in=categories)[:]
-                    categories = list(set(categories))  # remove duplicate recipes
-                    recipes = recipes.filter(categories__in=categories)
-            else:
-                recipes = recipes.filter(averageRating__range=(float(rating), 5.0))
+        elif which=="query": # simple search by name
+            query = request.POST.get("attributes")
+            recipesTitle = Recipe.objects.filter(title__contains=query)
+            recipesDescription = Recipe.objects.filter(description__contains=query)
+            recipes = recipesTitle.union(recipesDescription)
+        elif which=="filtered": # advanced filtering
+            #print("filtering started...")
+            attributes = json.loads(request.POST.get("attributes"))
+            rating = float(attributes.get("rating"))
+            selectedCatIds = attributes.get("checkedCategories")
+            query = attributes.get("query")
+            ingredients = attributes.get("ingredients")
+            sortBy = attributes.get("sortBy")
+            #print("attributes got : " + str(rating) + str(selectedCatIds) + query + str(ingredients))
+            # get by query
+            recipesTitle = Recipe.objects.filter(title__icontains=query)
+            recipesDescription = Recipe.objects.filter(description__icontains=query)
+            recipes = recipesTitle.union(recipesDescription)
+            if not recipes:
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            #print("got by query...: " + query)
+            # sort the result
+            if sortBy:
+                if sortBy=="Newest":
+                    recipes = recipes.order_by("-creationDate")
+                elif sortBy=="Most popular":
+                    recipes = recipes.order_by("-views")
+            # get by rating
+            re = []
+            if rating>=0.0:
+                for r in recipes:
+                    if r.averageRating>=rating:
+                        re.append(r)
+            recipes = re
+            #print("got by rating...: " + str(rating))
+            #rint(recipes)
+            # get by cats
+            if not recipes:
+                #print("empty because of rating")
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            if selectedCatIds:
+                selectedCats = []
+                for ID in selectedCatIds:
+                    cat = Category.objects.get(id=ID)
+                    if cat:
+                        selectedCats.append(cat)
+                #print("Selected categories: " + str(selectedCats))
+                re = []
+                for recipe in recipes:
+                    contains = True
+                    for cat in selectedCats:
+                        if cat not in recipe.categories.all():
+                            contains = False
+                    if contains:
+                        re.append(recipe)
+                recipes = re # just for keeping the variable name for later operations
+                #print("got by categories...")
+            # get by ingredients
+            if not recipes:
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            if ingredients:
+                re = []
+                for recipe in recipes:
+                    contains = True
+                    for name in ingredients:
+                        #print("Ingredient query for " + name + ": " + str(Ingredient.objects.filter(recipe=recipe).filter(name__icontains=name)))
+                        if  not Ingredient.objects.filter(recipe=recipe).filter(name__icontains=name):
+                            contains = False
+                            break
+                    if contains:
+                        re.append(recipe)
+                recipes = re # just for keeping the variable name for later operations
+            if not recipes:
+                return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
+            #print("got by ingredients...")
         else:
-            return HttpResponse("error: Wrong 'which' parameter")
-
+            return JsonResponse({"error": "Wrong 'which' parameter"})
+        
         # deal with the RecipesPerPage and pages
-        n = len(recipes) - 1  # end index of the number of queryset
-        if n < 0:
-            return HttpResponse("empty")
-        if n < (page - 1) * RecipesPerPage:
-            return HttpResponse("error: not this many recipes exist for " + str(page) + " pages and " + str(
-                RecipesPerPage) + " recipes per page")
-        if n + 1 > page * RecipesPerPage:
-            recipes = recipes[(page - 1) * RecipesPerPage:page * RecipesPerPage]
+        n = len(recipes)-1 # end index of the number of queryset
+        if n<0:
+            return JsonResponse({"error": "no", "data": "empty"})
+        if n<(page-1)*RecipesPerPage:
+            return JsonResponse({"error": "not this many recipes exist for "+str(page) +" pages and "+str(RecipesPerPage)+" recipes per page"})
+        if n+1>page*RecipesPerPage:
+            recipes = recipes[(page-1)*RecipesPerPage:page*RecipesPerPage] 
         else:
             recipes = recipes[(page - 1) * RecipesPerPage:n + 1]
 
@@ -666,10 +732,12 @@ class PaginationView(View):
                         responseString += ";;" + "save" + ";;"
                 responseString += "||RCP||"
         else:
-            return HttpResponse("error: no recipes returned")
-
-        responseString = responseString[:-7]  # remove last ||RCP|| delimiter
-        return HttpResponse(responseString)
+            return JsonResponse({"error": "no recipes returned"})
+        
+        responseString = responseString[:-7] # remove last ||RCP|| delimiter
+        pages = math.ceil((n+1)/RecipesPerPage)
+        response = {"error": "no", "pages":pages, "data": responseString}
+        return JsonResponse(response)
 
 
 class CreateRecipeView(View):
@@ -679,10 +747,10 @@ class CreateRecipeView(View):
         recipe_form = RecipeForm(instance=recipe)
         category_form = CategoryForm()
         ingredient_form = IngredientForm()
-        print(recipe.id)
         return render(request, 'cookhub/add_recipe.html',
                       context={'recipe_form': recipe_form, 'category_form': category_form, 'recipe': recipe,
                                'ingredient_form': ingredient_form, "recipe": recipe})
+
 
 
 class AddCategoryView(View):
@@ -732,60 +800,66 @@ class RemoveIngredientView(View):
 class CategoriesView(View):
     def get(self, request):
         cats = Category.objects.order_by("name")
-        return render(request, "cookhub/categories.html", {"categories": cats})
+        return render(request, "cookhub/categories.html", {"categories":cats})
+    
+    
+class SearchView(View):
+    RecipesPerPage = 9
+    
+    def get(self, request):
+        context_dict = {}
+        categories = Category.objects.order_by("-number_of_recipes")[:4]
+        context_dict["categories"] = categories
+        context_dict["RecipesPerPage"] = self.RecipesPerPage # just so the template does not fail
+        return render(request, "cookhub/search.html", context_dict)
+    
+class SearchQueryView(View):
+    RecipesPerPage = 9
+    
+    def get(self, request):
+        context_dict = {}
+        query = request.GET.get("query").lower()
+        print(query)
+        context_dict["query"] = query
+        context_dict["RecipesPerPage"] = self.RecipesPerPage
+        context_dict["do"] = "yes";
+        categories = Category.objects.order_by("-number_of_recipes")[:4]
+        context_dict["categories"] = categories
+        recipesTitle = Recipe.objects.filter(title__contains=query)
+        recipesDescription = Recipe.objects.filter(description__contains=query)
+        recipes = recipesTitle.union(recipesDescription)
+        n = len(recipes)
+        context_dict["NumberOfPages"] = math.ceil(n/self.RecipesPerPage)
+        #if n//self.RecipesPerPage!=n/self.RecipesPerPage:
+        #    context_dict["NumberOfPages"] += 1
+        return render(request, "cookhub/search.html", context_dict)
+    
 
-
-class Search(View):
-    def get(self, request, query=""):
-        n = 6  # number of recipes per page
-        context_dict = dict()
-        saved = []
-
-        if query == "":
-
-            # fetch query string and process it
-            query_string = request.GET.get('query', '')
-            query_list = query_string.split(" ")
-            query = [q.capitalize() for q in query_list]
-            query_passable = ", ".join(query)
-
-            context_dict['querySTR'] = query_passable
+class GetAllCategoriesView(View):
+    def post(self , request):
+        cat_dict = {}
+        cats = Category.objects.order_by("-number_of_recipes")
+        for cat in cats:
+            cat_dict[cat.id] = cat.name
+        return JsonResponse(cat_dict)
+    
+class CategoryView(View):
+    def get(self, request, category_id):
+        try:
+            category = Category.objects.get(id=int(category_id))
+        except Category.DoesNotExist:
+            return render(request, "cookhub/category.html", {"error": "An error occurred, the category could not be found"})
+        recipeList = []
+        for recipe in Recipe.objects.all():
+            if category in recipe.categories.all():
+                recipeList.append(recipe)
+        return render(request,"cookhub/category.html", {"recipes": recipeList})
+    
+class ViewAllRecipes(View):
+    def get(self, request, what):
+        if what=="newest":
+            return render(request, "cookhub/view_all.html", {"type": "Newest Recipes", "recipes": Recipe.objects.order_by("-creationDate")})
+        if what=="popular":
+            return render(request, "cookhub/view_all.html", {"type": "Popular Recipes", "recipes": Recipe.objects.order_by("-views")})
         else:
-            context_dict['querySTR'] = query
-
-        rating = request.GET.get('rating')
-
-        if rating is not None:
-            rating = float(rating)
-        else:
-            rating = 0
-        context_dict['rating'] = rating
-        
-        # get all the categories
-        category = Category.objects.filter(name__in=query)[:]
-
-        # if empty search return all recipes
-        if query == [""]:
-            # get all the recipes
-            recipes = Recipe.objects.filter(averageRating__range=(float(rating), 5.0))
-        else:
-            recipes = Recipe.objects.filter(categories__in=category, averageRating__range=(float(rating), 5.0))
-        # set page number
-        n_recipes = len(recipes)
-        if n_recipes // n != n_recipes / n:
-            context_dict['recipePages'] = n_recipes // n + 1
-        else:
-            context_dict['recipePages'] = n_recipes // n
-        context_dict['recipes'] = recipes
-
-        if request.user.is_authenticated:
-            userProfile = UserModel.objects.get(user=request.user)
-            savedRecipes = userProfile.saved_recipes.all()
-            for recipe in context_dict['recipes']:
-                if recipe in savedRecipes:
-                    saved += [recipe.id]
-        context_dict["saved"] = saved
-
-        context_dict['categories'] = Category.objects.order_by()[:5]
-
-        return render(request, 'cookhub/searchPage.html', context=context_dict)
+            return render(request, "cookhub/view_all.html", {"type": "Recipes", "error": "Wrong parameter!"})
