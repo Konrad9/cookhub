@@ -10,23 +10,23 @@
 {% endblock %}
 
 {% block body_block %}
-    <div class="jumbotron p-4 m-0">
+    <div class="jumbotron p-0 pt-3 m-0">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Search{% if query %}
+                    <h1 style="color: white; text-transform: uppercase; width: 700px" class="jumbotron-heading ml-2">Search{% if query %}
                         results for: '{{ query }}'{% else %} page{% endif %}</h1>
                 </div>
                 <div class="col-md-4">
                 </div>
                 <div class="col-md-4">
                     <div class="dropdown" style="text-align:right; margin-right: 250px; color:white;">
-                        Sort by:
+                        SORT BY:
                         <button onclick="dropper()" class="dropbtn" id="dropper">None</button>
                         <div id="myDropdown" class="dropdown-content">
                             <button class="dropbtn s">None</button>
                             <button class="dropbtn s">Newest</button>
-                            <button class="dropbtn s">Most popular</button>
+                            <button class="dropbtn s">Popular</button>
                         </div>
                     </div>
                 </div>
@@ -34,11 +34,11 @@
         </div>
     </div>
 
-    <div class="album py-5">
+    <div class="album pt-0">
         <div class="container">
 
             <div style="text-align:center;">
-                <hr style="border-color: white; margin-right: 250px;"/>
+                <hr style="border-color: #ffd32d; margin-right: 250px;"/>
                 <div class="row" id="results" style="margin-right: 250px;">
                 </div>
 
