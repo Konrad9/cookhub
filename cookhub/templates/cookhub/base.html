@@ -112,12 +112,12 @@
                 <p class="closebtn pointer" onclick="closeNavbar()">&times;</p>
                 <p>
                 <form action=""
-                      class="form-inline mt-2 mt-md-0"
+                      class="form-inline mt-2 mt-md-0 p-0 ml-3"
                       id="user-form"
                       method="post">
                     {% csrf_token %}
 
-                    <input class="form-control"
+                    <input class="form-control mb-2"
                            type="text"
                            name="query"
                            id="query"
@@ -136,7 +136,7 @@
                 </form>
                 </p>
                 {% if user.is_authenticated %}
-                <p>
+                <p class="mb-0 ml-2">
                     <a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit"
                        style="border-radius:10rem" href="{% url 'cookhub:create_recipe' %}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 27" fill="none"
