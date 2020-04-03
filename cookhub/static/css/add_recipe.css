@@ -36,3 +36,9 @@ ul {
     margin-top: 15px;
     margin-bottom: 0px;
 }
+
+#id_categories {
+    columns: 3; 
+    webkit-columns: 3; 
+    moz-columns: 3;
+}
