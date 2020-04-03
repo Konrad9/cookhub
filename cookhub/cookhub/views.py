@@ -51,8 +51,8 @@ class Homepage(View):
                 if recipe in savedRecipes:
                     saved += [recipe.id]
         context_dict["saved"] = saved
-        print("Newest pages: " + str(context_dict["NewestRecipePages"]))
-        print("Popular pages: " + str(context_dict["PopularRecipePages"]))
+        #print("Newest pages: " + str(context_dict["NewestRecipePages"]))
+        #print("Popular pages: " + str(context_dict["PopularRecipePages"]))
         response = render(request, 'cookhub/homepage.html', context=context_dict)
         return response
 
@@ -380,9 +380,9 @@ class RecipeView(View):
             recipe = context_dict['recipe']
             rating.recipe = recipe
             rating.save()
-            num = context_dict['recipe'].averageRating * len(context_dict['ratings']) + int(rating.rating)
-            if len(context_dict['ratings']):
-                rnum = ((num)) / (len(context_dict['ratings']) + 1)
+            num = context_dict['recipe'].averageRating * (len(context_dict['ratings'])-1) + int(rating.rating)
+            if len(context_dict['ratings'])!=0:
+                rnum = ((num)) / (len(context_dict['ratings']))
             else:
                 rnum = num
             Recipe.objects.filter(id=recipe_id).update(averageRating=float("{:.1f}".format(rnum)))
