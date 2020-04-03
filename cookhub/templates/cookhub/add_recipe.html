@@ -6,14 +6,19 @@
 {% endblock %}
 
 {% block head_block %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/add_recipe.css' %}" />
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/add_recipe.css' %}" />
 {% endblock %}
 
 {% block body_block %}
 {% if recipe.user == user %}
-    <div class="container p-4">
-        <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Create a recipe</h1>
+    <div class="jumbotron p-4 m-0">
+        <div class="container">
+            <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Create a recipe</h1>
+            <!-- Depending on who's watching, "My" or the username is displayed -->
+        </div>
     </div>
+
 
     <div class="container p-4" style="background-color: #1c1c1c; color:white; border-radius: 1.2rem">
         <img src="" id="preview" width="200px" />
