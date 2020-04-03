@@ -4,7 +4,7 @@ function searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPag
     var RecipesPerPage = RecipesPerPage; // set globally
     var author = "#"; // also global;
     var which = "query";
-    var nextPageNumber = 1; // this is on load up obviously the first page
+    var nextPageNumber = 1; // start on first page
     var page = "1";
     var single = "0"; // 1-based counting; if only one recipe from the page: 0 is NOT a single one
     var element = "div.row#results";
@@ -17,16 +17,14 @@ function searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPag
         var buttons = "";
     }
     var attributes = query;
-    console.log(nextPageNumber, NumberOfPages);
     if (nextPageNumber >= NumberOfPages) { // if we are on the only page, there is no next
-        $("button.first#results").attr("disabled", true);
-        $("button.previous#results").attr("disabled", true);
         $("button.next#results").attr("disabled", true);
         $("button.last#results").attr("disabled", true);
     }
     $("em#ResultsRecipePage").text("   " + page + "   "); // set the page counter
     RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);    
     
+    // bind the buttons
     $("button.last#results").bind("click", {"dict": searchdata.query}, lastResultButton);
     $("button.next#results").bind("click", {"dict": searchdata.query}, nextResultButton);
     $("button.previous#results").bind("click", {"dict": searchdata.query}, previousResultButton);
@@ -34,6 +32,7 @@ function searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPag
                
 }
 
+// controls the action of the "Last Page" button
 function lastResultButton(e) {
     dicti = e.data.dict;
     var csrf_token = dicti.csrf_token;
@@ -56,6 +55,7 @@ function lastResultButton(e) {
     RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
 }
 
+// controls the action of the "Next Page" button
 function nextResultButton(e) {
     dicti = e.data.dict;
     var csrf_token = dicti.csrf_token;
@@ -80,6 +80,7 @@ function nextResultButton(e) {
     RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
 }
 
+// controls the action of the "Previous Page" button
 function previousResultButton(e) {
     dicti = e.data.dict;
     var csrf_token = dicti.csrf_token;
@@ -104,6 +105,7 @@ function previousResultButton(e) {
     RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
 }
 
+// controls the action of the "First Page" button
 function firstResultButton(e) {
     dicti = e.data.dict;
     var csrf_token = dicti.csrf_token;
@@ -122,10 +124,9 @@ function firstResultButton(e) {
     $("button.previous#results").attr("disabled", true); // disable "previous", we are already on the first page
     $("button.next#results").attr("disabled", false);     // we could click on "first", so there is a next
     $("button.last#results").attr("disabled", false);    // and a last, too
-    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
+    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter
     RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes);
 }
-
 
  
  // add an ingredient to the list
@@ -142,6 +143,7 @@ function clearFilters() {
     $("input#ratingSlider").val("0");
     $("em#sliderValue").html("0.0");
     $("ul#ingredientList").empty();
+    // bind the buttons to the searchquery part again
     $("button.last#results").unbind();
     $("button.next#results").unbind();
     $("button.previous#results").unbind();
@@ -173,15 +175,17 @@ function searchfiltered(dicti) {
     var attributes = dicti.attributes;
     var nextPageNumber = 1;
     var page = "1";
-    var NumberOfPages = -1;
+    var NumberOfPages = 1;
     RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, function (value) {
                 console.log("Callback: " + value);
                 NumberOfPages = value;
     });
+    
+    // wait some time until the ajax finishes and the number of pages is returned
     setTimeout(function () {
         searchdata.filtered.NumberOfPages = NumberOfPages;
-        $("button.first#results").attr("disabled", true); // we are already on the first page
-        $("button.previous#results").attr("disabled", true); // disable "previous", we are already on the first page
+        $("button.first#results").attr("disabled", true);    // we are already 
+        $("button.previous#results").attr("disabled", true); // on the first page
         if (nextPageNumber>=NumberOfPages) {
             $("button.next#results").attr("disabled", true);     
             $("button.last#results").attr("disabled", true);
@@ -192,8 +196,9 @@ function searchfiltered(dicti) {
         } 
     }, 200); 
       
-    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
+    $("em#ResultsRecipePage").text("   " + page + "   "); // update the page counter
     
+    // bind buttons to the new searchfiltered part
     $("button.last#results").unbind();
     $("button.next#results").unbind();
     $("button.previous#results").unbind();
@@ -224,8 +229,6 @@ function clearResetup(dicti) {
     var attributes = dicti.attributes;
     var NumberOfPages = dicti.NumberOfPages;
     if (nextPageNumber >= NumberOfPages) { // if we are on the only page, there is no next
-        $("button.first#results").attr("disabled", true);
-        $("button.previous#results").attr("disabled", true);
         $("button.next#results").attr("disabled", true);
         $("button.last#results").attr("disabled", true);
     }
@@ -234,43 +237,41 @@ function clearResetup(dicti) {
 }
 
 function applyFilters() {
-                // get checked boxes
-                var cdBoxes = document.getElementsByName("catBox");
-                var checkedBoxes = [];
-                for (var i=0; i<cdBoxes.length; i++) {
-                    console.log("checking boxes");
-                    if (cdBoxes[i].checked) {
-                        checkedBoxes.push(cdBoxes[i].value);
-                        console.log(cdBoxes[i].value);
-                    }
-                }
-                if (checkedBoxes.length==0) {
-                    checkedBoxes = null;
-                }
+    // get checked boxes
+    var cdBoxes = document.getElementsByName("catBox");
+    var checkedBoxes = [];
+    for (var i=0; i<cdBoxes.length; i++) {
+        console.log("checking boxes");
+        if (cdBoxes[i].checked) {
+            checkedBoxes.push(cdBoxes[i].value);
+            console.log(cdBoxes[i].value);
+        }
+    }
+    if (checkedBoxes.length==0) {
+        checkedBoxes = null;
+    }
                 
-                // get rating
-                var rating = document.getElementById("sliderValue").innerHTML;
+    // get rating
+    var rating = document.getElementById("sliderValue").innerHTML;
                 
-                // get ingredients
-                var ingredients = [];
-                var ul = document.getElementById("ingredientList");
-                var items = ul.getElementsByTagName("li");
-                console.log(items.length);
-                for (var i=0; i<items.length; i++) {
-                    ingredients.push(items[i].innerHTML);
-                }
-                if (ingredients.length==0) {
-                    ingredients = null;
-                }
+    // get ingredients
+    var ingredients = [];
+    var ul = document.getElementById("ingredientList");
+    var items = ul.getElementsByTagName("li");
+    for (var i=0; i<items.length; i++) {
+        ingredients.push(items[i].innerHTML);
+    }
+    if (ingredients.length==0) {
+        ingredients = null;
+    }
                 
-                // get sorting
-                var sortBy = $("button.dropbtn#dropper").text();
+    // get sorting
+    var sortBy = $("button.dropbtn#dropper").text();
                 
-                // remember the query
-                var query = searchdata.query.attributes;
-                searchdata.filtered.attributes = JSON.stringify({"query": query, "checkedCategories": checkedBoxes, "rating": rating, "ingredients": ingredients, "sortBy": sortBy});
-                console.log(query, checkedBoxes, rating, ingredients);
-                searchfiltered(searchdata.filtered);
+    // remember the query
+    var query = searchdata.query.attributes;
+    searchdata.filtered.attributes = JSON.stringify({"query": query, "checkedCategories": checkedBoxes, "rating": rating, "ingredients": ingredients, "sortBy": sortBy});
+    searchfiltered(searchdata.filtered);
 }
 
 /* When the user clicks on the button,
@@ -279,6 +280,7 @@ function dropper() {
   document.getElementById("myDropdown").classList.toggle("show");
 }
 
+// changes sorting selection
 $("button.dropbtn.s").click(function () {
     $("button.dropbtn#dropper").text($(this).text());
     closeMenu();

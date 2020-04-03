@@ -1,3 +1,4 @@
+// adds a category to the list of possible categories to add the recipe to when creating a new recipe
 function addCat(url) {
     var name = $("input#id_name").val();
     if (name.length==0){

@@ -1,3 +1,7 @@
+// handles the pagination:
+// firstly, it sends parameters to the server, then 
+// secondly, extracts the information and saves the recipe data in a suitable data structure, and
+// thirdly, passes this data to a function that displays them in the wanted way.
 function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons, attributes, callback) {
     $.post(url, {"RecipesPerPage":RecipesPerPage, "author":author, "which":which, "page":page, "single":single, "buttons":buttons, "attributes":attributes, "csrfmiddlewaretoken": csrf_token},
           function(json) {
@@ -10,6 +14,11 @@ function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, e
               else {
                   var data = json.data;
                   var NumberOfPages = json.pages;
+                  
+                  // passes NumberOfPages to searchfiltered, if applicable
+                  if (callback) {
+                     callback(NumberOfPages);
+                 }
                   // firstly extract the information from the response
                   var recipes = data.split("||RCP||");           // each recipe is an array entry
                   var recipesArray = new Array(recipes.length);  // create the array of recipe objects
@@ -22,25 +31,22 @@ function RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, e
                          recipeInformation.title = recipe[2];
                          recipeInformation.averageRating = recipe[3];
                          recipeInformation.creator = recipe[4];
+                         // check what type of buttons we need
                          if (buttons=="yes") {
                                 recipeInformation.button = recipe[5];
                          }
-
                          if (buttons=="remove") {
                                 recipeInformation.button = "remove";
                          }
                          recipesArray[i] = recipeInformation;       // add the dictionary to the array of recipe dictionaries
                  }
+                
                  displayRecipes(element, recipesArray, buttons, which);
-                 //console.log("NumberOfPages pagHand: "+ NumberOfPages);
-                 if (callback) {
-                     callback(NumberOfPages);
-                }
              }
     });
 }
 
-// now to the representation
+// handles the presentation of the recipes passed by RecipeGetter
 function displayRecipes(element, recipesArray, buttons, which) {
     var part1 = "<div class='col-md-4'><div class='card mb-4 box-shadow'><img class='card-img-top' alt='Thumbnail [100%x225]' style='height: 225px; width: 100%; display: block;' src='";
     var part2 = "' data-holder-rendered='true'><div class='card-body'><a class='card-text-title p-0 m-0 text-truncate' style='max-width: 300px' href='/recipe/";

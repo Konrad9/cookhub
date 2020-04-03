@@ -87,10 +87,12 @@ function start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recip
                 RecipeGetter(csrf_token, RecipesPerPage, author, mode, page, single, element, url, buttons);
             }
         }
-                
+        
+        // since each button must have its own set of parameters, 
+        // each button has to have its own block, although some things repeat
+        
         // retrieve last "My Recipes" page
         $("button.last#my").click(function () {
-            alert
             var nextPageNumber = MyRecipePages;
             var page = nextPageNumber.toString();
             var which = "my";

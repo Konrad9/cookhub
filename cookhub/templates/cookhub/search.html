@@ -62,6 +62,7 @@
         <p>
         {% if categories %}
         <script>
+            // could not be put into external file because of parameters passed by django rendering engine
             url = "{% url 'cookhub:getAllCategories' %}";
             csrf_token =  "{{ csrf_token }}";
             function getAllCategories() {
