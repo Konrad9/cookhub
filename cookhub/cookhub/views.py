@@ -148,7 +148,7 @@ def user_login(request):
         else:
             # Bad login details were provided. So we can't log the user in.
             print(f"Invalid login details: {username}, {password}")
-            return HttpResponse("Invalid login details supplied.")
+            return render(request, "registration/login.html", context={"invalidDetails": "Invalid login details supplied!"})
 
     # The request is not a HTTP POST, so display the login form.
     # This scenario would most likely be a HTTP get.
@@ -277,10 +277,12 @@ class ProfileView(View):
             (user, user_profile, form) = self.get_user_details(username)
         except TypeError:
             return redirect(reverse('cookhub:homepage'))
-
+        
+        print("here")
         form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 
         if form.is_valid():
+            print("form is valid")
             newmail = request.POST.get("email")
             user.email = newmail
             user.save()

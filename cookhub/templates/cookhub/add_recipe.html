@@ -81,8 +81,6 @@
                         style="border-radius:10rem" id="addIngredient" >Add Ingredient</button>
 
 			</form>
-        <button class="btn btn-outline-warning my-2 my-sm-0 ml-0 btn-block" onclick="$('input#addRecipe').trigger('click');"
-               style="border-radius:10rem; width: 500px" name="addRecipe">Publish Recipe</button>
 			<script src="{% static 'js/recipeAddIngredient.js' %}"></script>
 			<script>
             	$("button#addIngredient").click( function(event) {
@@ -90,6 +88,9 @@
             		addIng("{% url 'cookhub:add_ingredient' %}", this, "{{ recipe.id }}");
             	});
 			</script>
+        <button class="btn btn-outline-warning my-2 my-sm-0 ml-0 btn-block" onclick="$('input#addRecipe').trigger('click');"
+               style="border-radius:10rem; width: 500px" name="addRecipe">Publish Recipe</button>
+			
 	</div>
 {% endif %}
 {% endblock %}
