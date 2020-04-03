@@ -470,7 +470,9 @@ def add_recipe(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
     recipe_form = RecipeForm(instance=recipe)
     recipe_form = RecipeForm(request.POST, request.FILES, instance=recipe)
+    print("here")
     if recipe_form.is_valid():
+        print("is valid")
         recipe = recipe_form.save(commit=False)
         recipe.save()
         recipe_form.save_m2m()
@@ -478,6 +480,7 @@ def add_recipe(request, recipe_id):
             cat.number_of_recipes += 1
             cat.save()
     else:
+        print("error: ")
         print(recipe_form.errors)
     return redirect(reverse('cookhub:recipe', kwargs={'recipe_id': recipe_id}))
 
@@ -742,6 +745,8 @@ class PaginationView(View):
 
 class CreateRecipeView(View):
     def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect(reverse("cookhub:login"))
         recipe = Recipe(user=request.user)
         recipe.save()
         recipe_form = RecipeForm(instance=recipe)
