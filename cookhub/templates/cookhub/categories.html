@@ -11,7 +11,7 @@
 {% if categories %}
 <ul id="categoryList" style="color: white; columns: 3; webkit-columns: 3; moz-columns: 3;" >
     {% for category in categories %}
-        <li><a href="#" style="color: #ffc107;">{{ category.name }}</a> ({{ category.number_of_recipes }} recipe{% ifnotequal category.number_of_recipes 1 %}s{% endifnotequal %}) </li>
+        <li><a href="{% url 'cookhub:category' category.id %}" style="color: #ffc107;">{{ category.name }}</a> ({{ category.number_of_recipes }} recipe{% ifnotequal category.number_of_recipes 1 %}s{% endifnotequal %}) </li>
     {% endfor %}
 </ul>
 {% else %}

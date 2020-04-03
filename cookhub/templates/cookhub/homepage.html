@@ -21,7 +21,7 @@
                                 <h1 class="card-section p-1 align-middle" style="display:inline"> NEWEST RECIPES</h1>
                                 <a class="btn btn-outline-warning my-2 my-sm-0 ml-3 align-middle"
                                    style="border-radius: 10rem"
-                                   href="" id="viewAllNewestRecipes">View All</a>
+                                   href="{% url 'cookhub:view_all' 'newest'%}" id="viewAllNewestRecipes">View All</a>
                             </div>
 
                             <br/>
@@ -45,7 +45,7 @@
                                 <h1 class="card-section p-1 align-middle" style="display:inline"> POPULAR RECIPES</h1>
                                 <a class="btn btn-outline-warning my-2 my-sm-0 ml-3 align-middle"
                                    style="border-radius: 10rem"
-                                   href="" id="viewAllPopularRecipes">View All</a>
+                                   href="{% url 'cookhub:view_all' 'popular' %}" id="viewAllPopularRecipes">View All</a>
                             </div>
                         </tr>
                         <tr>
@@ -76,7 +76,7 @@
 
                 <li class="pl-3 pr-3 pb-2">
                     <a class="bugged"
-                            href="#">{{ category.name }}
+                            href="{% url 'cookhub:category' category.id %}">{{ category.name }}
                     </a>
                 </li>
                 {% endfor %}

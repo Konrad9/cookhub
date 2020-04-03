@@ -264,7 +264,7 @@ function applyFilters() {
                 }
                 
                 // get sorting
-                var sortBy = "";
+                var sortBy = $("button.dropbtn#dropper").text();
                 
                 // remember the query
                 var query = searchdata.query.attributes;
@@ -272,3 +272,33 @@ function applyFilters() {
                 console.log(query, checkedBoxes, rating, ingredients);
                 searchfiltered(searchdata.filtered);
 }
+
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function dropper() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+$("button.dropbtn.s").click(function () {
+    $("button.dropbtn#dropper").text($(this).text());
+    closeMenu();
+});
+
+// close the menu
+function closeMenu() {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+        }
+    }
+}
+
+// Close the dropdown menu if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    closeMenu();
+  }
+}             

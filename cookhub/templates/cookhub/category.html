@@ -1,0 +1,44 @@
+{% extends 'cookhub/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+    {{ category.name }}
+{% endblock %}
+
+
+
+{% block body_block %}
+<main role="main">
+    <div class="album p-0 m-0 py-5 pr-5 mr-5">
+        <div class="container">
+            <div class="row" style="text-align:center;">
+            {% if error %}
+            <h2 style="color:white;">{{ error }}</h2>
+            {% else %}
+            {% if recipes %}
+            {% for recipe in recipes %}
+            <div class="card mb-4 box-shadow" style="margin-right: 5px;margin-left: 5px;">
+            <img class="card-img-top" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;" src="/media/{{ recipe.photo }}" data-holder-rendered="true">
+            	<div class="card-body">
+            		<a class="card-text-title p-0 m-0" href="/recipe/{{ recipe.id }}">{{ recipe.title }}</a>
+            		<div class="d-flex justify-content-between align-items-center">
+            			<p class="card-text-author mt-2 mb-2">Creator:<a href="/profile/{{ recipe.user.username }}/">{{ recipe.user.username }}</a></p>
+            			<p class="card-text-rating mt-2 mb-2">Rating: {{ recipe.rating }}</p>
+            			<div class="btn-group">
+            				<button type="button" id="{{ recipe.id }}" class="btn btn-sm btn-outline-warning addRecipeButton" data-recipeid="{{ recipe.id }}">
+            				Save
+            				</button>
+            			</div>
+            		</div>
+            	</div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <h2 style="color:white;">No recipes present!</h2>
+            {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

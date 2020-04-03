@@ -610,6 +610,12 @@ class PaginationView(View):
             if not recipes:
                 return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
             #print("got by query...: " + query)
+            # sort the result
+            if sortBy:
+                if sortBy=="Newest":
+                    recipes = recipes.order_by("-creationDate")
+                elif sortBy=="Most popular":
+                    recipes = recipes.order_by("-views")
             # get by rating
             re = []
             if rating>=0.0:
@@ -658,12 +664,6 @@ class PaginationView(View):
             if not recipes:
                 return JsonResponse({"error": "no", "pages": 0, "data": "empty"})
             #print("got by ingredients...")
-            # sort the result
-            if sortBy:
-                if sortBy=="newest":
-                    recipes = recipes.order_by("-creationDate")
-                elif sortBy=="popular":
-                    recipes = recipes.order_by("-views")
         else:
             return JsonResponse({"error": "Wrong 'which' parameter"})
         
@@ -828,11 +828,23 @@ class GetAllCategoriesView(View):
             cat_dict[cat.id] = cat.name
         return JsonResponse(cat_dict)
     
-class Test(View):
-    def post(self, request):
-        attributes = json.loads(request.POST.get("attributes"))
-        rating = attributes.get("rating")
-        print(attributes)
-        print(rating)
-        print(request.POST.get("csrfmiddlewaretoken"))
-        return HttpResponse()
+class CategoryView(View):
+    def get(self, request, category_id):
+        try:
+            category = Category.objects.get(id=int(category_id))
+        except Category.DoesNotExist:
+            return render(request, "cookhub/category.html", {"error": "An error occurred, the category could not be found"})
+        recipeList = []
+        for recipe in Recipe.objects.all():
+            if category in recipe.categories.all():
+                recipeList.append(recipe)
+        return render(request,"cookhub/category.html", {"recipes": recipeList})
+    
+class ViewAllRecipes(View):
+    def get(self, request, what):
+        if what=="newest":
+            return render(request, "cookhub/view_all.html", {"type": "Newest Recipes", "recipes": Recipe.objects.order_by("-creationDate")})
+        if what=="popular":
+            return render(request, "cookhub/view_all.html", {"type": "Popular Recipes", "recipes": Recipe.objects.order_by("-views")})
+        else:
+            return render(request, "cookhub/view_all.html", {"type": "Recipes", "error": "Wrong parameter!"})

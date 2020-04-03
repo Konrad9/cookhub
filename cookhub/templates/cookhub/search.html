@@ -12,7 +12,24 @@
 {% block body_block %}
 <div class="jumbotron p-4 m-0">
     <div class="container">
-        <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Search{% if query %} results for: '{{ query }}'{% else %} page{% endif %}</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Search{% if query %} results for: '{{ query }}'{% else %} page{% endif %}</h1>
+            </div>
+            <div class="col-md-4">
+            </div>
+            <div class="col-md-4"> 
+                <div class="dropdown" style="text-align:right; margin-right: 250px; color:white;">
+                Sort by:
+                    <button onclick="dropper()" class="dropbtn" id="dropper">None</button>
+                    <div id="myDropdown" class="dropdown-content">
+                        <button class="dropbtn s">None</button>
+                        <button class="dropbtn s">Newest</button>
+                        <button class="dropbtn s">Most popular</button>
+                    </div>
+                </div> 
+            </div>
+        </div>
     </div>
 </div>
 
@@ -61,14 +78,14 @@
                     $("button#viewAllCategories").css("display", "none");
                     }
                 );
-            }
-            /*
+/*
                 <li>
                     <label for="category{{ category.id }}">
                     <input class="catCheckbox" type="checkbox" value="{{ category.id }}" id="category{{ category.id }}" /> {{ category.name }} 
                     </label>
                 </li>
-            */
+*/
+}
             
         </script>
             <ul id="categories">
@@ -80,7 +97,7 @@
                 </li>
             {% endfor %}
             </ul>
-            <button id="viewAllCategories" onclick="getAllCategories();" >View all categories</button>
+            <button id="viewAllCategories" onclick="getAllCategories('{% url 'cookhub:getAllCategories' %}', '{{ csrf_token }}');" >View all categories</button>
         {% else %}
         There are no categories present!
         {% endif %}
@@ -175,8 +192,4 @@ var searchdata = {
         }
 }
 </script>
-
-<style>
- 
-</style>
 {% endblock %}

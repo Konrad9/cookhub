@@ -27,5 +27,6 @@ urlpatterns = [
     path("search/", views.SearchView.as_view(), name="search"),
     path("search_query/", views.SearchQueryView.as_view(), name="search_query"),
     path("get_all_categories/", views.GetAllCategoriesView.as_view(), name="getAllCategories"),
-    path("test/", views.Test.as_view(), name="test"),
+    path("category/<category_id>/", views.CategoryView.as_view(), name="category"),
+    path("recipes/<what>/", views.ViewAllRecipes.as_view(), name="view_all"),
 ]

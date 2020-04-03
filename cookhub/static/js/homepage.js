@@ -37,9 +37,6 @@ function start(csrf_token, authenticated, NewestRecipePages, PopularRecipePages,
             $("em#PopularRecipePage").text("   " + page + "   "); // set the page counter
             RecipeGetter(csrf_token, RecipesPerPage, author, which, page, single, element, url, buttons);
             
-            setTimeout(function after() {
-                console.log("n is now: " + n);
-            }, 500)
             
             // retrieve last "Newest Recipes" page
             $("button.last#newest").click(function () {
