@@ -1,8 +1,8 @@
-function start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recipe_pagination, selected_user, remove_saved_recipe) {
+function start(csrf_token, authenticated, MyRecipePages, SavedRecipePages, recipe_pagination, selected_user, remove_saved_recipe, RecipesPerPage) {
         // set up of the initial look
         $("button.previous").attr("disabled", true);
         $("button.first").attr("disabled", true);
-        var RecipesPerPage = "3"; // set globally for the whole page and all requests
+        var RecipesPerPage = RecipesPerPage; // set globally for the whole page and all requests
         var author = selected_user; // also global; we are on "selected_user"'s profile
         var which = "my";
         var nextPageNumber = 1; // this is on load up obviously the first page

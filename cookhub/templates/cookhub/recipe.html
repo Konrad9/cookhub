@@ -7,8 +7,8 @@
 
 {% block head_block %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/recipe.css' %}" />
-    <link href="{% static 'css/base.css' %}" rel="stylesheet">
 {% endblock %}
+
 {% block body_block %}
     <div class="container p-4">
         <h1 id="heading" style="text-transform: uppercase" class="jumbotron-heading">"{{ recipe.title }}"</h1>
@@ -169,6 +169,16 @@
                     </tr>
                 {% endif %}
             {% endif %}
+                    <tr>
+                        <td>
+                            <button class="btn btn-outline-warning my-2 my-sm-0" type="submit"
+                                    style="border-radius:10rem" id="saveRecipeButton">Save Recipe
+                            </button>
+                            <button onclick="window.open('http://www.facebook.com/sharer.php?u='+window.location.href);"
+                                    class="btn btn-outline-warning my-2 my-sm-0" style="border-radius:10rem">
+                        			Share on Facebook</button>
+                        </td>
+                    </tr>
             <hr id="hr1">
         </div>
 
@@ -208,6 +218,7 @@
 
 
     <script type="text/javascript"> // left inline script because the recipe ID has to be inserted by the Django rendering engine
+
     function deleteRecipe() {
         if (confirm("Delete Recipe?\nPress OK to confirm deletion.")) {
             window.open("/recipe/{{ recipe.id }}/delete/", "_self");
