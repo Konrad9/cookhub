@@ -1,4 +1,4 @@
-function search(csrf_token, authenticated, recipePages, recipe_pagination, categoriesSTR) {
+function search(csrf_token, authenticated, recipePages, recipe_pagination, categoriesSTR, rating) {
     // load initial recipes for search
     $("button.previous").attr("disabled", true);
     $("button.first").attr("disabled", true);
@@ -12,7 +12,7 @@ function search(csrf_token, authenticated, recipePages, recipe_pagination, categ
     let buttons = "";
     let categories = categoriesSTR;
 
-    console.log(categories);
+    console.log(rating);
 
     // if the user is authenticated, then he can save the recipes, so we need buttons
     if (authenticated == "True") {
@@ -29,7 +29,7 @@ function search(csrf_token, authenticated, recipePages, recipe_pagination, categ
 
     // set page counter
     $("em#SearchRecipePage").text("   " + nextPageNum.toString() + "   ");
-    RecipeGetter(csrf_token, recipesPerPage, author, which, nextPageNum.toString(), single, element, url, buttons, null, categories);
+    RecipeGetter(csrf_token, recipesPerPage, author, which, nextPageNum.toString(), single, element, url, buttons, null, categories, rating);
 
 
     // retrieve last "Search Recipes" page
@@ -43,7 +43,7 @@ function search(csrf_token, authenticated, recipePages, recipe_pagination, categ
         $("button.next#search").attr("disabled", true); // we are on the last page,
         $(this).attr("disabled", true);                 // so there is no next or last anymore
         $("em#SearchRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
-        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories);
+        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories, rating);
     });
 
     // retrieve next "Search Recipes" page
@@ -59,7 +59,7 @@ function search(csrf_token, authenticated, recipePages, recipe_pagination, categ
             $("button.last#search").attr("disabled", true);
         }
         $("em#SearchRecipePage").text("   " + page + "   "); // update the page counter as long as there are next pages
-        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories);
+        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories, rating);
     });
 
     // retrieve previous "Search Recipes" page
@@ -75,7 +75,7 @@ function search(csrf_token, authenticated, recipePages, recipe_pagination, categ
             $("button.first#search").attr("disabled", true);
         }
         $("em#SearchRecipePage").text("   " + page + "   "); // update the page counter as long as there are previous pages
-        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories);
+        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories, rating);
     });
 
     // retrieve first "Search Recipes" page
@@ -89,6 +89,6 @@ function search(csrf_token, authenticated, recipePages, recipe_pagination, categ
         $("button.next#search").attr("disabled", false);     // we could click on "first", so there is a next
         $("button.last#search").attr("disabled", false);    // and a last, too
         $("em#SearchRecipePage").text("   " + page + "   "); // update the page counter as long as there are previous pages
-        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories);
+        RecipeGetter(csrf_token, recipesPerPage, author, which, page, single, element, url, buttons, null, categories, rating);
     });
 }

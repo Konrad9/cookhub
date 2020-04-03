@@ -45,7 +45,7 @@ class RecipeForm(forms.ModelForm):
     title = forms.CharField(max_length=40, help_text="Name of your recipe:", min_length=1)
     description = forms.CharField(widget=forms.Textarea, min_length=1, max_length=4000, help_text="How to make your recipe:")
     photo = forms.ImageField(required=False, help_text="Upload a photo of your recipe:")
-    time = forms.IntegerField(help_text="How long it takes to prepare your recipe:", min_value=1)
+    time = forms.IntegerField(help_text="How long it takes to prepare your recipe (min):", min_value=1)
     averageRating = forms.FloatField(widget=forms.HiddenInput(), initial=0, required=False)
     servings = forms.IntegerField(help_text="The number of people your recipe serves:", min_value=1)
     creationDate = forms.DateTimeField(widget=forms.HiddenInput(), initial=timezone.now(), required=False)
@@ -57,7 +57,7 @@ class RecipeForm(forms.ModelForm):
         exclude = ('user',)
         
 class CommentForm(forms.ModelForm):
-    text = forms.CharField(widget=forms.Textarea, max_length = 400)
+    text = forms.CharField(widget=forms.Textarea, max_length = 400, min_length=1)
     creationDate = forms.DateTimeField(widget=forms.HiddenInput(), required=False)
     
     class Meta:
@@ -72,15 +72,15 @@ class RatingForm(forms.ModelForm):
         exclude = ('user', 'recipe',)
 
 class CategoryForm(forms.ModelForm):
-    name = forms.CharField(max_length=20)
+    name = forms.CharField(max_length=20, min_length=1)
     
     class Meta:
         model = Category
         fields = ('name',)
 
 class IngredientForm(forms.ModelForm):
-    name = forms.CharField(max_length=20, help_text='Name of the ingredient:')
-    quantity = forms.IntegerField(help_text='How many units of ingredient are there', min_value=0)
+    name = forms.CharField(max_length=20, min_length=1, help_text='Name of the ingredient:')
+    quantity = forms.IntegerField(help_text='How many units of ingredient are there', min_value=1)
     unit = forms.CharField(max_length=20, help_text='Unit used for the ingredient (can be blank)', required=False)
     
     class Meta:

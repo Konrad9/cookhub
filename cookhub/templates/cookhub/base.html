@@ -35,7 +35,7 @@
         <a class="navbar-brand p-0" href="{% url 'cookhub:homepage' %}"><img src="{% static 'images/logo.png' %}"/
             id="logoImage"></a>
         <div class="collapse navbar-collapse pr-3" id="navbarCollapse">
-            <ul class="navbar-nav mr-auto mb-0 mt-0">
+            <ul class="navbar-nav mr-auto">
 
                 {# TODO: Search function #}
                 <form class="form-inline mt-2 mt-md-0"
@@ -44,17 +44,18 @@
                       style="width: 570px; min-width: 570px;"
                       action="">
                     {% csrf_token %}
-                    <div class="form-group">
+                    <li class="form-group">
 
-                        <input class="form-control mr-sm-2 mb-0 ml-0"
+                        <input class="form-control mr-sm-2"
                                type="text"
                                name="query"
                                id="query"
 
                                {% if query %}
                                value={{ query }}>
-                               {% endif %}
-                    </div>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
                         <button class="btn btn-outline-warning my-2 my-sm-0"
                                 type="submit"
                                 style="border-radius:10rem"
@@ -62,6 +63,7 @@
                                 formmethod="GET"
                                 formaction="{% url 'cookhub:search' %}">Search
                         </button>
+                    </li>
                 </form>
             </ul>
             <ul class="navbar-nav mt-2 mt-md-0">{% if user.is_authenticated %}
@@ -97,7 +99,78 @@
                 {% endif %}
             </ul>
         </div>
-        </nav>
+        <div id="resizedNavbar">
+            <a href="javascript:void(0);" class="icon" onclick="openNavbar()" style="display: none;">
+                <i class="fa fa-bars"></i>
+            </a>
+            <div id="mySidenav" class="sidenavigation">
+                {% if user.is_authenticated %}
+                <em id="usernameDisplay">Welcome back,<br/>{{ user.username }}</em>
+                {% else %}
+                <em id="usernameDisplay">You are not logged in.</em>
+                {% endif %}
+                <p class="closebtn pointer" onclick="closeNavbar()">&times;</p>
+                <p>
+                <form action=""
+                      class="form-inline mt-2 mt-md-0"
+                      id="user-form"
+                      method="post">
+                    {% csrf_token %}
+
+                    <input class="form-control"
+                           type="text"
+                           name="query"
+                           id="query"
+                           {% if query %}
+                           value={{ query }}
+                           {% endif %}}>
+
+                    <button class="btn btn-outline-warning my-2 my-sm-0"
+                            type="submit"
+                            style="border-radius:8rem; color:white;"
+                            name="submit"
+                            formmethod="GET"
+                            formaction="{% url 'cookhub:search' %}">Search
+                    </button>
+
+                </form>
+                </p>
+                {% if user.is_authenticated %}
+                <p>
+                    <a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit"
+                       style="border-radius:10rem" href="{% url 'cookhub:create_recipe' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 27" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="feather feather-edit">
+                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                        </svg>
+                        New Recipe</a>
+                </p>
+                <p>
+                    <a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit"
+                       style="border-radius:10rem" href="{% url 'cookhub:profile' user.username %}">My
+                        Profile</a>
+                </p>
+                <p>
+                    <a class="btn btn-outline-warning my-2 my-sm-0" type="submit"
+                       style="border-radius:10rem" href="{% url 'cookhub:logout' %}?next=/cookhub/">
+                        Logout</a>
+                </p>
+                {% else %}
+                <p>
+                    <a class="btn btn-outline-warning my-2 my-sm-0 mr-2" type="submit"
+                       style="border-radius:10rem" href="{% url 'cookhub:register' %}" name="submit">Register</a>
+                </p>
+                <p>
+                    <a class="btn btn-outline-warning my-2 my-sm-0" type="submit"
+                       style="border-radius:10rem" href="{% url 'cookhub:login' %}"
+                       name="submit">Login</a>
+                </p>
+                {% endif %}
+            </div>
+            <div>
+    </nav>
 </header>
 <div class="container-fluid pr-0 pl-0 ml-0 pt-5 mt-5">
 
