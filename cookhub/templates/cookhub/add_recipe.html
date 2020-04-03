@@ -31,6 +31,7 @@
 				{{ field.help_text }}
 				{{ field }} <br />
 			{% endfor %}
+			<input type="submit" id="addRecipe" value="Finished Recipe" style="display:none;" />
 			<style>
     		#id_categories {
         		columns: 3; 
@@ -96,8 +97,8 @@
 				<button class="btn btn-outline-warning my-2 my-sm-0"
                         style="border-radius:10rem" id="addIngredient" >Add Ingredient</button>
 			</form>
-        <input class="btn btn-outline-warning my-2 my-sm-0 ml-0 btn-block"
-               style="border-radius:10rem; width: 500px" type="submit" name="addRecipe" value="Publish Recipe" />
+        <button class="btn btn-outline-warning my-2 my-sm-0 ml-0 btn-block" onclick="$('input#addRecipe').trigger('click');"
+               style="border-radius:10rem; width: 500px" name="addRecipe">Publish Recipe</button>
 			<script src="{% static 'js/recipeAddIngredient.js' %}"></script>
 			<script>
         			$("button#addIngredient").click( function(event) {
