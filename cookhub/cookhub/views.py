@@ -855,7 +855,7 @@ class CategoryView(View):
         for recipe in Recipe.objects.all():
             if category in recipe.categories.all():
                 recipeList.append(recipe)
-        return render(request,"cookhub/category.html", {"recipes": recipeList})
+        return render(request,"cookhub/category.html", {"recipes": recipeList, "category":category})
     
 class ViewAllRecipes(View):
     def get(self, request, what):
