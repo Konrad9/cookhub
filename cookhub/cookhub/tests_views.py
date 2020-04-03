@@ -398,15 +398,28 @@ class CategoriesViewTestCase(TestCase):
         self.assertContains(response, 'My Profile')
         self.assertContains(response, 'Logout')
 
-'''
-class SearchQueryViewTestCase(TestCase):
-    def test_searchQueryViewTestCase_view_no_recipes(self):
-        response = self.client.get(reverse('cookhub:search_query'))
+class ProfileViewTestCase(TestCase):
+    def test_profile_view_no_recipes(self):
+        user = add_user('username', 'bob@gmail.com', 'Bob', 'Bobbington', 'g00gl315b4d')
+        add_userModel(user)
+        self.client.force_login(user)
         
+        response = self.client.get(reverse('cookhub:profile', kwargs={'username':'username'}))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'No recipes present')
-        self.assertEquals(response.context['NumberOfPages'], 0)
-'''
+        self.assertEquals(response.context['SavedRecipePages'], 0)
+        self.assertEquals(response.context['MyRecipePages'], 0)
+    
+    def test_profile_view_with_recipes(self):
+        user = add_user('username', 'bob@gmail.com', 'Bob', 'Bobbington', 'g00gl315b4d')
+        add_userModel(user)
+        self.client.force_login(user)
+        recipe = add_recipe('Meatballs', 'Make a bunch of Meatballs', 10, 1, user)
+        
+        response = self.client.get(reverse('cookhub:profile', kwargs={'username':'username'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['MyRecipePages'] > 0)
+        
+        
 
 
 
