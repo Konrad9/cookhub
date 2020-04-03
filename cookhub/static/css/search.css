@@ -35,12 +35,12 @@
   color: #f1f1f1;
 }
 
-/* Style page content 
+
 .container {
-  margin-right: 250px; /* Same as the width of the sidebar */
+  margin-right: 250px;
   padding: 0px 10px;
 }
-*/
+
 
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
@@ -93,3 +93,25 @@
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;}
+
+#results {
+  color: #ffd32d;
+}
+
+#side_nav_search {
+  color: white;
+}
+
+hr {
+  border: #ffd32d 1px solid;
+}
+
+#ingredientInput {
+  background-color: #252525;
+  color: white;
+  border-radius: 10rem;
+  padding-left: 10px;
+  font-size: 15px;
+  border: 0px;
+  margin-bottom: 7px;
+}

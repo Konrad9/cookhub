@@ -2,194 +2,213 @@
 {% load staticfiles %}
 
 {% block title_block %}
- Search
+    Search
 {% endblock %}
 
 {% block head_block %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/search.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/search.css' %}"/>
 {% endblock %}
 
 {% block body_block %}
-<div class="jumbotron p-4 m-0">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Search{% if query %} results for: '{{ query }}'{% else %} page{% endif %}</h1>
-            </div>
-            <div class="col-md-4">
-            </div>
-            <div class="col-md-4"> 
-                <div class="dropdown" style="text-align:right; margin-right: 250px; color:white;">
-                Sort by:
-                    <button onclick="dropper()" class="dropbtn" id="dropper">None</button>
-                    <div id="myDropdown" class="dropdown-content">
-                        <button class="dropbtn s">None</button>
-                        <button class="dropbtn s">Newest</button>
-                        <button class="dropbtn s">Most popular</button>
+    <div class="jumbotron p-4 m-0">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h1 style="color: white; text-transform: uppercase" class="jumbotron-heading">Search{% if query %}
+                        results for: '{{ query }}'{% else %} page{% endif %}</h1>
+                </div>
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-4">
+                    <div class="dropdown" style="text-align:right; margin-right: 250px; color:white;">
+                        Sort by:
+                        <button onclick="dropper()" class="dropbtn" id="dropper">None</button>
+                        <div id="myDropdown" class="dropdown-content">
+                            <button class="dropbtn s">None</button>
+                            <button class="dropbtn s">Newest</button>
+                            <button class="dropbtn s">Most popular</button>
+                        </div>
                     </div>
-                </div> 
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="album py-5">
-    <div class="container">
-    
-                    <div style="text-align:center;">
-                    <hr style="border-color: white; margin-right: 250px;"/>
-                            <div class="row" id="results" style="margin-right: 250px;">
-                            </div>
+    <div class="album py-5">
+        <div class="container">
 
-                        
-                            <div style="margin-right:250px;">
-                                <button class="first btn btn-outline-warning my-2 my-sm-0" id="results">First Page</button>
-                                <button class="previous btn btn-outline-warning my-2 my-sm-0" id="results">&laquo; Previous</button>
-                                <strong><em class="pr-2 pl-2" id="ResultsRecipePage" style="color: white"> 1 </em></strong>
-                                <button class="next btn btn-outline-warning my-2 my-sm-0" id="results">Next &raquo;</button>
-                                <button class="last btn btn-outline-warning my-2 my-sm-0" id="results">Last Page</button>
-                            </div>
-                       </div>
+            <div style="text-align:center;">
+                <hr style="border-color: white; margin-right: 250px;"/>
+                <div class="row" id="results" style="margin-right: 250px;">
+                </div>
+
+
+                <div style="margin-right:250px;">
+                    <button class="first btn btn-outline-warning my-2 my-sm-0" id="results">First Page</button>
+                    <button class="previous btn btn-outline-warning my-2 my-sm-0" id="results">&laquo; Previous</button>
+                    <strong><em class="pr-2 pl-2" id="ResultsRecipePage" style="color: white"> 1 </em></strong>
+                    <button class="next btn btn-outline-warning my-2 my-sm-0" id="results">Next &raquo;</button>
+                    <button class="last btn btn-outline-warning my-2 my-sm-0" id="results">Last Page</button>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script type="text/javascript" src="{% static 'js/search.js' %}"></script>
-<div class="sidenav pt-5 mt-5" style="background: white;">
-        <br />
-        <h2 class="pl-5 pb-3" >Filter Results</h2>
-        <hr />
-        <h5> By Categories </h5>
+    <script type="text/javascript" src="{% static 'js/search.js' %}"></script>
+    <div class="sidenav pl-4 pt-3 mt-5" id="side_nav_search" style="background: #1c1c1c;">
+        <br/>
+        <h2 id="results" class="">Filter Results</h2>
+        <hr class="mr-4">
+        <h5 class="mb-0"> By Categories </h5>
         <p>
-        {% if categories %}
-        <script>
-            url = "{% url 'cookhub:getAllCategories' %}";
-            csrf_token =  "{{ csrf_token }}";
-            function getAllCategories() {
-                $.post(url, {"csrfmiddlewaretoken": csrf_token}, 
-                    function(json) {
-                        $("ul#categories").empty();
-                        for (var id in json) {
-                             $("ul#categories").append("<li><label for='category" +
-                             id + "'><input name='catBox' type='checkbox' value='" + 
-                             id + "' id='category" +
-                             id + "' />" +
-                             json[id] +" </label></li>");
-                        }
-                    $("button#viewAllCategories").css("display", "none");
-                    }
-                );
-/*
-                <li>
-                    <label for="category{{ category.id }}">
-                    <input class="catCheckbox" type="checkbox" value="{{ category.id }}" id="category{{ category.id }}" /> {{ category.name }} 
+            {% if categories %}
+                <script>
+                    url = "{% url 'cookhub:getAllCategories' %}";
+                    csrf_token = "{{ csrf_token }}";
+
+                    function getAllCategories() {
+                        $.post(url, {"csrfmiddlewaretoken": csrf_token},
+                            function (json) {
+                                $("ul#categories").empty();
+                                for (var id in json) {
+                                    $("ul#categories").append("<li><label for='category" +
+                                        id + "'><input name='catBox' type='checkbox' value='" +
+                                        id + "' id='category" +
+                                        id + "' />" +
+                                        json[id] + " </label></li>");
+                                }
+                                $("button#viewAllCategories").css("display", "none");
+                            }
+                        );
+                        /*
+                                        <li>
+                                            <label for="category
+                        {{ category.id }}">
+                    <input class="catCheckbox" type="checkbox" value="
+                        {{ category.id }}" id="category
+                        {{ category.id }}" />
+                        {{ category.name }}
                     </label>
                 </li>
 */
-}
-            
-        </script>
-            <ul id="categories">
-            {% for category in categories %}
-                <li>
-                    <label for="category{{ category.id }}">
-                    <input name="catBox" type="checkbox" value="{{ category.id }}" id="category{{ category.id }}" /> {{ category.name }} 
-                    </label>
-                </li>
-            {% endfor %}
-            </ul>
-            <button id="viewAllCategories" onclick="getAllCategories('{% url 'cookhub:getAllCategories' %}', '{{ csrf_token }}');" >View all categories</button>
-        {% else %}
-        There are no categories present!
-        {% endif %}
+                    }
+
+                </script>
+                <ul id="categories">
+                    {% for category in categories %}
+                        <li>
+                            <label for="category{{ category.id }}">
+                                <input name="catBox" type="checkbox" value="{{ category.id }}"
+                                       id="category{{ category.id }}"/> {{ category.name }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <button class="btn btn-outline-warning my-2 my-sm-0 ml-2"
+                        style="border-radius:10rem;" id="viewAllCategories"
+                        onclick="getAllCategories('{% url 'cookhub:getAllCategories' %}', '{{ csrf_token }}');">View all
+                    categories
+                </button>
+            {% else %}
+                There are no categories present!
+            {% endif %}
         </p>
-        <hr />
+        <hr class="mr-4">
         <h5> By Rating </h5>
-        <p> 
+        <p>
         <div class="slidecontainer">
-            <input oninput="sliderFunction()" type="range" min="0" max="50" value="0" id="ratingSlider" class="slider" /><br />
+            <input oninput="sliderFunction()" type="range" min="0" max="50" value="0" id="ratingSlider" class="slider"/><br/>
             Value: <em id="sliderValue">0.0</em>
         </div>
-            <style>
-                
-            </style>
+        <style>
+
+        </style>
         </p>
-        <hr />
+        <hr class="mr-4">
         <h5> Include Ingredients </h5>
-        <p>
-            <input type="text" id="ingredientInput" />
-            <button onclick="addIngredient();">Add</button>
-            <ul id="ingredientList"></ul>
+        <p class="pl-0 pt-0">
+            <input type="text" id="ingredientInput" style="width: 180px; height: 30px"/>
+            <button class="btn btn-block btn-outline-warning my-2 my-sm-0 ml-0"
+                    style="border-radius:10rem; width: 180px" onclick="addIngredient();">Add
+            </button>
+        <ul id="ingredientList"></ul>
         </p>
-        <hr />
-        <p>
-        <button id="clearFilters" onclick="clearFilters();" >Clear Filters</button>
-        <button id="applyFilters" onclick="applyFilters();" >Apply Filters</button>
+        <hr class="mr-4">
+        <p class="m-0 p-0">
+            <button class="btn btn-block btn-outline-warning my-2 my-sm-0 ml-0"
+                    style="border-radius:10rem; width: 180px" id="clearFilters" onclick="clearFilters();">Clear Filters
+            </button>
         </p>
-        <br />
-</div>
-<script>
-$(document).ready(function() {
-        if ("{{ do }}"=="yes") {
-            // for when we are redirected from the homepage
-            var query = "{{ query }}";
-            var authenticated = "{{ user.is_authenticated }}";
-            var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
-            var csrf_token = "{{ csrf_token }}";
-            var RecipesPerPage = {{ RecipesPerPage }};
-            var NumberOfPages = {{ NumberOfPages }};
-            searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPage, query, NumberOfPages);
-        }
-    
-    
-    
-    {% if user.is_authenticated %}
-    // save recipes, only possible if the user is authenticated
-    $("body").on("click", "button.addRecipeButton", function () {
-        var recipeID = $(this).attr("data-recipeid");
-        $(this).attr("disabled", true);
-        $(this).html("Saved");
-        $.post("{% url 'cookhub:save_recipe' %}",
-            {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"})
-    });
-   {% endif %}
-});
+        <p class="pl-0 mt-1">
+            <button id="apply" class="btn btn-block btn-outline-warning my-2 my-sm-0 ml-0"
+                    style="border-radius:10rem; width: 180px" id="applyFilters" onclick="applyFilters();">Apply Filters
+            </button>
+        </p>
+        <br/>
+    </div>
+    <script>
+        $(document).ready(function () {
+            if ("{{ do }}" == "yes") {
+                // for when we are redirected from the homepage
+                var query = "{{ query }}";
+                var authenticated = "{{ user.is_authenticated }}";
+                var recipe_pagination = "{% url 'cookhub:recipe_pagination' %}";
+                var csrf_token = "{{ csrf_token }}";
+                var RecipesPerPage = {{ RecipesPerPage }};
+                var NumberOfPages = {{ NumberOfPages }};
+                searchquery(csrf_token, authenticated, recipe_pagination, RecipesPerPage, query, NumberOfPages);
+            }
 
-</script>
 
-<script>
-var searchdata = {
-        "query": {
-            "csrf_token": "{{ csrf_token }}",
-            "RecipesPerPage": {{ RecipesPerPage }},
-            "author": "#",
-            "which": "query",
-            "NumberOfPages": {{ NumberOfPages }},
-            "single": "0",
-            "element":"div.row#results",
-            "url": "{% url 'cookhub:recipe_pagination' %}",
+
             {% if user.is_authenticated %}
-            "buttons": "yes",
-            {% else %}
-            "buttons": "",
+                // save recipes, only possible if the user is authenticated
+                $("body").on("click", "button.addRecipeButton", function () {
+                    var recipeID = $(this).attr("data-recipeid");
+                    $(this).attr("disabled", true);
+                    $(this).html("Saved");
+                    $.post("{% url 'cookhub:save_recipe' %}",
+                        {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"})
+                });
             {% endif %}
-            "attributes": "{{ query }}"
-        },
-        "filtered": {
-            "csrf_token": "{{ csrf_token }}",
-            "RecipesPerPage": {{ RecipesPerPage }},
-            "author": "#",
-            "which": "filtered",
-            "NumberOfPages": "",
-            "single": "0",
-            "element":"div.row#results",
-            "url": "{% url 'cookhub:recipe_pagination' %}",
-            {% if user.is_authenticated %}
-            "buttons": "yes",
-            {% else %}
-            "buttons": "",
-            {% endif %}
-            "attributes": ""
+        });
+
+    </script>
+
+    <script>
+        var searchdata = {
+            "query": {
+                "csrf_token": "{{ csrf_token }}",
+                "RecipesPerPage": {{ RecipesPerPage }},
+                "author": "#",
+                "which": "query",
+                "NumberOfPages": {{ NumberOfPages }},
+                "single": "0",
+                "element": "div.row#results",
+                "url": "{% url 'cookhub:recipe_pagination' %}",
+                {% if user.is_authenticated %}
+                    "buttons": "yes",
+                {% else %}
+                    "buttons": "",
+                {% endif %}
+                "attributes": "{{ query }}"
+            },
+            "filtered": {
+                "csrf_token": "{{ csrf_token }}",
+                "RecipesPerPage": {{ RecipesPerPage }},
+                "author": "#",
+                "which": "filtered",
+                "NumberOfPages": "",
+                "single": "0",
+                "element": "div.row#results",
+                "url": "{% url 'cookhub:recipe_pagination' %}",
+                {% if user.is_authenticated %}
+                    "buttons": "yes",
+                {% else %}
+                    "buttons": "",
+                {% endif %}
+                "attributes": ""
+            }
         }
-}
-</script>
+    </script>
 {% endblock %}
