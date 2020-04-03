@@ -24,11 +24,13 @@
             		<div class="d-flex justify-content-between align-items-center">
             			<p class="card-text-author mt-2 mb-2">Creator:<a href="/profile/{{ recipe.user.username }}/">{{ recipe.user.username }}</a></p>
             			<p class="card-text-rating mt-2 mb-2">Rating: {{ recipe.rating }}</p>
+            			{% if user.is_authenticated %}
             			<div class="btn-group">
             				<button type="button" id="{{ recipe.id }}" class="btn btn-sm btn-outline-warning addRecipeButton" data-recipeid="{{ recipe.id }}">
             				Save
             				</button>
             			</div>
+            			{% endif %}
             		</div>
             	</div>
             </div>
@@ -41,4 +43,23 @@
         </div>
     </div>
 </div>
+{% if user.is_authenticated %}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            
+            
+                // save recipes, only possible if the user is authenticated
+                $("body").on("click", "button.addRecipeButton", function () {
+                    var recipeID = $(this).attr("data-recipeid");
+                    $(this).attr("disabled", true);
+                    $(this).html("Saved");
+                    $.post("{% url 'cookhub:save_recipe' %}",
+                        {"recipeID": recipeID, "csrfmiddlewaretoken": "{{ csrf_token }}"})
+                });
+            
+
+        });
+    </script>
+    {% endif %}
 {% endblock %}

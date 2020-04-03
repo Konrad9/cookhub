@@ -278,11 +278,9 @@ class ProfileView(View):
         except TypeError:
             return redirect(reverse('cookhub:homepage'))
         
-        print("here")
         form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 
         if form.is_valid():
-            print("form is valid")
             newmail = request.POST.get("email")
             user.email = newmail
             user.save()
