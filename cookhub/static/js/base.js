@@ -9,7 +9,7 @@ function closeNavbar() {
 $(document).ready(function(){
    // resize the search bar on window resize
    function searchbarResize() {
-       $("input#query").attr("style", "width:"+($(window).width()/4).toString()+"px; border-radius:10rem; background-color: #252525; color: #f8f9fa; border-color: #252525");
+       $("input#query").attr("style", "width:"+($(window).width()/4).toString()+"px; min-width:219px; border-radius:10rem; background-color: #252525; color: #f8f9fa; border-color: #252525");
    }
    // show sidebar button and hide the top navigation bar
    function sidebarShow() {
