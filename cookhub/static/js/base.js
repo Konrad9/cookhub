@@ -1,11 +1,15 @@
+// opens side navigation
 function openNavbar() {
     document.getElementById("mySidenav").style.width = "250px";
 }
 
+// closes the side navigation
 function closeNavbar() {
     document.getElementById("mySidenav").style.width = "0";
 }
 
+// switches between normal top navigation bar and sandwich button and side navigation,
+// also adjusts the searchbar length slightly according to window width
 $(document).ready(function(){
    // resize the search bar on window resize
    function searchbarResize() {

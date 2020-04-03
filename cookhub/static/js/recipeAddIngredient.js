@@ -1,3 +1,4 @@
+// adds an ingredient to the list of ingredients when creating a new recipe
 function addIng(url, btn, recipeID) {
     $.post(url,{"name": $(btn).closest("#ingredient_form").children("input#id_name").val(),
     			 "quantity": $("input#id_quantity").val(),

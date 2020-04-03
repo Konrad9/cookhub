@@ -61,33 +61,29 @@
         <hr class="mr-4">
         <h5 class="mb-0"> By Categories </h5>
         <p>
-            {% if categories %}
-                <script>
-                    url = "{% url 'cookhub:getAllCategories' %}";
-                    csrf_token = "{{ csrf_token }}";
-
-                    function getAllCategories() {
-                        $.post(url, {"csrfmiddlewaretoken": csrf_token},
-                            function (json) {
-                                $("ul#categories").empty();
-                                for (var id in json) {
-                                    $("ul#categories").append("<li><label for='category" +
-                                        id + "'><input name='catBox' type='checkbox' value='" +
-                                        id + "' id='category" +
-                                        id + "' />" +
-                                        json[id] + " </label></li>");
-                                }
-                                $("button#viewAllCategories").css("display", "none");
-                            }
-                        );
-                        /*
-                                        <li>
-                                            <label for="category
-                        {{ category.id }}">
-                    <input class="catCheckbox" type="checkbox" value="
-                        {{ category.id }}" id="category
-                        {{ category.id }}" />
-                        {{ category.name }}
+        {% if categories %}
+        <script>
+            // could not be put into external file because of parameters passed by django rendering engine
+            url = "{% url 'cookhub:getAllCategories' %}";
+            csrf_token =  "{{ csrf_token }}";
+            function getAllCategories() {
+                $.post(url, {"csrfmiddlewaretoken": csrf_token}, 
+                    function(json) {
+                        $("ul#categories").empty();
+                        for (var id in json) {
+                             $("ul#categories").append("<li><label for='category" +
+                             id + "'><input name='catBox' type='checkbox' value='" + 
+                             id + "' id='category" +
+                             id + "' />" +
+                             json[id] +" </label></li>");
+                        }
+                    $("button#viewAllCategories").css("display", "none");
+                    }
+                );
+/* This is what the function displays:
+                <li>
+                    <label for="category{{ category.id }}">
+                    <input class="catCheckbox" type="checkbox" value="{{ category.id }}" id="category{{ category.id }}" /> {{ category.name }} 
                     </label>
                 </li>
 */

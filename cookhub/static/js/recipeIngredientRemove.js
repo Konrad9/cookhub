@@ -1,3 +1,4 @@
+// removes an ingredient from the list of added ones when creating a new recipe
 function remIng(url, csrf_token, btn) {
         			var ingredientID = $(btn).attr("data-ingredientid");
         			$.post(url,
