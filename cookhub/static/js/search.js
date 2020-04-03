@@ -138,6 +138,7 @@ function firstResultButton(e) {
 
 // clear all filters
 function clearFilters() {
+    $("button.dropbtn#dropper").text("None");
     clearResetup(searchdata.query);
     $("input").removeAttr("checked");
     $("input#ratingSlider").val("0");

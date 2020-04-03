@@ -45,21 +45,10 @@ Login
 </form>
 <script> 
 window.onload = function() {
-    document.getElementById("login_link").remove();
-    document.getElementById("register_link").remove();
-    
+    document.getElementById("loginLink").remove();
+    {% if invalidDetails %}
+    alert("{{ invalidDetails }}");
+    {% endif %}
 }
 </script>
-<!--
-<h1>Login</h1>
-
-<form method="post" action=".">
-    {% csrf_token %}
-    
-    {{ form.as_p }}
-    
-    <input type="submit" value="Log In" />
-    <input type="hidden" name="next" value="{{ next }}" />
-</form>
--->
 {% endblock %}

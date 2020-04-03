@@ -59,9 +59,11 @@ def populate():
     
     commentsList = ["Great", "Good", "Tasty", "can recommend!", "Would do it again, very tasty"]
     
+    populationPath = os.path.join(STATIC_DIR, "population")
+    
     # get the lorem ipsum recipe descriptions
     recipeDescriptions = []
-    with open(os.path.join(STATIC_DIR, "population\\"+"loremipsum.txt"), "r") as f:
+    with open(os.path.join(populationPath, "loremipsum.txt"), "r") as f:
         recipeDescriptions = f.read().split("\n\n")
     
     print("\nAdding users:")
@@ -84,7 +86,7 @@ def populate():
         userList += [user]
         usrMdl = UserModel.objects.get_or_create(user=user)[0]
         photoSource = photoFiles.get("users")[i]
-        photo = open(os.path.join(STATIC_DIR, "population\\"+photoSource), "rb")
+        photo = open(os.path.join(populationPath, photoSource), "rb")
         usrMdl.picture.save(photoSource, File(photo), save=True)
         photo.close()
         print("- "+username)
@@ -111,7 +113,7 @@ def populate():
         title = recipes[i]
         description = recipeDescriptions[random.randrange(0, len(recipeDescriptions))]
         photoSource = photoFiles.get("recipes")[i]
-        photoFile = open(os.path.join(STATIC_DIR, "population\\"+photoSource), "rb")
+        photoFile = open(os.path.join(populationPath, photoSource), "rb")
         photo = File(photoFile)
         time = random.randrange(1,100)
         averageRating = float("{:.1f}".format(random.uniform(0.0, 5.0)))
